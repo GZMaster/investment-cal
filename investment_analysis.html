@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Strategy with Currency Appreciation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .scenario-selector {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .scenario-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .scenario-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #6c757d;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .scenario-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .scenario-btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .comparison-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .strategy-card {
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .compound-card {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .two-tier-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .strategy-card.winner {
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        
+        .strategy-card h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+        }
+        
+        .strategy-card .amount {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .strategy-card .description {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .winner-badge {
+            background: #ffd700;
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        
+        .currency-info {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            color: #721c24;
+            text-align: center;
+        }
+        
+        .currency-info h3 {
+            margin-top: 0;
+            color: #721c24;
+        }
+        
+        .breakeven-info {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            color: #155724;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .table-header {
+            padding: 15px;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #f8f9fa;
+            color: #333;
+            padding: 12px 10px;
+            text-align: right;
+            font-weight: 600;
+        }
+        
+        th:first-child {
+            text-align: left;
+        }
+        
+        td {
+            padding: 10px;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+        }
+        
+        td:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .total-row {
+            background: #e3f2fd !important;
+            font-weight: bold;
+        }
+        
+        .number {
+            font-family: 'Courier New', monospace;
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .analysis {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            color: #856404;
+        }
+        
+        @media (max-width: 768px) {
+            .scenario-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Investment Strategy with USD Appreciation</h1>
+        
+        <div class="scenario-selector">
+            <h3>Select Investment Parameters</h3>
+            <div style="margin-bottom: 15px;">
+                <label><strong>Time Period:</strong></label>
+                <select id="timePeriod" onchange="updateTimePeriod()" style="margin-left: 10px; padding: 5px 10px; border-radius: 5px; border: 1px solid #ccc;">
+                    <option value="1">1 Year</option>
+                    <option value="2">2 Years</option>
+                </select>
+            </div>
+            <p>Choose how much USD strengthens against Naira annually</p>
+            <div class="scenario-buttons">
+                <button class="scenario-btn active" onclick="updateScenario(0)">No Change (₦1,650)</button>
+                <button class="scenario-btn" onclick="updateScenario(5)">5% Appreciation</button>
+                <button class="scenario-btn" onclick="updateScenario(10)">10% Appreciation</button>
+                <button class="scenario-btn" onclick="updateScenario(15)">15% Appreciation</button>
+                <button class="scenario-btn" onclick="updateScenario(20)">20% Appreciation</button>
+                <button class="scenario-btn" onclick="updateScenario(25)">25% Appreciation</button>
+            </div>
+        </div>
+        
+        <div class="currency-info" id="currencyInfo">
+            <h3>Current Scenario: No USD Appreciation</h3>
+            <p><strong>Exchange Rate:</strong> ₦1,650 → ₦1,650 (No change)</p>
+            <p><strong>USD Portfolio Value:</strong> $1,090.94 = ₦1,800,000</p>
+        </div>
+        
+        <div class="comparison-cards">
+            <div class="strategy-card compound-card" id="compoundCard">
+                <h3>Strategy A: Compound in PiggyVest</h3>
+                <div class="amount" id="compoundAmount">₦1,956,182</div>
+                <div class="description">Reinvest all interest at 18% annually</div>
+                <div class="winner-badge" id="compoundBadge">WINNER! +₦118,857</div>
+            </div>
+            <div class="strategy-card two-tier-card" id="twoTierCard">
+                <h3>Strategy B: Two-Tier Investment</h3>
+                <div class="amount" id="twoTierAmount">₦1,837,325</div>
+                <div class="description">Transfer interest to USD + appreciation</div>
+                <div class="winner-badge" id="twoTierBadge" style="display: none;">WINNER!</div>
+            </div>
+        </div>
+        
+        <div class="breakeven-info">
+            <h4>💡 Breakeven Analysis</h4>
+            <p id="breakevenText"><strong>The two-tier strategy becomes more profitable when USD appreciates by approximately 7.2% annually or more.</strong></p>
+            <p id="breakevenDetail">At 7.2% appreciation (₦1,650 → ₦1,769), both strategies yield similar returns.</p>
+        </div>
+        
+        <div class="table-container">
+            <div class="table-header">
+                Two-Tier Strategy with Currency Appreciation
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Naira Interest</th>
+                        <th>USD Added</th>
+                        <th>Cumulative USD</th>
+                        <th>USD Interest</th>
+                        <th>Exchange Rate</th>
+                        <th>USD Value (₦)</th>
+                        <th>Total Earnings</th>
+                    </tr>
+                </thead>
+                <tbody id="currencyTable">
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="highlight" id="summarySection">
+            <h3>Annual Summary</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+                <div>
+                    <h4 style="color: #11998e;">Strategy A: Compound Interest</h4>
+                    <p><strong>Total Earnings:</strong> <span class="number">₦1,956,182</span></p>
+                    <p><strong>Final Balance:</strong> <span class="number">₦11,956,182</span></p>
+                    <p><strong>Effective Rate:</strong> <span class="number">19.56%</span></p>
+                </div>
+                <div>
+                    <h4 style="color: #f5576c;">Strategy B: Two-Tier + Appreciation</h4>
+                    <p><strong>Total Earnings:</strong> <span class="number" id="twoTierTotal">₦1,837,325</span></p>
+                    <p><strong>USD Portfolio:</strong> <span class="number">$1,090.94</span></p>
+                    <p><strong>USD Value:</strong> <span class="number" id="usdValue">₦1,800,000</span></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="analysis">
+            <h4>Key Insights:</h4>
+            <ul id="insightsList">
+                <li>With no USD appreciation, compound strategy wins by ₦118,857</li>
+                <li>USD needs to appreciate ~7.2% annually to break even with compound strategy</li>
+                <li>Nigeria's historical USD/NGN appreciation has often exceeded 10% annually</li>
+                <li>Two-tier strategy provides hedge against currency devaluation</li>
+                <li>Consider your outlook on Naira stability when choosing strategy</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentAppreciation = 0;
+        let timePeriod = 1;
+        const baseExchangeRate = 1650;
+        const monthlyNairaInterest = 150000;
+        const monthlyUSDConversion = monthlyNairaInterest / baseExchangeRate;
+        const monthlyUSDRate = 0.08 / 12;
+        const annualCompoundRate = 0.18;
+        
+        function updateTimePeriod() {
+            timePeriod = parseInt(document.getElementById('timePeriod').value);
+            calculateAndDisplay();
+        }
+        
+        function updateScenario(appreciation) {
+            currentAppreciation = appreciation;
+            
+            // Update active button
+            document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            calculateAndDisplay();
+        }
+        
+        function calculateCompoundEarnings(years) {
+            const principal = 10000000;
+            const finalAmount = principal * Math.pow(1 + annualCompoundRate, years);
+            return finalAmount - principal;
+        }
+        
+        function calculateAndDisplay() {
+            const totalMonths = timePeriod * 12;
+            const finalExchangeRate = baseExchangeRate * Math.pow(1 + currentAppreciation / 100, timePeriod);
+            const monthlyAppreciationRate = Math.pow(1 + currentAppreciation / 100, 1/12) - 1;
+            
+            let cumulativeUSD = 0;
+            let totalUSDInterest = 0;
+            const totalNairaFromInterest = monthlyNairaInterest * totalMonths;
+            
+            // Calculate month by month
+            const tbody = document.getElementById('currencyTable');
+            tbody.innerHTML = '';
+            
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            
+            // Show only first 12 months in table for readability, but calculate all months
+            for (let month = 1; month <= totalMonths; month++) {
+                const currentRate = baseExchangeRate * Math.pow(1 + monthlyAppreciationRate, month);
+                cumulativeUSD += monthlyUSDConversion;
+                const usdInterest = cumulativeUSD * monthlyUSDRate;
+                totalUSDInterest += usdInterest;
+                
+                // Only show first 12 months in table
+                if (month <= 12) {
+                    const row = document.createElement('tr');
+                    const yearLabel = timePeriod > 1 ? ` Y${Math.ceil(month/12)}` : '';
+                    row.innerHTML = `
+                        <td>${monthNames[(month-1) % 12]}${yearLabel}</td>
+                        <td class="number">₦${monthlyNairaInterest.toLocaleString()}</td>
+                        <td class="number">${monthlyUSDConversion.toFixed(2)}</td>
+                        <td class="number">${cumulativeUSD.toFixed(2)}</td>
+                        <td class="number">${usdInterest.toFixed(2)}</td>
+                        <td class="number">₦${Math.round(currentRate).toLocaleString()}</td>
+                        <td class="number">₦${Math.round(cumulativeUSD * currentRate).toLocaleString()}</td>
+                        <td class="number">₦${Math.round(monthlyNairaInterest + (usdInterest * currentRate)).toLocaleString()}</td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            }
+            
+            // Show summary row for year 2 if applicable
+            if (timePeriod > 1) {
+                const year2Row = document.createElement('tr');
+                year2Row.style.backgroundColor = '#f0f8ff';
+                year2Row.innerHTML = `
+                    <td colspan="8" style="text-align: center; font-style: italic; color: #666;">
+                        <strong>... ${totalMonths - 12} additional months calculated ...</strong>
+                    </td>
+                `;
+                tbody.appendChild(year2Row);
+            }
+            
+            // Final calculations
+            const compoundEarnings = calculateCompoundEarnings(timePeriod);
+            const finalUSDValue = (cumulativeUSD + totalUSDInterest) * finalExchangeRate;
+            const currencyAppreciationGain = cumulativeUSD * (finalExchangeRate - baseExchangeRate);
+            const totalTwoTierEarnings = totalNairaFromInterest + (totalUSDInterest * finalExchangeRate) + currencyAppreciationGain;
+            
+            // Add total row
+            const totalRow = document.createElement('tr');
+            totalRow.className = 'total-row';
+            totalRow.innerHTML = `
+                <td><strong>${timePeriod} YEAR TOTAL</strong></td>
+                <td class="number"><strong>₦${totalNairaFromInterest.toLocaleString()}</strong></td>
+                <td class="number"><strong>${(cumulativeUSD).toFixed(2)}</strong></td>
+                <td class="number"><strong>${(cumulativeUSD).toFixed(2)}</strong></td>
+                <td class="number"><strong>${totalUSDInterest.toFixed(2)}</strong></td>
+                <td class="number"><strong>₦${Math.round(finalExchangeRate).toLocaleString()}</strong></td>
+                <td class="number"><strong>₦${Math.round(finalUSDValue).toLocaleString()}</strong></td>
+                <td class="number"><strong>₦${Math.round(totalTwoTierEarnings).toLocaleString()}</strong></td>
+            `;
+            tbody.appendChild(totalRow);
+            
+            // Update UI
+            updateUI(totalTwoTierEarnings, compoundEarnings, finalExchangeRate, finalUSDValue, cumulativeUSD, currencyAppreciationGain);
+        }
+        
+        function updateUI(twoTierEarnings, compoundEarnings, finalRate, usdValue, totalUSD, currencyGain) {
+            const difference = twoTierEarnings - compoundEarnings;
+            const isTwoTierWinner = difference > 0;
+            const compoundRate = ((compoundEarnings / 10000000) / timePeriod * 100).toFixed(2);
+            const twoTierRate = ((twoTierEarnings / 10000000) / timePeriod * 100).toFixed(2);
+            
+            // Update currency info
+            document.getElementById('currencyInfo').innerHTML = `
+                <h3>Current Scenario: ${currentAppreciation}% Annual USD Appreciation over ${timePeriod} Year${timePeriod > 1 ? 's' : ''}</h3>
+                <p><strong>Exchange Rate:</strong> ₦1,650 → ₦${Math.round(finalRate).toLocaleString()} (+${((finalRate/baseExchangeRate - 1) * 100).toFixed(1)}% total)</p>
+                <p><strong>USD Portfolio:</strong> ${totalUSD.toFixed(2)} + Currency Gain: ₦${Math.round(currencyGain).toLocaleString()}</p>
+            `;
+            
+            // Update amounts
+            document.getElementById('compoundAmount').textContent = `₦${Math.round(compoundEarnings).toLocaleString()}`;
+            document.getElementById('twoTierAmount').textContent = `₦${Math.round(twoTierEarnings).toLocaleString()}`;
+            document.getElementById('twoTierTotal').textContent = `₦${Math.round(twoTierEarnings).toLocaleString()}`;
+            document.getElementById('usdValue').textContent = `₦${Math.round(usdValue).toLocaleString()}`;
+            
+            // Update winner badges and cards
+            const compoundCard = document.getElementById('compoundCard');
+            const twoTierCard = document.getElementById('twoTierCard');
+            const compoundBadge = document.getElementById('compoundBadge');
+            const twoTierBadge = document.getElementById('twoTierBadge');
+            
+            if (isTwoTierWinner) {
+                compoundCard.classList.remove('winner');
+                twoTierCard.classList.add('winner');
+                compoundBadge.style.display = 'none';
+                twoTierBadge.style.display = 'inline-block';
+                twoTierBadge.textContent = `WINNER! +₦${Math.round(Math.abs(difference)).toLocaleString()}`;
+            } else {
+                compoundCard.classList.add('winner');
+                twoTierCard.classList.remove('winner');
+                compoundBadge.style.display = 'inline-block';
+                twoTierBadge.style.display = 'none';
+                compoundBadge.textContent = `WINNER! +₦${Math.round(Math.abs(difference)).toLocaleString()}`;
+            }
+            
+            // Calculate breakeven
+            const baseNairaInterest = monthlyNairaInterest * timePeriod * 12;
+            const baseUSDInterest = (totalUSD * monthlyUSDRate * timePeriod * 12) * baseExchangeRate;
+            const breakevenAppreciation = ((compoundEarnings - baseNairaInterest - baseUSDInterest) / (totalUSD * baseExchangeRate)) * 100;
+            
+            // Update breakeven info
+            document.getElementById('breakevenText').innerHTML = `<strong>The two-tier strategy becomes more profitable when USD appreciates by approximately ${breakevenAppreciation.toFixed(1)}% annually or more over ${timePeriod} year${timePeriod > 1 ? 's' : ''}.</strong>`;
+            document.getElementById('breakevenDetail').textContent = `At ${breakevenAppreciation.toFixed(1)}% annual appreciation, both strategies yield similar returns.`;
+            
+            // Update summary section
+            document.getElementById('summarySection').innerHTML = `
+                <h3>${timePeriod} Year${timePeriod > 1 ? 's' : ''} Summary</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+                    <div>
+                        <h4 style="color: #11998e;">Strategy A: Compound Interest</h4>
+                        <p><strong>Total Earnings:</strong> <span class="number">₦${Math.round(compoundEarnings).toLocaleString()}</span></p>
+                        <p><strong>Final Balance:</strong> <span class="number">₦${Math.round(10000000 + compoundEarnings).toLocaleString()}</span></p>
+                        <p><strong>Average Annual Rate:</strong> <span class="number">${compoundRate}%</span></p>
+                    </div>
+                    <div>
+                        <h4 style="color: #f5576c;">Strategy B: Two-Tier + Appreciation</h4>
+                        <p><strong>Total Earnings:</strong> <span class="number">₦${Math.round(twoTierEarnings).toLocaleString()}</span></p>
+                        <p><strong>USD Portfolio:</strong> <span class="number">${totalUSD.toFixed(2)}</span></p>
+                        <p><strong>Average Annual Rate:</strong> <span class="number">${twoTierRate}%</span></p>
+                    </div>
+                </div>
+            `;
+            
+            // Update insights
+            document.getElementById('insightsList').innerHTML = `
+                <li><strong>${isTwoTierWinner ? 'Two-tier strategy wins' : 'Compound strategy wins'} by ₦${Math.round(Math.abs(difference)).toLocaleString()}</strong> over ${timePeriod} year${timePeriod > 1 ? 's' : ''}</li>
+                <li>Breakeven point: ${breakevenAppreciation.toFixed(1)}% annual USD appreciation</li>
+                <li>Current scenario: ${currentAppreciation}% annual USD appreciation</li>
+                <li>Currency gain component: ₦${Math.round(currencyGain).toLocaleString()} from USD appreciation</li>
+                <li>${timePeriod > 1 ? 'Longer time periods amplify the impact of currency appreciation' : 'Single year analysis - consider longer periods for currency strategies'}</li>
+                <li>Two-tier strategy provides ${totalUSD.toFixed(2)} USD in foreign currency reserves</li>
+            `;
+        }
+        
+        // Initialize with 1 year, no appreciation
+        calculateAndDisplay();
+    </script>
+</body>
+</html>
