@@ -94,11 +94,9 @@ export function calculateInvestmentResult(
     useRealTimeRate,
   } = scenario
 
-  console.log(scenario)
-
   const totalMonths = timePeriod * 12
   const finalExchangeRate = useRealTimeRate
-    ? (realTimeRate ?? baseExchangeRate)
+    ? (realTimeRate ?? baseExchangeRate) * (1 + appreciation / 100) ** timePeriod
     : baseExchangeRate * (1 + appreciation / 100) ** timePeriod
   const monthlyPiggyVestRate = piggyVestAnnualRate / 12
   const monthlyRiseVestRate = riseVestAnnualRate / 12

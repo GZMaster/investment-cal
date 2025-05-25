@@ -6,7 +6,7 @@ import {
   Fade,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { InvestmentScenario } from '../types/investment';
 import { calculateInvestmentResult } from '../utils/investment-calculator';
 import { AnalysisSection } from './AnalysisSection';
@@ -26,19 +26,24 @@ const MotionBox = motion(Box);
 export function InvestmentCalculator() {
   const [scenario, setScenario] = useState<InvestmentScenario>(DEFAULT_SCENARIO);
   const { data, updateScenarioWithRates } = useExchangeRate();
+  const prevRateRef = useRef<number | null>(null);
+  const prevAppreciationRef = useRef<number | null>(null);
 
   // Update scenario with real-time rates when enabled
   useEffect(() => {
     if (scenario.useRealTimeRate && data) {
-      setScenario(prev => updateScenarioWithRates(prev));
+      const hasRateChanged = prevRateRef.current !== data.rate;
+      const hasAppreciationChanged = prevAppreciationRef.current !== data.expectedAppreciation;
+
+      if (hasRateChanged || hasAppreciationChanged) {
+        prevRateRef.current = data.rate;
+        prevAppreciationRef.current = data.expectedAppreciation;
+        setScenario(prev => updateScenarioWithRates(prev));
+      }
     }
   }, [scenario.useRealTimeRate, data, updateScenarioWithRates]);
 
-  const result = calculateInvestmentResult({
-    ...scenario,
-    baseExchangeRate: data?.rate ?? scenario.baseExchangeRate,
-    appreciation: data?.expectedAppreciation ?? scenario.appreciation,
-  });
+  const result = calculateInvestmentResult(scenario, data?.rate);
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
