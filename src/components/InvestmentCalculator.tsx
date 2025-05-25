@@ -1,8 +1,7 @@
 import {
   Box,
-  Heading,
   VStack,
-  useColorModeValue
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import type { InvestmentScenario } from '../types/investment';
@@ -14,51 +13,46 @@ import { CurrencyInfo } from './CurrencyInfo';
 import { InvestmentTable } from './InvestmentTable';
 import { ScenarioSelector } from './ScenarioSelector';
 import { SummarySection } from './SummarySection';
+import { DEFAULT_SCENARIO } from '../constants/investment';
+import { Header } from './Header';
 
 export function InvestmentCalculator() {
-  const [scenario, setScenario] = useState<InvestmentScenario>({
-    appreciation: 0,
-    timePeriod: 1,
-  });
-
+  const [scenario, setScenario] = useState<InvestmentScenario>(DEFAULT_SCENARIO);
   const result = calculateInvestmentResult(scenario);
   const bgColor = useColorModeValue('white', 'gray.800');
 
   return (
-    <Box
-      w="full"
-      bg={bgColor}
-      borderRadius="xl"
-      p={8}
-      boxShadow="xl"
-    >
-      <VStack spacing={8} align="stretch">
-        <Heading
-          textAlign="center"
-          bgGradient="linear(to-r, blue.400, purple.500)"
-          bgClip="text"
-          fontSize="3xl"
-        >
-          Investment Strategy with USD Appreciation
-        </Heading>
+    <VStack spacing={0} align="stretch">
+      <Header />
 
-        <ScenarioSelector
-          scenario={scenario}
-          onScenarioChange={setScenario}
-        />
+      <Box
+        w="full"
+        bg={bgColor}
+        borderRadius="xl"
+        p={8}
+        boxShadow="xl"
+        mx="auto"
+        maxW="container.xl"
+      >
+        <VStack spacing={8} align="stretch">
+          <ScenarioSelector
+            scenario={scenario}
+            onScenarioChange={setScenario}
+          />
 
-        <CurrencyInfo scenario={scenario} result={result} />
+          <CurrencyInfo scenario={scenario} result={result} />
 
-        <ComparisonCards result={result} />
+          <ComparisonCards result={result} />
 
-        <BreakevenInfo scenario={scenario} result={result} />
+          <BreakevenInfo scenario={scenario} result={result} />
 
-        <InvestmentTable scenario={scenario} />
+          <InvestmentTable scenario={scenario} />
 
-        <SummarySection scenario={scenario} result={result} />
+          <SummarySection result={result} />
 
-        <AnalysisSection scenario={scenario} result={result} />
-      </VStack>
-    </Box>
+          <AnalysisSection scenario={scenario} result={result} />
+        </VStack>
+      </Box>
+    </VStack>
   );
 } 

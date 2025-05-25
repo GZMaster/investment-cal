@@ -6,7 +6,7 @@ import {
 } from '@chakra-ui/react';
 import type { InvestmentScenario, InvestmentResult } from '../types/investment';
 import { calculateBreakevenPoint } from '../utils/investment-calculator';
-import { INVESTMENT_CONSTANTS } from '../constants/investment';
+import { formatCurrency } from '../utils/investment-calculator';
 
 interface BreakevenInfoProps {
   scenario: InvestmentScenario;
@@ -14,16 +14,13 @@ interface BreakevenInfoProps {
 }
 
 export function BreakevenInfo({ scenario, result }: BreakevenInfoProps) {
-  const { timePeriod } = scenario;
-  const { compoundEarnings, totalUSD } = result;
-  const { baseExchangeRate, monthlyNairaInterest, monthlyUSDRate } = INVESTMENT_CONSTANTS;
+  const { compoundEarnings, twoTierEarnings, finalExchangeRate, usdValue, totalUSD, currencyGain } = result;
+  const { baseExchangeRate } = scenario;
 
-  const totalNairaFromInterest = monthlyNairaInterest * timePeriod * 12;
-  const baseUSDInterest = (totalUSD * monthlyUSDRate * timePeriod * 12) * baseExchangeRate;
-  const breakevenAppreciation = calculateBreakevenPoint(
+  const breakevenPoint = calculateBreakevenPoint(
     compoundEarnings,
-    totalNairaFromInterest,
-    baseUSDInterest,
+    twoTierEarnings - currencyGain,
+    usdValue - (totalUSD * baseExchangeRate),
     totalUSD,
     baseExchangeRate
   );
@@ -33,17 +30,31 @@ export function BreakevenInfo({ scenario, result }: BreakevenInfoProps) {
 
   return (
     <Box bg={bgColor} p={6} borderRadius="lg" color={textColor}>
-      <VStack align="stretch" spacing={3}>
-        <Text fontSize="lg" fontWeight="bold">
-          💡 Breakeven Analysis
+      <VStack align="stretch" spacing={4}>
+        <Text fontSize="xl" fontWeight="bold">
+          Breakeven Analysis
         </Text>
+
         <Text>
-          <strong>
-            The two-tier strategy becomes more profitable when USD appreciates by approximately {breakevenAppreciation.toFixed(1)}% annually or more over {timePeriod} year{timePeriod > 1 ? 's' : ''}.
-          </strong>
+          The two-tier strategy becomes more profitable than the single-tier strategy when USD appreciates by{' '}
+          <Text as="span" fontWeight="bold">
+            {breakevenPoint.toFixed(1)}%
+          </Text>
+          {' '}against Naira.
         </Text>
+
         <Text>
-          At {breakevenAppreciation.toFixed(1)}% annual appreciation, both strategies yield similar returns.
+          Current USD appreciation rate: {' '}
+          <Text as="span" fontWeight="bold">
+            {((finalExchangeRate / baseExchangeRate - 1) * 100).toFixed(1)}%
+          </Text>
+        </Text>
+
+        <Text>
+          Currency gain from USD appreciation: {' '}
+          <Text as="span" fontWeight="bold">
+            {formatCurrency(currencyGain)}
+          </Text>
         </Text>
       </VStack>
     </Box>

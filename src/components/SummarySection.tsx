@@ -1,91 +1,41 @@
 import {
   Box,
   SimpleGrid,
-  Text,
-  VStack,
-  useColorModeValue,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
 } from '@chakra-ui/react';
-import type { InvestmentScenario, InvestmentResult } from '../types/investment';
-import { formatCurrency } from '../utils/investment-calculator';
-import { INVESTMENT_CONSTANTS } from '../constants/investment';
+import type { InvestmentResult } from '../types/investment';
 
 interface SummarySectionProps {
-  scenario: InvestmentScenario;
   result: InvestmentResult;
 }
 
-export function SummarySection({ scenario, result }: SummarySectionProps) {
-  const { timePeriod } = scenario;
-  const { compoundEarnings, twoTierEarnings, totalUSD } = result;
-  const { principal } = INVESTMENT_CONSTANTS;
-
-  const compoundRate = ((compoundEarnings / principal) / timePeriod * 100).toFixed(2);
-  const twoTierRate = ((twoTierEarnings / principal) / timePeriod * 100).toFixed(2);
-
-  const bgColor = useColorModeValue('orange.50', 'orange.900');
-  const textColor = useColorModeValue('orange.900', 'orange.50');
+export function SummarySection({ result }: SummarySectionProps) {
+  const { compoundEarnings, twoTierEarnings, finalExchangeRate, usdValue, totalUSD, currencyGain } = result;
 
   return (
-    <Box bg={bgColor} p={6} borderRadius="lg" color={textColor}>
-      <VStack align="stretch" spacing={4}>
-        <Text fontSize="xl" fontWeight="bold">
-          {timePeriod} Year{timePeriod > 1 ? 's' : ''} Summary
-        </Text>
+    <Box mt={8}>
+      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
+        <Stat>
+          <StatLabel>Single-Tier Strategy</StatLabel>
+          <StatNumber>₦{compoundEarnings.toLocaleString()}</StatNumber>
+          <StatHelpText>Total Interest (PiggyVest Only)</StatHelpText>
+        </Stat>
 
-        <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
-          <Box>
-            <Text fontSize="lg" fontWeight="bold" color="green.600">
-              Strategy A: Compound Interest
-            </Text>
-            <VStack align="stretch" mt={2} spacing={2}>
-              <Text>
-                <strong>Total Earnings:</strong>{' '}
-                <Text as="span" fontFamily="mono">
-                  {formatCurrency(compoundEarnings)}
-                </Text>
-              </Text>
-              <Text>
-                <strong>Final Balance:</strong>{' '}
-                <Text as="span" fontFamily="mono">
-                  {formatCurrency(principal + compoundEarnings)}
-                </Text>
-              </Text>
-              <Text>
-                <strong>Average Annual Rate:</strong>{' '}
-                <Text as="span" fontFamily="mono">
-                  {compoundRate}%
-                </Text>
-              </Text>
-            </VStack>
-          </Box>
+        <Stat>
+          <StatLabel>Two-Tier Strategy</StatLabel>
+          <StatNumber>₦{twoTierEarnings.toLocaleString()}</StatNumber>
+          <StatHelpText>Total Interest (PiggyVest + RiseVest)</StatHelpText>
+        </Stat>
 
-          <Box>
-            <Text fontSize="lg" fontWeight="bold" color="purple.600">
-              Strategy B: Two-Tier + Appreciation
-            </Text>
-            <VStack align="stretch" mt={2} spacing={2}>
-              <Text>
-                <strong>Total Earnings:</strong>{' '}
-                <Text as="span" fontFamily="mono">
-                  {formatCurrency(twoTierEarnings)}
-                </Text>
-              </Text>
-              <Text>
-                <strong>USD Portfolio:</strong>{' '}
-                <Text as="span" fontFamily="mono">
-                  {totalUSD.toFixed(2)}
-                </Text>
-              </Text>
-              <Text>
-                <strong>Average Annual Rate:</strong>{' '}
-                <Text as="span" fontFamily="mono">
-                  {twoTierRate}%
-                </Text>
-              </Text>
-            </VStack>
-          </Box>
-        </SimpleGrid>
-      </VStack>
+        <Stat>
+          <StatLabel>Currency Gain</StatLabel>
+          <StatNumber>₦{currencyGain.toLocaleString()}</StatNumber>
+          <StatHelpText>From USD Appreciation</StatHelpText>
+        </Stat>
+      </SimpleGrid>
     </Box>
   );
 } 

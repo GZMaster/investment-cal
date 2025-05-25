@@ -1,14 +1,20 @@
 import {
   Box,
+  FormControl,
+  FormLabel,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  SimpleGrid,
   VStack,
-  HStack,
-  Button,
-  Select,
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { APPRECIATION_RATES, TIME_PERIODS } from '../constants/investment';
 import type { InvestmentScenario } from '../types/investment';
+import { DEFAULT_SCENARIO, INVESTMENT_RANGES } from '../constants/investment';
+import { formatCurrency } from '../utils/investment-calculator';
 
 interface ScenarioSelectorProps {
   scenario: InvestmentScenario;
@@ -16,55 +22,70 @@ interface ScenarioSelectorProps {
 }
 
 export function ScenarioSelector({ scenario, onScenarioChange }: ScenarioSelectorProps) {
-  const bgColor = useColorModeValue('gray.50', 'gray.700');
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const borderColor = useColorModeValue('gray.200', 'gray.700');
+
+  const handleChange = (field: keyof InvestmentScenario, value: number) => {
+    onScenarioChange({
+      ...scenario,
+      [field]: value,
+    });
+  };
+
+  const renderNumberInput = (
+    label: string,
+    field: keyof InvestmentScenario,
+    format?: (value: number) => string
+  ) => {
+    const range = INVESTMENT_RANGES[field];
+    return (
+      <FormControl>
+        <FormLabel>{label}</FormLabel>
+        <NumberInput
+          value={scenario[field]}
+          min={range.min}
+          max={range.max}
+          step={range.step}
+          onChange={(_, value) => handleChange(field, value)}
+        >
+          <NumberInputField />
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        </NumberInput>
+        {format && (
+          <Text fontSize="sm" color="gray.500" mt={1}>
+            {format(scenario[field])}
+          </Text>
+        )}
+      </FormControl>
+    );
+  };
 
   return (
-    <Box bg={bgColor} p={6} borderRadius="lg">
-      <VStack spacing={4} align="stretch">
-        <Text fontSize="lg" fontWeight="bold">
-          Select Investment Parameters
+    <Box
+      p={6}
+      bg={bgColor}
+      borderRadius="lg"
+      borderWidth="1px"
+      borderColor={borderColor}
+      boxShadow="sm"
+    >
+      <VStack spacing={6} align="stretch">
+        <Text fontSize="xl" fontWeight="bold">
+          Investment Parameters
         </Text>
 
-        <HStack spacing={4}>
-          <Text>Time Period:</Text>
-          <Select
-            value={scenario.timePeriod}
-            onChange={(e) =>
-              onScenarioChange({
-                ...scenario,
-                timePeriod: Number(e.target.value),
-              })
-            }
-            w="200px"
-          >
-            {TIME_PERIODS.map((period) => (
-              <option key={period} value={period}>
-                {period} Year{period > 1 ? 's' : ''}
-              </option>
-            ))}
-          </Select>
-        </HStack>
-
-        <Text>Choose how much USD strengthens against Naira annually:</Text>
-
-        <HStack spacing={2} wrap="wrap">
-          {APPRECIATION_RATES.map((rate) => (
-            <Button
-              key={rate}
-              colorScheme={rate === scenario.appreciation ? 'purple' : 'gray'}
-              onClick={() =>
-                onScenarioChange({
-                  ...scenario,
-                  appreciation: rate,
-                })
-              }
-            >
-              {rate === 0
-                ? 'No Change (₦1,650)'
-                : `${rate}% Appreciation`}
-            </Button>
-          ))}
-        </HStack>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+          {renderNumberInput('Time Period (Years)', 'timePeriod')}
+          {renderNumberInput('USD Appreciation (%)', 'appreciation')}
+          {renderNumberInput('Initial Investment', 'principal', formatCurrency)}
+          {renderNumberInput('Monthly Savings', 'monthlySavings', formatCurrency)}
+          {renderNumberInput('PiggyVest Annual Rate (%)', 'piggyVestAnnualRate', (value) => `${(value * 100).toFixed(1)}%`)}
+          {renderNumberInput('RiseVest Annual Rate (%)', 'riseVestAnnualRate', (value) => `${(value * 100).toFixed(1)}%`)}
+          {renderNumberInput('Base Exchange Rate', 'baseExchangeRate', (value) => `₦${value.toLocaleString()}`)}
+        </SimpleGrid>
       </VStack>
     </Box>
   );
