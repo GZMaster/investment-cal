@@ -14,6 +14,7 @@ import {
 import { Link as RouterLink } from 'react-router-dom';
 import { FaCalculator, FaChartLine, FaExchangeAlt, FaMoneyBillWave, FaLock } from 'react-icons/fa';
 import favicon from '../assets/favicon.svg';
+import { SEO } from '../components/SEO';
 
 const tools = [
   {
@@ -22,6 +23,14 @@ const tools = [
     description: 'Analyze and compare different investment approaches with real-time exchange rates and market data.',
     icon: FaCalculator,
     path: '/calculator',
+    status: 'active',
+  },
+  {
+    id: 'budget-analysis',
+    title: 'Budget Analysis Tool',
+    description: 'Track your spending, savings, and debt management across different platforms with detailed allocation plans.',
+    icon: FaChartLine,
+    path: '/budget',
     status: 'active',
   },
   {
@@ -58,6 +67,18 @@ export function LandingPage() {
 
   return (
     <Box>
+      <SEO
+        title="Home"
+        description="A comprehensive collection of investment tools to help you make better financial decisions. Compare investment strategies, analyze budgets, and optimize your portfolio."
+        keywords={[
+          'investment tools',
+          'financial planning',
+          'budget analysis',
+          'investment calculator',
+          'portfolio optimization',
+          'financial management',
+        ]}
+      />
       {/* Hero Section */}
       <Box
         bg={heroBgColor}

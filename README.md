@@ -1,44 +1,35 @@
-# Investment Strategy Calculator
+# Investment Tools Suite
 
-A modern web application that helps users compare different investment strategies, specifically focusing on Naira and USD investments with currency appreciation considerations.
+A comprehensive collection of financial tools to help you make better investment decisions and manage your portfolio effectively.
 
-## Features
+## 🌟 Features
 
-- **Two-Tier Investment Strategy Comparison**
-  - Strategy A: Compound interest in PiggyVest (18% p.a.)
-  - Strategy B: Two-tier approach with PiggyVest and RiseVest (8% p.a. USD)
-  - Monthly savings of 1M Naira
-  - Initial investment of 10M Naira
+### Active Tools
 
-- **Interactive Parameters**
-  - Time period selection (1-4 years)
-  - USD appreciation rate scenarios (0-25%)
-  - Real-time calculations and updates
+1. **Investment Calculator**
+   - Compare Single-Tier vs Two-Tier Investment Strategies
+   - Real-time exchange rates integration
+   - Detailed investment analysis and visualization
+   - [Try it now](/calculator)
 
-- **Detailed Analysis**
-  - Monthly breakdown of investments
-  - PiggyVest balance tracking
-  - USD portfolio growth
-  - Currency appreciation impact
-  - Breakeven analysis
-  - Comparative performance metrics
+2. **Budget Analysis Tool**
+   - Track spending and savings across multiple platforms
+   - Debt management and allocation planning
+   - Visual progress tracking
+   - [Try it now](/budget)
 
-## Tech Stack
+### Coming Soon
 
-- **Frontend Framework**: React 18 with TypeScript
-- **UI Library**: Chakra UI
-- **Build Tool**: Vite
-- **Development Tools**:
-  - ESLint for code quality
-  - TypeScript for type safety
-  - Prettier for code formatting
+- Portfolio Optimizer
+- Risk Analysis Tool
+- Retirement Planning Calculator
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
-- npm (v7 or higher)
+- Node.js (v18 or higher)
+- npm (v9 or higher)
 
 ### Installation
 
@@ -61,71 +52,60 @@ A modern web application that helps users compare different investment strategie
    npm run dev
    ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+4. Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-## Project Structure
+## 🛠️ Tech Stack
+
+- **Frontend Framework**: React with TypeScript
+- **UI Library**: Chakra UI
+- **State Management**: React Query
+- **Routing**: React Router
+- **Build Tool**: Vite
+- **SEO**: React Helmet Async
+
+## 📁 Project Structure
 
 ```
-investment-cal/
-├── src/
-│   ├── components/          # React components
-│   │   ├── AnalysisSection.tsx
-│   │   ├── BreakevenInfo.tsx
-│   │   ├── ComparisonCards.tsx
-│   │   ├── CurrencyInfo.tsx
-│   │   ├── InvestmentCalculator.tsx
-│   │   ├── InvestmentTable.tsx
-│   │   ├── ScenarioSelector.tsx
-│   │   └── SummarySection.tsx
-│   ├── constants/          # Application constants
-│   │   └── investment.ts
-│   ├── types/             # TypeScript type definitions
-│   │   └── investment.ts
-│   ├── utils/             # Utility functions
-│   │   └── investment-calculator.ts
-│   ├── App.tsx            # Main application component
-│   ├── main.tsx           # Application entry point
-│   └── theme.ts           # Chakra UI theme configuration
-├── public/                # Static assets
-├── index.html            # HTML entry point
-├── package.json          # Project dependencies
-├── tsconfig.json         # TypeScript configuration
-└── vite.config.ts        # Vite configuration
+src/
+├── assets/          # Static assets
+├── components/      # Reusable components
+├── constants/       # Application constants
+├── hooks/          # Custom React hooks
+├── pages/          # Page components
+├── types/          # TypeScript type definitions
+├── utils/          # Utility functions
+└── theme.ts        # Chakra UI theme configuration
 ```
 
-## Investment Calculations
-
-### PiggyVest Strategy
-
-- Initial investment: 10M Naira
-- Annual interest rate: 18%
-- Monthly savings: 1M Naira
-- Interest compounds monthly
-
-### RiseVest Strategy
-
-- Converts PiggyVest interest to USD
-- USD interest rate: 8% p.a.
-- Exchange rate: 1650 Naira/USD
-- Considers USD appreciation scenarios
-
-## Development
+## 🔧 Development
 
 ### Available Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
-- `npm run lint` - Run ESLint
 - `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript type checking
 
 ### Code Style
 
-- Follows TypeScript best practices
-- Uses functional components
-- Implements proper type safety
-- Follows Chakra UI design patterns
+- Follow TypeScript best practices
+- Use functional components with hooks
+- Implement proper error handling
+- Write meaningful comments
+- Follow the established file structure
 
-## Contributing
+## 📈 Version History
+
+### v1.0.0 (Current)
+
+- Initial release
+- Investment Calculator with real-time rates
+- Budget Analysis Tool
+- SEO optimization
+- Responsive design
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -133,12 +113,12 @@ investment-cal/
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
-- Chakra UI for the component library
-- Vite for the build tool
-- React team for the amazing framework
+- [Chakra UI](https://chakra-ui.com/) for the component library
+- [React Query](https://tanstack.com/query) for data fetching
+- [Vite](https://vitejs.dev/) for the build tool

@@ -1,8 +1,10 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { LandingPage } from './pages/LandingPage';
 import { CalculatorPage } from './pages/CalculatorPage';
+import { BudgetAnalysisPage } from './pages/BudgetAnalysisPage';
 import theme from './theme';
 
 const queryClient = new QueryClient({
@@ -17,16 +19,19 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ChakraProvider theme={theme}>
-        <Router>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/calculator" element={<CalculatorPage />} />
-          </Routes>
-        </Router>
-      </ChakraProvider>
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <ChakraProvider theme={theme}>
+          <Router>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/calculator" element={<CalculatorPage />} />
+              <Route path="/budget" element={<BudgetAnalysisPage />} />
+            </Routes>
+          </Router>
+        </ChakraProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 }
 
