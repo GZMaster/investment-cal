@@ -34,8 +34,6 @@ export function InvestmentCalculator() {
     }
   }, [scenario.useRealTimeRate, data, updateScenarioWithRates]);
 
-  console.log(data)
-
   const result = calculateInvestmentResult({
     ...scenario,
     baseExchangeRate: data?.rate ?? scenario.baseExchangeRate,
