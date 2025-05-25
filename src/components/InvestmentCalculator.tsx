@@ -2,7 +2,10 @@ import {
   Box,
   VStack,
   useColorModeValue,
+  ScaleFade,
+  Fade,
 } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import type { InvestmentScenario } from '../types/investment';
 import { calculateInvestmentResult } from '../utils/investment-calculator';
@@ -17,45 +20,105 @@ import { DEFAULT_SCENARIO } from '../constants/investment';
 import { Header } from './Header';
 import { VisualizationSection } from './VisualizationSection';
 
+const MotionBox = motion(Box);
+
 export function InvestmentCalculator() {
   const [scenario, setScenario] = useState<InvestmentScenario>(DEFAULT_SCENARIO);
   const result = calculateInvestmentResult(scenario);
   const bgColor = useColorModeValue('white', 'gray.800');
+  const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   return (
     <VStack spacing={0} align="stretch">
-      <Header />
+      <Fade in={true}>
+        <Header />
+      </Fade>
 
-      <Box
-        w="full"
-        bg={bgColor}
-        borderRadius="xl"
-        p={8}
-        boxShadow="xl"
-        mx="auto"
-        maxW="container.xl"
-      >
-        <VStack spacing={8} align="stretch">
-          <ScenarioSelector
-            scenario={scenario}
-            onScenarioChange={setScenario}
-          />
+      <ScaleFade initialScale={0.9} in={true}>
+        <MotionBox
+          w="full"
+          bg={bgColor}
+          borderRadius="xl"
+          p={8}
+          boxShadow="xl"
+          mx="auto"
+          maxW="container.xl"
+          border="1px solid"
+          borderColor={borderColor}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <VStack spacing={8} align="stretch">
+            <MotionBox
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <ScenarioSelector
+                scenario={scenario}
+                onScenarioChange={setScenario}
+              />
+            </MotionBox>
 
-          <CurrencyInfo scenario={scenario} result={result} />
+            <MotionBox
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <CurrencyInfo scenario={scenario} result={result} />
+            </MotionBox>
 
-          <ComparisonCards result={result} />
+            <MotionBox
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <ComparisonCards result={result} />
+            </MotionBox>
 
-          <BreakevenInfo scenario={scenario} result={result} />
+            <MotionBox
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <BreakevenInfo scenario={scenario} result={result} />
+            </MotionBox>
 
-          <InvestmentTable scenario={scenario} />
+            <MotionBox
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <InvestmentTable scenario={scenario} />
+            </MotionBox>
 
-          <SummarySection result={result} />
+            <MotionBox
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <SummarySection result={result} />
+            </MotionBox>
 
-          <AnalysisSection scenario={scenario} result={result} />
+            <MotionBox
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <AnalysisSection scenario={scenario} result={result} />
+            </MotionBox>
 
-          <VisualizationSection scenario={scenario} result={result} />
-        </VStack>
-      </Box>
+            <MotionBox
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+            >
+              <VisualizationSection scenario={scenario} result={result} />
+            </MotionBox>
+          </VStack>
+        </MotionBox>
+      </ScaleFade>
     </VStack>
   );
 } 

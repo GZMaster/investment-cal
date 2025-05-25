@@ -34,7 +34,6 @@ interface VisualizationSectionProps {
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const formatCurrencyTooltip = (value: number) => formatCurrency(value);
-const formatPercentageTooltip = (value: number) => `${(value * 100).toFixed(1)}%`;
 
 interface CustomTooltipProps extends TooltipProps<number, string> {
   active?: boolean;
