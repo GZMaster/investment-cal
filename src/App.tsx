@@ -1,7 +1,8 @@
 import { ChakraProvider } from '@chakra-ui/react';
-import { Container, VStack } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { InvestmentCalculator } from './components/InvestmentCalculator';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { LandingPage } from './pages/LandingPage';
+import { CalculatorPage } from './pages/CalculatorPage';
 import theme from './theme';
 
 const queryClient = new QueryClient({
@@ -18,11 +19,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ChakraProvider theme={theme}>
-        <Container maxW="container.xl" py={8}>
-          <VStack gap={8}>
-            <InvestmentCalculator />
-          </VStack>
-        </Container>
+        <Router>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/calculator" element={<CalculatorPage />} />
+          </Routes>
+        </Router>
       </ChakraProvider>
     </QueryClientProvider>
   );
