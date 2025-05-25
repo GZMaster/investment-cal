@@ -21,8 +21,19 @@ import {
   Th,
   Td,
   Badge,
+  Input,
+  FormControl,
+  FormLabel,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  HStack,
+  Button,
+  useToast,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { PLATFORMS, type PlatformBalance } from '../types/budget';
 import { SEO } from '../components/SEO';
 
@@ -64,8 +75,29 @@ const INITIAL_BALANCES: PlatformBalance[] = [
   },
 ];
 
+interface WeeklyAllocation {
+  piggyvest: number;
+  fairmoneySavings: number;
+  risevest: number;
+  greyCard: number;
+  fairmoney: number;
+}
+
+const INITIAL_WEEKLY_ALLOCATION: WeeklyAllocation = {
+  piggyvest: 250000,
+  fairmoneySavings: 50000,
+  risevest: 10,
+  greyCard: 5000,
+  fairmoney: 5000,
+};
+
 export function BudgetAnalysisPage() {
-  const [balances] = useState<PlatformBalance[]>(INITIAL_BALANCES);
+  const [balances, setBalances] = useState<PlatformBalance[]>(INITIAL_BALANCES);
+  const [weeklyIncome, setWeeklyIncome] = useState(350000);
+  const [weeklyAllocation, setWeeklyAllocation] = useState<WeeklyAllocation>(INITIAL_WEEKLY_ALLOCATION);
+  const [isEditing, setIsEditing] = useState(false);
+  const toast = useToast();
+
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
@@ -84,6 +116,48 @@ export function BudgetAnalysisPage() {
     return `₦${(amount / 1000).toFixed(1)}k`;
   };
 
+  const handleSave = useCallback(() => {
+    // Calculate total allocation
+    const totalAllocation = Object.values(weeklyAllocation).reduce((sum, amount) => sum + amount, 0);
+
+    if (totalAllocation > weeklyIncome) {
+      toast({
+        title: 'Invalid Allocation',
+        description: 'Total allocation cannot exceed weekly income',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // Update balances with new allocations
+    const updatedBalances = balances.map(balance => {
+      const allocation = weeklyAllocation[balance.platformId as keyof WeeklyAllocation] || 0;
+      const currency = getPlatformCurrency(balance.platformId);
+      const monthlyAllocation = allocation * 4; // 4 weeks in a month
+
+      return {
+        ...balance,
+        expectedBalance: balance.currentBalance + (currency === 'USD' ? monthlyAllocation : monthlyAllocation),
+      };
+    });
+
+    setBalances(updatedBalances);
+    setIsEditing(false);
+    toast({
+      title: 'Changes Saved',
+      description: 'Your budget allocations have been updated',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
+  }, [weeklyAllocation, weeklyIncome, balances, toast]);
+
+  const totalSavings = balances.reduce((sum, balance) => sum + balance.currentBalance, 0);
+  const totalDebt = balances.reduce((sum, balance) => sum + balance.debtBalance, 0);
+  const monthlyIncome = weeklyIncome * 4;
+
   return (
     <Container maxW="container.xl" py={8}>
       <SEO
@@ -101,16 +175,80 @@ export function BudgetAnalysisPage() {
       <VStack spacing={8} align="stretch">
         <Heading>Budget Analysis</Heading>
 
+        {/* Income and Allocation Controls */}
+        <Card bg={bgColor} border="1px solid" borderColor={borderColor}>
+          <CardBody>
+            <VStack spacing={6}>
+              <FormControl>
+                <FormLabel>Weekly Income (₦)</FormLabel>
+                <NumberInput
+                  value={weeklyIncome}
+                  onChange={(_, value) => setWeeklyIncome(value)}
+                  min={0}
+                  isDisabled={!isEditing}
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </FormControl>
+
+              <Heading size="md">Weekly Allocations</Heading>
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} width="100%">
+                {PLATFORMS.map((platform) => (
+                  <FormControl key={platform.id}>
+                    <FormLabel>{platform.name} ({platform.currency})</FormLabel>
+                    <NumberInput
+                      value={weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0}
+                      onChange={(_, value) => setWeeklyAllocation(prev => ({
+                        ...prev,
+                        [platform.id]: value
+                      }))}
+                      min={0}
+                      isDisabled={!isEditing}
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+                  </FormControl>
+                ))}
+              </SimpleGrid>
+
+              <HStack spacing={4}>
+                {isEditing ? (
+                  <>
+                    <Button colorScheme="blue" onClick={handleSave}>
+                      Save Changes
+                    </Button>
+                    <Button variant="ghost" onClick={() => setIsEditing(false)}>
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <Button colorScheme="blue" onClick={() => setIsEditing(true)}>
+                    Edit Allocations
+                  </Button>
+                )}
+              </HStack>
+            </VStack>
+          </CardBody>
+        </Card>
+
         {/* Summary Cards */}
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
           <Card bg={bgColor} border="1px solid" borderColor={borderColor}>
             <CardBody>
               <Stat>
                 <StatLabel>Total Savings</StatLabel>
-                <StatNumber>₦4.0M</StatNumber>
+                <StatNumber>{formatAmount(totalSavings, 'NGN')}</StatNumber>
                 <StatHelpText>
                   <StatArrow type="increase" />
-                  25% increase expected
+                  {formatAmount(monthlyIncome, 'NGN')} monthly
                 </StatHelpText>
               </Stat>
             </CardBody>
@@ -120,10 +258,10 @@ export function BudgetAnalysisPage() {
             <CardBody>
               <Stat>
                 <StatLabel>Total Debt</StatLabel>
-                <StatNumber>₦1.0M</StatNumber>
+                <StatNumber>{formatAmount(totalDebt, 'NGN')}</StatNumber>
                 <StatHelpText>
                   <StatArrow type="decrease" />
-                  100% decrease expected
+                  {formatAmount(weeklyIncome * 4, 'NGN')} monthly income
                 </StatHelpText>
               </Stat>
             </CardBody>
@@ -133,10 +271,10 @@ export function BudgetAnalysisPage() {
             <CardBody>
               <Stat>
                 <StatLabel>Monthly Income</StatLabel>
-                <StatNumber>₦1.4M</StatNumber>
+                <StatNumber>{formatAmount(monthlyIncome, 'NGN')}</StatNumber>
                 <StatHelpText>
                   <StatArrow type="increase" />
-                  $1,000 monthly
+                  {formatAmount(weeklyIncome, 'NGN')} weekly
                 </StatHelpText>
               </Stat>
             </CardBody>
@@ -211,42 +349,17 @@ export function BudgetAnalysisPage() {
                 </Tr>
               </Thead>
               <Tbody>
-                <Tr>
-                  <Td>7th</Td>
-                  <Td isNumeric>₦350k</Td>
-                  <Td isNumeric>₦250k</Td>
-                  <Td isNumeric>₦50k</Td>
-                  <Td isNumeric>$10</Td>
-                  <Td isNumeric>₦5k</Td>
-                  <Td isNumeric>₦5k</Td>
-                </Tr>
-                <Tr>
-                  <Td>14th</Td>
-                  <Td isNumeric>₦350k</Td>
-                  <Td isNumeric>₦250k</Td>
-                  <Td isNumeric>₦50k</Td>
-                  <Td isNumeric>$10</Td>
-                  <Td isNumeric>₦5k</Td>
-                  <Td isNumeric>₦5k</Td>
-                </Tr>
-                <Tr>
-                  <Td>21st</Td>
-                  <Td isNumeric>₦350k</Td>
-                  <Td isNumeric>₦250k</Td>
-                  <Td isNumeric>₦50k</Td>
-                  <Td isNumeric>$10</Td>
-                  <Td isNumeric>₦5k</Td>
-                  <Td isNumeric>₦5k</Td>
-                </Tr>
-                <Tr>
-                  <Td>28th</Td>
-                  <Td isNumeric>₦350k</Td>
-                  <Td isNumeric>₦250k</Td>
-                  <Td isNumeric>₦50k</Td>
-                  <Td isNumeric>$10</Td>
-                  <Td isNumeric>₦5k</Td>
-                  <Td isNumeric>₦5k</Td>
-                </Tr>
+                {[7, 14, 21, 28].map((date) => (
+                  <Tr key={date}>
+                    <Td>{date}th</Td>
+                    <Td isNumeric>{formatAmount(weeklyIncome, 'NGN')}</Td>
+                    <Td isNumeric>{formatAmount(weeklyAllocation.piggyvest, 'NGN')}</Td>
+                    <Td isNumeric>{formatAmount(weeklyAllocation.fairmoneySavings, 'NGN')}</Td>
+                    <Td isNumeric>{formatAmount(weeklyAllocation.risevest, 'USD')}</Td>
+                    <Td isNumeric>{formatAmount(weeklyAllocation.greyCard, 'NGN')}</Td>
+                    <Td isNumeric>{formatAmount(weeklyAllocation.fairmoney, 'NGN')}</Td>
+                  </Tr>
+                ))}
               </Tbody>
             </Table>
           </CardBody>
