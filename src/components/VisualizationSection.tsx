@@ -38,6 +38,7 @@ interface VisualizationSectionProps {
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const formatCurrencyTooltip = (value: number) => formatCurrency(value);
+const formatExchangeRateTooltip = (value: number) => `₦${value.toLocaleString()}`;
 
 interface CustomTooltipProps extends TooltipProps<number, string> {
   active?: boolean;
@@ -66,7 +67,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
         <Text fontWeight="bold">Month {label}</Text>
         {payload.map((entry) => (
           <Text key={`${entry.name}-${entry.value}`} color={entry.color}>
-            {entry.name}: {formatCurrency(entry.value)}
+            {entry.name}: {entry.name.includes('Rate') ? `₦${entry.value.toLocaleString()}` : formatCurrency(entry.value)}
           </Text>
         ))}
       </Box>
@@ -101,6 +102,12 @@ export function VisualizationSection({ scenario, result }: VisualizationSectionP
     month: data.month,
     nairaInterest: data.nairaInterest,
     usdInterest: data.usdInterest * data.exchangeRate,
+  }));
+
+  const exchangeRateData = monthlyData.map((data) => ({
+    month: data.month,
+    exchangeRate: data.exchangeRate,
+    baseRate: scenario.baseExchangeRate,
   }));
 
   const pieChartData = [
@@ -204,7 +211,7 @@ export function VisualizationSection({ scenario, result }: VisualizationSectionP
           </Box>
         </MotionBox>
 
-        {/* Investment Composition */}
+        {/* USD Exchange Rate Trend */}
         <MotionBox
           p={6}
           bg={bgColor}
@@ -216,6 +223,48 @@ export function VisualizationSection({ scenario, result }: VisualizationSectionP
           initial="hidden"
           animate="visible"
           transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <Heading size="md" mb={4}>USD Exchange Rate Trend</Heading>
+          <Box height={chartHeight}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={exchangeRateData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis tickFormatter={formatExchangeRateTooltip} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="exchangeRate"
+                  stroke="#ff7300"
+                  name="Exchange Rate"
+                  strokeWidth={2}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="baseRate"
+                  stroke="#8884d8"
+                  name="Base Rate"
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </Box>
+        </MotionBox>
+
+        {/* Investment Composition */}
+        <MotionBox
+          p={6}
+          bg={bgColor}
+          borderRadius="xl"
+          borderWidth="1px"
+          borderColor={borderColor}
+          boxShadow="lg"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ duration: 0.5, delay: 0.5 }}
           gridColumn={gridColumns === 1 ? '1' : 'span 2'}
         >
           <Heading size="md" mb={4}>Investment Composition</Heading>
