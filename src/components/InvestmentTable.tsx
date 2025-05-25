@@ -8,10 +8,18 @@ import {
   Td,
   Text,
   useColorModeValue,
+  useBreakpointValue,
+  Icon,
+  Heading,
+  Flex,
 } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
+import { FaTable } from 'react-icons/fa';
 import type { InvestmentScenario } from '../types/investment';
 import { calculateMonthlyData } from '../utils/investment-calculator';
 import { formatCurrency } from '../utils/investment-calculator';
+
+const MotionBox = motion(Box);
 
 interface InvestmentTableProps {
   scenario: InvestmentScenario;
@@ -22,54 +30,101 @@ export function InvestmentTable({ scenario }: InvestmentTableProps) {
   const totalMonths = timePeriod * 12;
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const iconColor = useColorModeValue('blue.500', 'blue.300');
 
   const monthlyData = Array.from({ length: totalMonths }, (_, i) =>
     calculateMonthlyData(i + 1, totalMonths, scenario)
   );
 
+  const visibleColumns = useBreakpointValue({
+    base: ['month', 'piggyVestBalance', 'totalEarnings'],
+    sm: ['month', 'piggyVestBalance', 'nairaInterest', 'totalEarnings'],
+    md: ['month', 'piggyVestBalance', 'nairaInterest', 'usdValue', 'totalEarnings'],
+    lg: ['month', 'piggyVestBalance', 'nairaInterest', 'usdAdded', 'cumulativeUSD', 'usdInterest', 'exchangeRate', 'usdValue', 'totalEarnings'],
+  });
+
+  const columnLabels: Record<string, string> = {
+    month: 'Month',
+    piggyVestBalance: 'PiggyVest Balance',
+    nairaInterest: 'Naira Interest',
+    usdAdded: 'USD Added',
+    cumulativeUSD: 'Cumulative USD',
+    usdInterest: 'USD Interest',
+    exchangeRate: 'Exchange Rate',
+    usdValue: 'USD Value',
+    totalEarnings: 'Total Earnings',
+  };
+
+  const formatValue = (key: string, value: number) => {
+    switch (key) {
+      case 'usdAdded':
+      case 'cumulativeUSD':
+      case 'usdInterest':
+        return `$${value.toFixed(2)}`;
+      case 'exchangeRate':
+        return `₦${value.toLocaleString()}`;
+      default:
+        return formatCurrency(value);
+    }
+  };
+
   return (
-    <Box
+    <MotionBox
       p={6}
       bg={bgColor}
-      borderRadius="lg"
+      borderRadius="xl"
       borderWidth="1px"
       borderColor={borderColor}
-      boxShadow="sm"
+      boxShadow="lg"
       overflowX="auto"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
     >
-      <Text fontSize="xl" fontWeight="bold" mb={4}>
-        Monthly Breakdown
-      </Text>
-      <Table variant="simple" size="sm">
-        <Thead>
-          <Tr>
-            <Th>Month</Th>
-            <Th isNumeric>PiggyVest Balance</Th>
-            <Th isNumeric>Naira Interest</Th>
-            <Th isNumeric>USD Added</Th>
-            <Th isNumeric>Cumulative USD</Th>
-            <Th isNumeric>USD Interest</Th>
-            <Th isNumeric>Exchange Rate</Th>
-            <Th isNumeric>USD Value</Th>
-            <Th isNumeric>Total Earnings</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {monthlyData.map((data) => (
-            <Tr key={data.month}>
-              <Td>{data.month}</Td>
-              <Td isNumeric>{formatCurrency(data.piggyVestBalance)}</Td>
-              <Td isNumeric>{formatCurrency(data.nairaInterest)}</Td>
-              <Td isNumeric>${data.usdAdded.toFixed(2)}</Td>
-              <Td isNumeric>${data.cumulativeUSD.toFixed(2)}</Td>
-              <Td isNumeric>${data.usdInterest.toFixed(2)}</Td>
-              <Td isNumeric>₦{data.exchangeRate.toLocaleString()}</Td>
-              <Td isNumeric>{formatCurrency(data.usdValue)}</Td>
-              <Td isNumeric>{formatCurrency(data.totalEarnings)}</Td>
+      <Flex align="center" gap={3} mb={4}>
+        <Icon as={FaTable} boxSize={6} color={iconColor} />
+        <Heading size="md">Monthly Breakdown</Heading>
+      </Flex>
+
+      <Box overflowX="auto" css={{
+        '&::-webkit-scrollbar': {
+          height: '8px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: useColorModeValue('gray.100', 'gray.700'),
+          borderRadius: '4px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: useColorModeValue('gray.300', 'gray.600'),
+          borderRadius: '4px',
+          '&:hover': {
+            background: useColorModeValue('gray.400', 'gray.500'),
+          },
+        },
+      }}>
+        <Table variant="simple" size="sm">
+          <Thead>
+            <Tr>
+              {visibleColumns?.map((column) => (
+                <Th key={column} isNumeric={column !== 'month'}>
+                  {columnLabels[column]}
+                </Th>
+              ))}
             </Tr>
-          ))}
-        </Tbody>
-      </Table>
-    </Box>
+          </Thead>
+          <Tbody>
+            {monthlyData.map((data) => (
+              <Tr key={data.month}>
+                {visibleColumns?.map((column) => (
+                  <Td key={`${data.month}-${column}`} isNumeric={column !== 'month'}>
+                    {column === 'month' ? data.month : formatValue(column, data[column as keyof typeof data] as number)}
+                  </Td>
+                ))}
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </Box>
+    </MotionBox>
   );
 } 
