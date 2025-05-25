@@ -2,18 +2,18 @@ import {
   Box,
   FormControl,
   FormLabel,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
   SimpleGrid,
-  VStack,
   Text,
   useColorModeValue,
+  VStack,
 } from '@chakra-ui/react';
+import { INVESTMENT_RANGES } from '../constants/investment';
 import type { InvestmentScenario } from '../types/investment';
-import { DEFAULT_SCENARIO, INVESTMENT_RANGES } from '../constants/investment';
 import { formatCurrency } from '../utils/investment-calculator';
 
 interface ScenarioSelectorProps {

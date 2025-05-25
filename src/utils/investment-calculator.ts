@@ -88,7 +88,6 @@ export function calculateInvestmentResult(scenario: InvestmentScenario): Investm
 
   const totalMonths = timePeriod * 12
   const finalExchangeRate = baseExchangeRate * (1 + appreciation / 100) ** timePeriod
-  const monthlyAppreciationRate = (1 + appreciation / 100) ** (1 / 12) - 1
   const monthlyPiggyVestRate = piggyVestAnnualRate / 12
   const monthlyRiseVestRate = riseVestAnnualRate / 12
 

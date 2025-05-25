@@ -15,6 +15,7 @@ import { ScenarioSelector } from './ScenarioSelector';
 import { SummarySection } from './SummarySection';
 import { DEFAULT_SCENARIO } from '../constants/investment';
 import { Header } from './Header';
+import { VisualizationSection } from './VisualizationSection';
 
 export function InvestmentCalculator() {
   const [scenario, setScenario] = useState<InvestmentScenario>(DEFAULT_SCENARIO);
@@ -51,6 +52,8 @@ export function InvestmentCalculator() {
           <SummarySection result={result} />
 
           <AnalysisSection scenario={scenario} result={result} />
+
+          <VisualizationSection scenario={scenario} result={result} />
         </VStack>
       </Box>
     </VStack>

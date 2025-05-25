@@ -13,7 +13,7 @@ interface SummarySectionProps {
 }
 
 export function SummarySection({ result }: SummarySectionProps) {
-  const { compoundEarnings, twoTierEarnings, finalExchangeRate, usdValue, totalUSD, currencyGain } = result;
+  const { compoundEarnings, twoTierEarnings, currencyGain } = result;
 
   return (
     <Box mt={8}>
