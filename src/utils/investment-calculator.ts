@@ -33,6 +33,7 @@ export function calculateMonthlyData(
   month: number,
   totalMonths: number,
   scenario: InvestmentScenario,
+  realTimeRate?: number,
 ): MonthlyData {
   const {
     baseExchangeRate,
@@ -41,10 +42,13 @@ export function calculateMonthlyData(
     monthlySavings,
     principal,
     appreciation,
+    useRealTimeRate,
   } = scenario
 
-  const monthlyAppreciationRate = (1 + appreciation / 100) ** (1 / 12) - 1
-  const currentRate = baseExchangeRate * (1 + monthlyAppreciationRate) ** month
+  const monthlyAppreciationRate = useRealTimeRate ? 0 : (1 + appreciation / 100) ** (1 / 12) - 1
+  const effectiveRate = useRealTimeRate
+    ? (realTimeRate ?? baseExchangeRate)
+    : baseExchangeRate * (1 + monthlyAppreciationRate) ** month
   const monthlyPiggyVestRate = piggyVestAnnualRate / 12
   const monthlyRiseVestRate = riseVestAnnualRate / 12
 
@@ -57,10 +61,10 @@ export function calculateMonthlyData(
   const monthlyUSDConversion = piggyVestInterest / baseExchangeRate
   const cumulativeUSD = monthlyUSDConversion * month
   const usdInterest = cumulativeUSD * monthlyRiseVestRate
-  const usdValue = cumulativeUSD * currentRate
+  const usdValue = cumulativeUSD * effectiveRate
 
   // Total earnings = PiggyVest interest + RiseVest USD interest converted to Naira
-  const totalEarnings = piggyVestInterest + usdInterest * currentRate
+  const totalEarnings = piggyVestInterest + usdInterest * effectiveRate
 
   return {
     month: `${MONTH_NAMES[(month - 1) % 12]}${totalMonths > 12 ? ` Y${Math.ceil(month / 12)}` : ''}`,
@@ -69,13 +73,16 @@ export function calculateMonthlyData(
     usdAdded: monthlyUSDConversion,
     cumulativeUSD,
     usdInterest,
-    exchangeRate: currentRate,
+    exchangeRate: effectiveRate,
     usdValue,
     totalEarnings,
   }
 }
 
-export function calculateInvestmentResult(scenario: InvestmentScenario): InvestmentResult {
+export function calculateInvestmentResult(
+  scenario: InvestmentScenario,
+  realTimeRate?: number,
+): InvestmentResult {
   const {
     appreciation,
     timePeriod,
@@ -84,10 +91,15 @@ export function calculateInvestmentResult(scenario: InvestmentScenario): Investm
     monthlySavings,
     principal,
     piggyVestAnnualRate,
+    useRealTimeRate,
   } = scenario
 
+  console.log(scenario)
+
   const totalMonths = timePeriod * 12
-  const finalExchangeRate = baseExchangeRate * (1 + appreciation / 100) ** timePeriod
+  const finalExchangeRate = useRealTimeRate
+    ? (realTimeRate ?? baseExchangeRate)
+    : baseExchangeRate * (1 + appreciation / 100) ** timePeriod
   const monthlyPiggyVestRate = piggyVestAnnualRate / 12
   const monthlyRiseVestRate = riseVestAnnualRate / 12
 

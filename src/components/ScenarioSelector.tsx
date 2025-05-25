@@ -13,12 +13,18 @@ import {
   VStack,
   Icon,
   Heading,
+  Switch,
+  Flex,
+  Spinner,
+  Alert,
+  AlertIcon,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { FaCog } from 'react-icons/fa';
 import { INVESTMENT_RANGES } from '../constants/investment';
 import type { InvestmentScenario } from '../types/investment';
 import { formatCurrency } from '../utils/investment-calculator';
+import { useExchangeRate } from '../hooks/useExchangeRate';
 
 const MotionBox = motion(Box);
 
@@ -27,22 +33,37 @@ interface ScenarioSelectorProps {
   onScenarioChange: (scenario: InvestmentScenario) => void;
 }
 
+type NumberField = Exclude<keyof InvestmentScenario, 'useRealTimeRate'>;
+
 export function ScenarioSelector({ scenario, onScenarioChange }: ScenarioSelectorProps) {
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const iconColor = useColorModeValue('blue.500', 'blue.300');
+  const { data, isLoading, error } = useExchangeRate();
 
-  const handleChange = (field: keyof InvestmentScenario, value: number) => {
+  const handleNumberChange = (field: NumberField, value: number) => {
     onScenarioChange({
       ...scenario,
       [field]: value,
     });
   };
 
+  const handleBooleanChange = (field: 'useRealTimeRate', value: boolean) => {
+    onScenarioChange({
+      ...scenario,
+      [field]: value,
+      ...(value && data && {
+        appreciation: data.expectedAppreciation,
+        baseExchangeRate: data.rate,
+      }),
+    });
+  };
+
   const renderNumberInput = (
     label: string,
-    field: keyof InvestmentScenario,
-    format?: (value: number) => string
+    field: NumberField,
+    format?: (value: number) => string,
+    isDisabled?: boolean
   ) => {
     const range = INVESTMENT_RANGES[field];
     return (
@@ -58,8 +79,9 @@ export function ScenarioSelector({ scenario, onScenarioChange }: ScenarioSelecto
             min={range.min}
             max={range.max}
             step={range.step}
-            onChange={(_, value) => handleChange(field, value)}
+            onChange={(_, value) => handleNumberChange(field, value)}
             size="lg"
+            isDisabled={isDisabled}
           >
             <NumberInputField
               _focus={{
@@ -102,9 +124,45 @@ export function ScenarioSelector({ scenario, onScenarioChange }: ScenarioSelecto
           </Heading>
         </Box>
 
+        <FormControl display="flex" alignItems="center">
+          <FormLabel htmlFor="use-real-time" mb="0">
+            Use Real-Time Exchange Rate
+          </FormLabel>
+          <Switch
+            id="use-real-time"
+            isChecked={scenario.useRealTimeRate}
+            onChange={(e) => handleBooleanChange('useRealTimeRate', e.target.checked)}
+            colorScheme="blue"
+          />
+        </FormControl>
+
+        {scenario.useRealTimeRate && (
+          <Alert status={isLoading ? "info" : error ? "error" : "success"} borderRadius="md">
+            <AlertIcon />
+            {isLoading ? (
+              <Flex align="center" gap={2}>
+                <Spinner size="sm" />
+                <Text>Fetching current exchange rate...</Text>
+              </Flex>
+            ) : error ? (
+              <Text>Failed to fetch exchange rates. Please try again later.</Text>
+            ) : data ? (
+              <VStack align="start" spacing={1}>
+                <Text>Current USD/NGN Rate: ₦{data.rate.toLocaleString()}</Text>
+                <Text>Expected Annual Appreciation: {data.expectedAppreciation}%</Text>
+              </VStack>
+            ) : null}
+          </Alert>
+        )}
+
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
           {renderNumberInput('Time Period (Years)', 'timePeriod')}
-          {renderNumberInput('USD Appreciation (%)', 'appreciation')}
+          {renderNumberInput(
+            'USD Appreciation (%)',
+            'appreciation',
+            (value) => `${value}%`,
+            scenario.useRealTimeRate
+          )}
           {renderNumberInput('Initial Investment', 'principal', formatCurrency)}
           {renderNumberInput('Monthly Savings', 'monthlySavings', formatCurrency)}
           {renderNumberInput('PiggyVest Annual Rate (%)', 'piggyVestAnnualRate', (value) => `${(value * 100).toFixed(1)}%`)}

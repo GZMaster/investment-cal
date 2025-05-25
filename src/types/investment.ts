@@ -6,6 +6,7 @@ export interface InvestmentScenario {
   piggyVestAnnualRate: number
   riseVestAnnualRate: number
   baseExchangeRate: number
+  useRealTimeRate: boolean
 }
 
 export interface InvestmentResult {

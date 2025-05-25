@@ -8,6 +8,7 @@ export const DEFAULT_SCENARIO: InvestmentScenario = {
   piggyVestAnnualRate: 0.18,
   riseVestAnnualRate: 0.08,
   baseExchangeRate: 1650,
+  useRealTimeRate: false,
 }
 
 export const INVESTMENT_RANGES = {
@@ -27,7 +28,7 @@ export const INVESTMENT_RANGES = {
     step: 1000000,
   },
   monthlySavings: {
-    min: 100000,
+    min: 0,
     max: 10000000,
     step: 100000,
   },

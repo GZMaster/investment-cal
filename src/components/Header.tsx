@@ -3,13 +3,12 @@ import {
   Container,
   Flex,
   Heading,
-  Icon,
+  Image,
   Text,
   VStack,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { FaChartLine } from 'react-icons/fa';
 
 const MotionBox = motion(Box);
 
@@ -35,7 +34,12 @@ export function Header() {
             transition={{ duration: 0.5 }}
           >
             <Flex align="center" gap={3}>
-              <Icon as={FaChartLine} boxSize={8} color={iconColor} />
+              <Image
+                src="/favicon.svg"
+                alt="Investment Strategy Logo"
+                boxSize={8}
+                objectFit="contain"
+              />
               <Heading
                 size="2xl"
                 fontWeight="bold"
