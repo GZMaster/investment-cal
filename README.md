@@ -10,13 +10,13 @@ A comprehensive collection of financial tools to help you make better investment
    - Compare Single-Tier vs Two-Tier Investment Strategies
    - Real-time exchange rates integration
    - Detailed investment analysis and visualization
-   - [Try it now](/calculator)
+   - [Try it now](https://investment-cal-beta.vercel.app/calculator)
 
 2. **Budget Analysis Tool**
    - Track spending and savings across multiple platforms
    - Debt management and allocation planning
    - Visual progress tracking
-   - [Try it now](/budget)
+   - [Try it now](https://investment-cal-beta.vercel.app/budget)
 
 ### Coming Soon
 
