@@ -35,6 +35,14 @@ export interface PlatformBalance {
   expectedDebtBalance: number
 }
 
+export interface WeeklyAllocation {
+  piggyvest: number
+  fairmoneySavings: number
+  risevest: number
+  greyCard: number
+  fairmoney: number
+}
+
 export const PLATFORMS: Platform[] = [
   {
     id: 'piggyvest',
