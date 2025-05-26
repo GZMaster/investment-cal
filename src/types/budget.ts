@@ -75,3 +75,49 @@ export const PLATFORMS: Platform[] = [
     currency: 'NGN',
   },
 ]
+
+export const INITIAL_BALANCES: PlatformBalance[] = [
+  {
+    platformId: 'piggyvest',
+    currentBalance: 6000000,
+    expectedBalance: 7000000,
+    debtBalance: 0,
+    expectedDebtBalance: 0,
+  },
+  {
+    platformId: 'risevest',
+    currentBalance: 130,
+    expectedBalance: 130,
+    debtBalance: 0,
+    expectedDebtBalance: 0,
+  },
+  {
+    platformId: 'fairmoney-savings',
+    currentBalance: 0,
+    expectedBalance: 200000,
+    debtBalance: 0,
+    expectedDebtBalance: 0,
+  },
+  {
+    platformId: 'fairmoney',
+    currentBalance: 0,
+    expectedBalance: 0,
+    debtBalance: 0,
+    expectedDebtBalance: 0,
+  },
+  {
+    platformId: 'grey-card',
+    currentBalance: 0,
+    expectedBalance: 20000,
+    debtBalance: 0,
+    expectedDebtBalance: 0,
+  },
+]
+
+export const INITIAL_WEEKLY_ALLOCATION: WeeklyAllocation = {
+  piggyvest: 200000,
+  fairmoneySavings: 50000,
+  risevest: 10000,
+  greyCard: 10000,
+  fairmoney: 50000,
+}

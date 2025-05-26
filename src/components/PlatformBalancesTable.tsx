@@ -13,7 +13,7 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react';
-import { PLATFORMS, type PlatformBalance } from '../types/budget';
+import { PLATFORMS, type PlatformBalance, type WeeklyAllocation } from '../types/budget';
 
 interface PlatformBalancesTableProps {
   balances: PlatformBalance[];
@@ -23,6 +23,8 @@ interface PlatformBalancesTableProps {
   isRateLoading: boolean;
   rateError: unknown;
   exchangeRateData?: { rate: number };
+  numWeeks: number;
+  weeklyAllocation: WeeklyAllocation;
 }
 
 export function PlatformBalancesTable({
@@ -33,6 +35,8 @@ export function PlatformBalancesTable({
   isRateLoading,
   rateError,
   exchangeRateData,
+  numWeeks,
+  weeklyAllocation,
 }: PlatformBalancesTableProps) {
   return (
     <Card>
@@ -54,10 +58,18 @@ export function PlatformBalancesTable({
               const platform = PLATFORMS.find(p => p.id === balance.platformId);
               const currency = platform?.currency || 'NGN';
               const progress = balance.expectedBalance > 0
-                ? (balance.currentBalance / balance.expectedBalance) * 100
+                ? ((balance.currentBalance === 0 ? 1 : balance.currentBalance) / balance.expectedBalance) * 100
                 : 0;
               const isRiseVest = balance.platformId === 'risevest';
               const usdToNgn = exchangeRateData?.rate;
+              // Calculate expectedBalance based on allocation and numWeeks
+              let expectedBalance = balance.currentBalance;
+              const allocation = weeklyAllocation[balance.platformId as keyof WeeklyAllocation] || 0;
+              if (isRiseVest && usdToNgn) {
+                expectedBalance += (allocation / usdToNgn) * numWeeks;
+              } else {
+                expectedBalance += allocation * numWeeks;
+              }
               return (
                 <Tr key={balance.platformId}>
                   <Td>
@@ -78,9 +90,9 @@ export function PlatformBalancesTable({
                       </Box>
                     )}
                   </Td>
-                  <Td isNumeric>{formatAmount(balance.expectedBalance, currency)}</Td>
+                  <Td isNumeric>{formatAmount(expectedBalance, currency)}</Td>
                   <Td isNumeric>{formatAmount(balance.debtBalance, currency)}</Td>
-                  <Td isNumeric>{formatAmount(balance.expectedDebtBalance, currency)}</Td>
+                  <Td isNumeric>{formatAmount(Math.max(0, balance.debtBalance - expectedBalance), currency)}</Td>
                   <Td>
                     <Progress
                       value={progress}

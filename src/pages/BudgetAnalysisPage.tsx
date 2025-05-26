@@ -1,7 +1,7 @@
 import { Container, VStack, Heading, useToast } from '@chakra-ui/react';
 import { useCallback, useState } from 'react';
 import { SEO } from '../components/SEO';
-import { PLATFORMS, type PlatformBalance } from '../types/budget';
+import { PLATFORMS, type PlatformBalance, INITIAL_BALANCES, INITIAL_WEEKLY_ALLOCATION, type WeeklyAllocation } from '../types/budget';
 import { useExchangeRate } from '../hooks/useExchangeRate';
 import { SetPlatformBalancesSection } from '../components/SetPlatformBalancesSection';
 import { IncomeAndAllocationSection } from '../components/IncomeAndAllocationSection';
@@ -9,60 +9,6 @@ import { SummaryCardsSection } from '../components/SummaryCardsSection';
 import { PlatformBalancesTable } from '../components/PlatformBalancesTable';
 import { MonthlyAllocationTable } from '../components/MonthlyAllocationTable';
 import { BudgetVisualizations } from '../components/BudgetVisualizations';
-
-const INITIAL_BALANCES: PlatformBalance[] = [
-  {
-    platformId: 'piggyvest',
-    currentBalance: 4000000,
-    expectedBalance: 5000000,
-    debtBalance: 1000000,
-    expectedDebtBalance: 0,
-  },
-  {
-    platformId: 'risevest',
-    currentBalance: 79.85,
-    expectedBalance: 99.85,
-    debtBalance: 0,
-    expectedDebtBalance: 0,
-  },
-  {
-    platformId: 'fairmoney-savings',
-    currentBalance: 0,
-    expectedBalance: 200000,
-    debtBalance: 0,
-    expectedDebtBalance: 0,
-  },
-  {
-    platformId: 'fairmoney',
-    currentBalance: 0,
-    expectedBalance: 0,
-    debtBalance: 0,
-    expectedDebtBalance: 0,
-  },
-  {
-    platformId: 'grey-card',
-    currentBalance: 0,
-    expectedBalance: 20000,
-    debtBalance: 0,
-    expectedDebtBalance: 0,
-  },
-];
-
-interface WeeklyAllocation {
-  piggyvest: number;
-  fairmoneySavings: number;
-  risevest: number;
-  greyCard: number;
-  fairmoney: number;
-}
-
-const INITIAL_WEEKLY_ALLOCATION: WeeklyAllocation = {
-  piggyvest: 200000,
-  fairmoneySavings: 50000,
-  risevest: 10,
-  greyCard: 10000,
-  fairmoney: 50000,
-};
 
 // Helper: Format currency for charts (₦1.2M, ₦350.0k, ₦500)
 function formatCurrencyShort(value: number): string {
@@ -74,7 +20,6 @@ function formatCurrencyShort(value: number): string {
 export function BudgetAnalysisPage() {
   const [balances, setBalances] = useState<PlatformBalance[]>(INITIAL_BALANCES);
   const [weeklyIncome, setWeeklyIncome] = useState(350000);
-  const [weeklyAllocation, setWeeklyAllocation] = useState<WeeklyAllocation>(INITIAL_WEEKLY_ALLOCATION);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingBalances, setIsEditingBalances] = useState(false);
   const [pendingBalances, setPendingBalances] = useState<PlatformBalance[] | null>(null);
@@ -83,6 +28,7 @@ export function BudgetAnalysisPage() {
   const now = new Date();
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth()); // 0-indexed
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  const [weeklyAllocation, setWeeklyAllocation] = useState<WeeklyAllocation>(INITIAL_WEEKLY_ALLOCATION);
 
   const getPlatformName = (platformId: string) => {
     return PLATFORMS.find(p => p.id === platformId)?.name || platformId;
@@ -100,19 +46,6 @@ export function BudgetAnalysisPage() {
   };
 
   const handleSave = useCallback(() => {
-    // Calculate total allocation in NGN (all allocations are in NGN)
-    const totalAllocation = Object.values(weeklyAllocation).reduce((sum, amount) => sum + amount, 0);
-
-    // if (totalAllocation > weeklyIncome) {
-    //   toast({
-    //     title: 'Invalid Allocation',
-    //     description: 'Total allocation cannot exceed weekly income',
-    //     status: 'error',
-    //     duration: 3000,
-    //     isClosable: true,
-    //   });
-    //   return;
-    // }
 
     // Update balances with new allocations
     const updatedBalances = balances.map(balance => {
@@ -141,7 +74,7 @@ export function BudgetAnalysisPage() {
       duration: 3000,
       isClosable: true,
     });
-  }, [weeklyAllocation, weeklyIncome, balances, toast, exchangeRateData]);
+  }, [weeklyIncome, toast, exchangeRateData, balances, weeklyAllocation]);
 
   const totalSavings = balances.reduce((sum, balance) => sum + balance.currentBalance, 0);
   const totalDebt = balances.reduce((sum, balance) => sum + balance.debtBalance, 0);
@@ -176,6 +109,7 @@ export function BudgetAnalysisPage() {
   }
 
   const lastFridays = getLastFridaysOfWeeks(selectedYear, selectedMonth);
+  const numWeeks = lastFridays.length;
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -243,6 +177,8 @@ export function BudgetAnalysisPage() {
           isRateLoading={isRateLoading}
           rateError={rateError}
           exchangeRateData={exchangeRateData}
+          numWeeks={numWeeks}
+          weeklyAllocation={weeklyAllocation}
         />
 
         <MonthlyAllocationTable
