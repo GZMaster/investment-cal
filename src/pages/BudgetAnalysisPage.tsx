@@ -200,6 +200,8 @@ export function BudgetAnalysisPage() {
           weeklyAllocation={weeklyAllocation}
           getPlatformName={getPlatformName}
           formatCurrencyShort={formatCurrencyShort}
+          numWeeks={numWeeks}
+          exchangeRateData={exchangeRateData}
         />
       </VStack>
     </Container>
