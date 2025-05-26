@@ -1,41 +1,43 @@
 import {
-  Box,
-  Container,
-  VStack,
-  Heading,
-  SimpleGrid,
-  useColorModeValue,
+  Badge,
+  Button,
   Card,
   CardBody,
-  Text,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  StatArrow,
-  Progress,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Badge,
-  Input,
+  Container,
   FormControl,
   FormLabel,
+  HStack,
+  Heading,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
-  HStack,
-  Button,
+  Progress,
+  SimpleGrid,
+  Stat,
+  StatArrow,
+  StatHelpText,
+  StatLabel,
+  StatNumber,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  VStack,
+  useColorModeValue,
   useToast,
+  Box,
+  Tooltip,
+  Select
 } from '@chakra-ui/react';
-import { useState, useCallback } from 'react';
-import { PLATFORMS, type PlatformBalance } from '../types/budget';
+import { useCallback, useState } from 'react';
 import { SEO } from '../components/SEO';
+import { PLATFORMS, type PlatformBalance } from '../types/budget';
+import { useExchangeRate } from '../hooks/useExchangeRate';
 
 const INITIAL_BALANCES: PlatformBalance[] = [
   {
@@ -96,7 +98,13 @@ export function BudgetAnalysisPage() {
   const [weeklyIncome, setWeeklyIncome] = useState(350000);
   const [weeklyAllocation, setWeeklyAllocation] = useState<WeeklyAllocation>(INITIAL_WEEKLY_ALLOCATION);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingBalances, setIsEditingBalances] = useState(false);
+  const [pendingBalances, setPendingBalances] = useState<PlatformBalance[] | null>(null);
   const toast = useToast();
+  const { data: exchangeRateData, isLoading: isRateLoading, error: rateError } = useExchangeRate();
+  const now = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(now.getMonth()); // 0-indexed
+  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
 
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
@@ -158,6 +166,41 @@ export function BudgetAnalysisPage() {
   const totalDebt = balances.reduce((sum, balance) => sum + balance.debtBalance, 0);
   const monthlyIncome = weeklyIncome * 4;
 
+  // Helper: Get all last Fridays for each week in the selected month/year
+  function getLastFridaysOfWeeks(year: number, month: number): Date[] {
+    const dates: Date[] = [];
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const weekStart = new Date(firstDay);
+    while (weekStart <= lastDay) {
+      // Find the last Friday in this week
+      let lastFriday: Date | null = null;
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(weekStart);
+        d.setDate(weekStart.getDate() + i);
+        if (d > lastDay) break;
+        if (d.getDay() === 5) lastFriday = d;
+      }
+      // If no Friday, use last day of week (or last day of month)
+      if (!lastFriday) {
+        const endOfWeek = new Date(weekStart);
+        endOfWeek.setDate(weekStart.getDate() + 6);
+        lastFriday = endOfWeek > lastDay ? lastDay : endOfWeek;
+      }
+      dates.push(lastFriday);
+      // Move to next week
+      weekStart.setDate(weekStart.getDate() + 7);
+    }
+    return dates;
+  }
+
+  const lastFridays = getLastFridaysOfWeeks(selectedYear, selectedMonth);
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  const yearOptions = Array.from({ length: 5 }, (_, i) => now.getFullYear() - 2 + i);
+
   return (
     <Container maxW="container.xl" py={8}>
       <SEO
@@ -174,6 +217,87 @@ export function BudgetAnalysisPage() {
       />
       <VStack spacing={8} align="stretch">
         <Heading>Budget Analysis</Heading>
+
+        {/* Set Platform Balances Section */}
+        <Card bg={bgColor} border="1px solid" borderColor={borderColor}>
+          <CardBody>
+            <Heading size="md" mb={4}>Set Platform Balances (Start of Month)</Heading>
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4} mb={4}>
+              {(isEditingBalances ? (pendingBalances ?? balances) : balances).map((balance, idx) => {
+                const platform = PLATFORMS.find(p => p.id === balance.platformId);
+                const currency = platform?.currency || 'NGN';
+                const isRiseVest = balance.platformId === 'risevest';
+                const usdToNgn = exchangeRateData?.rate;
+                const tooltipLabel = `Current balance for ${getPlatformName(balance.platformId)}: ${currency === 'USD' ? `${balance.currentBalance.toLocaleString(undefined, { maximumFractionDigits: 8 })} USD` : `${balance.currentBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })} NGN`}`;
+                return (
+                  <FormControl key={balance.platformId}>
+                    <FormLabel>{getPlatformName(balance.platformId)} ({currency})</FormLabel>
+                    <Tooltip label={tooltipLabel} placement="top" hasArrow>
+                      <NumberInput
+                        value={balance.currentBalance}
+                        min={0}
+                        precision={currency === 'USD' ? 2 : 0}
+                        step={currency === 'USD' ? 0.01 : 1000}
+                        isDisabled={!isEditingBalances}
+                        onChange={(_, value) => {
+                          if (!isEditingBalances) return;
+                          setPendingBalances(prev => {
+                            const arr = prev ? [...prev] : balances.map(b => ({ ...b }));
+                            arr[idx].currentBalance = value;
+                            return arr;
+                          });
+                        }}
+                        size="sm"
+                      >
+                        <NumberInputField />
+                        <NumberInputStepper>
+                          <NumberIncrementStepper />
+                          <NumberDecrementStepper />
+                        </NumberInputStepper>
+                      </NumberInput>
+                    </Tooltip>
+                    {isRiseVest && !isEditingBalances && (
+                      <Box fontSize="sm" color="gray.500">
+                        {isRateLoading && ' (Loading NGN...)'}
+                        {rateError && ' (Rate error)'}
+                        {usdToNgn &&
+                          ` ≈ ₦${(balance.currentBalance * usdToNgn).toLocaleString(undefined, { maximumFractionDigits: 0 })}`
+                        }
+                      </Box>
+                    )}
+                  </FormControl>
+                );
+              })}
+            </SimpleGrid>
+            <HStack spacing={4}>
+              {isEditingBalances ? (
+                <>
+                  <Button colorScheme="blue" onClick={() => {
+                    if (pendingBalances) setBalances(pendingBalances);
+                    setIsEditingBalances(false);
+                    setPendingBalances(null);
+                    toast({ title: 'Balances Updated', status: 'success', duration: 2000, isClosable: true });
+                  }}>
+                    Save Balances
+                  </Button>
+                  <Button variant="ghost" onClick={() => {
+                    setIsEditingBalances(false);
+                    setPendingBalances(null);
+                  }}>
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <Button colorScheme="blue" onClick={() => {
+                  setIsEditingBalances(true);
+                  setPendingBalances(balances.map(b => ({ ...b })));
+                }}>
+                  Edit Balances
+                </Button>
+              )}
+            </HStack>
+          </CardBody>
+        </Card>
 
         {/* Income and Allocation Controls */}
         <Card bg={bgColor} border="1px solid" borderColor={borderColor}>
@@ -297,13 +421,14 @@ export function BudgetAnalysisPage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {balances.map((balance) => {
+                {balances.map((balance, idx) => {
                   const platform = PLATFORMS.find(p => p.id === balance.platformId);
                   const currency = platform?.currency || 'NGN';
                   const progress = balance.expectedBalance > 0
                     ? (balance.currentBalance / balance.expectedBalance) * 100
                     : 0;
-
+                  const isRiseVest = balance.platformId === 'risevest';
+                  const usdToNgn = exchangeRateData?.rate;
                   return (
                     <Tr key={balance.platformId}>
                       <Td>
@@ -312,7 +437,41 @@ export function BudgetAnalysisPage() {
                           {platform?.type}
                         </Badge>
                       </Td>
-                      <Td isNumeric>{formatAmount(balance.currentBalance, currency)}</Td>
+                      <Td isNumeric>
+                        {isEditing ? (
+                          <NumberInput
+                            value={balance.currentBalance}
+                            min={0}
+                            precision={currency === 'USD' ? 2 : 0}
+                            step={currency === 'USD' ? 0.01 : 1000}
+                            onChange={(_, value) => {
+                              setBalances(prev => prev.map((b, i) =>
+                                i === idx ? { ...b, currentBalance: value } : b
+                              ));
+                            }}
+                            size="sm"
+                          >
+                            <NumberInputField />
+                            <NumberInputStepper>
+                              <NumberIncrementStepper />
+                              <NumberDecrementStepper />
+                            </NumberInputStepper>
+                          </NumberInput>
+                        ) : (
+                          <>
+                            {formatAmount(balance.currentBalance, currency)}
+                            {isRiseVest && (
+                              <Box fontSize="sm" color="gray.500">
+                                {isRateLoading && ' (Loading NGN...)'}
+                                {rateError && ' (Rate error)'}
+                                {usdToNgn &&
+                                  ` ≈ ₦${(balance.currentBalance * usdToNgn).toLocaleString(undefined, { maximumFractionDigits: 0 })}`
+                                }
+                              </Box>
+                            )}
+                          </>
+                        )}
+                      </Td>
                       <Td isNumeric>{formatAmount(balance.expectedBalance, currency)}</Td>
                       <Td isNumeric>{formatAmount(balance.debtBalance, currency)}</Td>
                       <Td isNumeric>{formatAmount(balance.expectedDebtBalance, currency)}</Td>
@@ -329,6 +488,14 @@ export function BudgetAnalysisPage() {
                 })}
               </Tbody>
             </Table>
+            {/* Show exchange rate info if RiseVest is present */}
+            {balances.some(b => b.platformId === 'risevest') && (
+              <Box mt={2} fontSize="sm" color="gray.500">
+                {isRateLoading && 'Fetching USD/NGN rate...'}
+                {rateError && 'Failed to fetch USD/NGN rate.'}
+                {exchangeRateData && `Current USD/NGN rate: ₦${exchangeRateData.rate.toLocaleString()}`}
+              </Box>
+            )}
           </CardBody>
         </Card>
 
@@ -336,28 +503,46 @@ export function BudgetAnalysisPage() {
         <Card bg={bgColor} border="1px solid" borderColor={borderColor}>
           <CardBody>
             <Heading size="md" mb={4}>Monthly Allocation Plan</Heading>
-            <Table variant="simple">
+            <HStack mb={4} gap={4}>
+              <FormControl maxW="200px">
+                <FormLabel>Month</FormLabel>
+                <Select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))}>
+                  {monthNames.map((name, idx) => (
+                    <option key={name} value={idx}>{name}</option>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl maxW="120px">
+                <FormLabel>Year</FormLabel>
+                <Select value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))}>
+                  {yearOptions.map(y => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </Select>
+              </FormControl>
+            </HStack>
+            <Table variant="simple" sx={{ tableLayout: 'fixed' }}>
               <Thead>
                 <Tr>
-                  <Th>Date</Th>
-                  <Th>Income</Th>
-                  <Th>PiggyVest</Th>
-                  <Th>FairMoney Savings</Th>
-                  <Th>RiseVest</Th>
-                  <Th>Grey Card</Th>
-                  <Th>FairMoney</Th>
+                  <Th minW="140px" maxW="180px">Date</Th>
+                  <Th isNumeric minW="110px">Income</Th>
+                  <Th isNumeric minW="110px">PiggyVest</Th>
+                  <Th isNumeric minW="140px">FairMoney Savings</Th>
+                  <Th isNumeric minW="110px">RiseVest</Th>
+                  <Th isNumeric minW="110px">Grey Card</Th>
+                  <Th isNumeric minW="110px">FairMoney</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {[7, 14, 21, 28].map((date) => (
-                  <Tr key={date}>
-                    <Td>{date}th</Td>
-                    <Td isNumeric>{formatAmount(weeklyIncome, 'NGN')}</Td>
-                    <Td isNumeric>{formatAmount(weeklyAllocation.piggyvest, 'NGN')}</Td>
-                    <Td isNumeric>{formatAmount(weeklyAllocation.fairmoneySavings, 'NGN')}</Td>
-                    <Td isNumeric>{formatAmount(weeklyAllocation.risevest, 'USD')}</Td>
-                    <Td isNumeric>{formatAmount(weeklyAllocation.greyCard, 'NGN')}</Td>
-                    <Td isNumeric>{formatAmount(weeklyAllocation.fairmoney, 'NGN')}</Td>
+                {lastFridays.map((date) => (
+                  <Tr key={date.toISOString()}>
+                    <Td minW="140px" maxW="180px">{date.toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</Td>
+                    <Td isNumeric minW="110px"><Box as="span" fontFamily="mono">{formatAmount(weeklyIncome, 'NGN')}</Box></Td>
+                    <Td isNumeric minW="110px"><Box as="span" fontFamily="mono">{formatAmount(weeklyAllocation.piggyvest, 'NGN')}</Box></Td>
+                    <Td isNumeric minW="140px"><Box as="span" fontFamily="mono">{formatAmount(weeklyAllocation.fairmoneySavings, 'NGN')}</Box></Td>
+                    <Td isNumeric minW="110px"><Box as="span" fontFamily="mono">{formatAmount(weeklyAllocation.risevest, 'USD')}</Box></Td>
+                    <Td isNumeric minW="110px"><Box as="span" fontFamily="mono">{formatAmount(weeklyAllocation.greyCard, 'NGN')}</Box></Td>
+                    <Td isNumeric minW="110px"><Box as="span" fontFamily="mono">{formatAmount(weeklyAllocation.fairmoney, 'NGN')}</Box></Td>
                   </Tr>
                 ))}
               </Tbody>
