@@ -204,7 +204,6 @@ export function BudgetAnalysisPage() {
         <BudgetVisualizations
           balances={balances}
           weeklyAllocation={weeklyAllocation}
-          getPlatformName={getPlatformName}
           formatCurrencyShort={formatCurrencyShort}
           numWeeks={numWeeks}
           exchangeRateData={exchangeRateData}

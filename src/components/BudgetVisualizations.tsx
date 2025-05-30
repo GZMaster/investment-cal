@@ -5,6 +5,7 @@ import {
   Heading,
   SimpleGrid,
   Box,
+  Text,
 } from '@chakra-ui/react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, Legend, Tooltip as RechartsTooltip } from 'recharts';
 import { type PlatformBalance, type WeeklyAllocation } from '../types/budget';
@@ -13,7 +14,6 @@ import { usePlatforms } from '../hooks/usePlatforms';
 interface BudgetVisualizationsProps {
   balances: PlatformBalance[];
   weeklyAllocation: WeeklyAllocation;
-  getPlatformName: (id: string) => string;
   formatCurrencyShort: (value: number) => string;
   numWeeks: number;
   exchangeRateData?: { rate: number };
@@ -25,9 +25,35 @@ function BarChartTooltip({ active, payload }: any): React.ReactNode {
       <Box bg="white" p={3} borderWidth="1px" borderRadius="md" boxShadow="md">
         {payload.map((entry: any) => (
           <Box as="span" key={entry.dataKey} color={entry.color} fontWeight="bold" display="block">
-            {entry.name}: {entry.value}
+            {entry.name}: {entry.value.toLocaleString(undefined, {
+              style: 'currency',
+              currency: entry.payload.currency === 'USD' ? 'USD' : 'NGN',
+              maximumFractionDigits: entry.payload.currency === 'USD' ? 2 : 0
+            })}
           </Box>
         ))}
+      </Box>
+    );
+  }
+  return null;
+}
+
+function PieChartTooltip({ active, payload }: any): React.ReactNode {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <Box bg="white" p={3} borderWidth="1px" borderRadius="md" boxShadow="md">
+        <Text fontWeight="bold">{data.name}</Text>
+        <Text>
+          {data.value.toLocaleString(undefined, {
+            style: 'currency',
+            currency: data.currency === 'USD' ? 'USD' : 'NGN',
+            maximumFractionDigits: data.currency === 'USD' ? 2 : 0
+          })}
+        </Text>
+        <Text color="gray.500">
+          {((data.percent || 0) * 100).toFixed(1)}%
+        </Text>
       </Box>
     );
   }
@@ -37,7 +63,6 @@ function BarChartTooltip({ active, payload }: any): React.ReactNode {
 export function BudgetVisualizations({
   balances,
   weeklyAllocation,
-  getPlatformName,
   formatCurrencyShort,
   numWeeks,
   exchangeRateData,
@@ -62,16 +87,40 @@ export function BudgetVisualizations({
     };
   });
 
+  // Calculate total weekly income from allocations
+  const totalWeeklyIncome = Object.values(weeklyAllocation).reduce((sum, v) => sum + v, 0);
+  const totalMonthlyIncome = totalWeeklyIncome * numWeeks;
+
+  // Calculate total allocations for the month
+  const totalAllocations = platforms.reduce((sum, p) => {
+    const allocation = weeklyAllocation[p.id] || 0;
+    if (p.currency === 'USD' && exchangeRateData?.rate) {
+      return sum + ((allocation * numWeeks) / exchangeRateData.rate);
+    }
+    return sum + (allocation * numWeeks);
+  }, 0);
+
+  // Calculate balance left
+  const balanceLeft = Math.max(0, totalMonthlyIncome - totalAllocations);
+
   // Pie chart data: monthly allocation
-  const totalAllocations = platforms.reduce((sum, p) => sum + ((weeklyAllocation[p.id] || 0) * numWeeks), 0);
-  const balanceLeft = Math.max(0, (numWeeks * (Object.values(weeklyAllocation).reduce((sum, v) => sum + v, 0))) - totalAllocations);
   const pieData = [
-    ...platforms.map(p => ({
-      name: p.name,
-      value: (weeklyAllocation[p.id] || 0) * numWeeks,
-    })),
-    { name: 'Balance Left', value: balanceLeft }
+    ...platforms.map(p => {
+      const allocation = weeklyAllocation[p.id] || 0;
+      const monthlyAllocation = p.currency === 'USD' && exchangeRateData?.rate
+        ? (allocation * numWeeks) / exchangeRateData.rate
+        : allocation * numWeeks;
+
+      return {
+        name: p.name,
+        value: monthlyAllocation,
+        currency: p.currency,
+      };
+    }),
+    { name: 'Balance Left', value: balanceLeft, currency: 'NGN' }
   ];
+
+  const COLORS = ['#3182ce', '#38a169', '#d69e2e', '#e53e3e', '#805ad5', '#dd6b20', '#6b46c1', '#2c5282'];
 
   return (
     <Card mt={8}>
@@ -84,8 +133,18 @@ export function BudgetVisualizations({
             <ResponsiveContainer width="100%" height={320}>
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={formatCurrencyShort} />
+                <XAxis
+                  dataKey="name"
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                  interval={0}
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis
+                  tickFormatter={formatCurrencyShort}
+                  width={80}
+                />
                 <RechartsTooltip content={BarChartTooltip} />
                 <Legend />
                 <Bar dataKey="Current Balance" fill="#3182ce" />
@@ -107,13 +166,23 @@ export function BudgetVisualizations({
                   cx="50%"
                   cy="50%"
                   outerRadius={100}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) =>
+                    percent > 0.05 ? `${name}: ${(percent * 100).toFixed(0)}%` : ''
+                  }
                 >
                   {pieData.map((entry, i) => (
-                    <Cell key={entry.name} fill={entry.name === 'Balance Left' ? '#A0AEC0' : ["#3182ce", "#38a169", "#d69e2e", "#e53e3e", "#805ad5"][i % 5]} />
+                    <Cell
+                      key={entry.name}
+                      fill={entry.name === 'Balance Left' ? '#A0AEC0' : COLORS[i % COLORS.length]}
+                    />
                   ))}
                 </Pie>
-                <Legend />
+                <RechartsTooltip content={PieChartTooltip} />
+                <Legend
+                  layout="vertical"
+                  align="right"
+                  verticalAlign="middle"
+                />
               </PieChart>
             </ResponsiveContainer>
           </Box>
