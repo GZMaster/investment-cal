@@ -7,7 +7,7 @@ import {
   Box,
 } from '@chakra-ui/react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, Legend, Tooltip as RechartsTooltip } from 'recharts';
-import { PLATFORMS, type PlatformBalance, type WeeklyAllocation } from '../types/budget';
+import { getDefaultPlatforms, type PlatformBalance, type WeeklyAllocation } from '../types/budget';
 
 interface BudgetVisualizationsProps {
   balances: PlatformBalance[];
@@ -60,11 +60,10 @@ export function BudgetVisualizations({
     };
   });
   // Pie chart data: monthly allocation
-  const monthlyIncome = (Object.values(weeklyAllocation).reduce((sum, v) => sum + v, 0) < 1) ? 0 : numWeeks * (Object.values(weeklyAllocation).reduce((sum, v) => sum + v, 0));
-  const totalAllocations = PLATFORMS.reduce((sum, p) => sum + ((weeklyAllocation[p.id as keyof WeeklyAllocation] || 0) * numWeeks), 0);
+  const totalAllocations = getDefaultPlatforms().reduce((sum, p) => sum + ((weeklyAllocation[p.id as keyof WeeklyAllocation] || 0) * numWeeks), 0);
   const balanceLeft = Math.max(0, (numWeeks * (Object.values(weeklyAllocation).reduce((sum, v) => sum + v, 0))) - totalAllocations);
   const pieData = [
-    ...PLATFORMS.map(p => ({
+    ...getDefaultPlatforms().map(p => ({
       name: p.name,
       value: (weeklyAllocation[p.id as keyof WeeklyAllocation] || 0) * numWeeks,
     })),

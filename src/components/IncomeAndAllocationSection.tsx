@@ -16,7 +16,7 @@ import {
   HStack,
   Box,
 } from '@chakra-ui/react';
-import { PLATFORMS, type WeeklyAllocation } from '../types/budget';
+import { getDefaultPlatforms, type WeeklyAllocation } from '../types/budget';
 
 interface IncomeAndAllocationSectionProps {
   weeklyIncome: number;
@@ -59,7 +59,7 @@ export function IncomeAndAllocationSection({
 
           <Heading size="md">Weekly Allocations</Heading>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} width="100%">
-            {PLATFORMS.map((platform) => (
+            {getDefaultPlatforms().map((platform) => (
               <FormControl key={platform.id}>
                 <FormLabel>
                   {platform.name} {platform.id === 'risevest' ? '(NGN input, converts to USD)' : `(${platform.currency})`}

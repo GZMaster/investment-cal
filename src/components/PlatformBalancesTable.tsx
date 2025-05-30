@@ -13,7 +13,7 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react';
-import { PLATFORMS, type PlatformBalance, type WeeklyAllocation } from '../types/budget';
+import { getDefaultPlatforms, type PlatformBalance, type WeeklyAllocation } from '../types/budget';
 
 interface PlatformBalancesTableProps {
   balances: PlatformBalance[];
@@ -30,7 +30,6 @@ interface PlatformBalancesTableProps {
 export function PlatformBalancesTable({
   balances,
   getPlatformName,
-  getPlatformCurrency,
   formatAmount,
   isRateLoading,
   rateError,
@@ -55,7 +54,7 @@ export function PlatformBalancesTable({
           </Thead>
           <Tbody>
             {balances.map((balance) => {
-              const platform = PLATFORMS.find(p => p.id === balance.platformId);
+              const platform = getDefaultPlatforms().find(p => p.id === balance.platformId);
               const currency = platform?.currency || 'NGN';
               const progress = balance.expectedBalance > 0
                 ? ((balance.currentBalance === 0 ? 1 : balance.currentBalance) / balance.expectedBalance) * 100

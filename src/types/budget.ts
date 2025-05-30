@@ -43,38 +43,47 @@ export interface WeeklyAllocation {
   fairmoney: number
 }
 
-export const PLATFORMS: Platform[] = [
-  {
-    id: 'piggyvest',
-    name: 'PiggyVest',
-    type: 'savings',
-    currency: 'NGN',
-  },
-  {
-    id: 'risevest',
-    name: 'RiseVest',
-    type: 'investment',
-    currency: 'USD',
-  },
-  {
-    id: 'fairmoney-savings',
-    name: 'FairMoney Savings',
-    type: 'savings',
-    currency: 'NGN',
-  },
-  {
-    id: 'fairmoney',
-    name: 'FairMoney',
-    type: 'debt',
-    currency: 'NGN',
-  },
-  {
-    id: 'grey-card',
-    name: 'Grey Card',
-    type: 'savings',
-    currency: 'NGN',
-  },
-]
+export function getDefaultPlatforms(): Platform[] {
+  return [
+    {
+      id: 'piggyvest',
+      name: 'PiggyVest',
+      type: 'savings',
+      currency: 'NGN',
+    },
+    {
+      id: 'risevest',
+      name: 'RiseVest',
+      type: 'investment',
+      currency: 'USD',
+    },
+    {
+      id: 'fairmoney-savings',
+      name: 'FairMoney Savings',
+      type: 'savings',
+      currency: 'NGN',
+    },
+    {
+      id: 'fairmoney',
+      name: 'FairMoney',
+      type: 'debt',
+      currency: 'NGN',
+    },
+    {
+      id: 'grey-card',
+      name: 'Grey Card',
+      type: 'savings',
+      currency: 'NGN',
+    },
+  ];
+}
+
+export interface PlatformManagement {
+  platforms: Platform[];
+  addPlatform: (platform: Platform) => void;
+  updatePlatform: (platform: Platform) => void;
+  deletePlatform: (platformId: string) => void;
+}
 
 export const INITIAL_BALANCES: PlatformBalance[] = [
   {

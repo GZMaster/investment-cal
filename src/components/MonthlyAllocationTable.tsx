@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Card,
   CardBody,
@@ -15,7 +14,7 @@ import {
   FormLabel,
   Select,
 } from '@chakra-ui/react';
-import { PLATFORMS, type WeeklyAllocation } from '../types/budget';
+import { getDefaultPlatforms, type WeeklyAllocation } from '../types/budget';
 
 interface MonthlyAllocationTableProps {
   lastFridays: Date[];
@@ -72,7 +71,7 @@ export function MonthlyAllocationTable({
             <Tr>
               <Th minW="140px" maxW="180px">Date</Th>
               <Th isNumeric minW="110px">Income</Th>
-              {PLATFORMS.map(platform => (
+              {getDefaultPlatforms().map(platform => (
                 <Th key={platform.id} isNumeric minW="110px">{platform.name}</Th>
               ))}
               <Th isNumeric minW="110px">Balance Left</Th>
@@ -80,13 +79,13 @@ export function MonthlyAllocationTable({
           </Thead>
           <Tbody>
             {lastFridays.map((date) => {
-              const totalAllocated = PLATFORMS.reduce((sum, platform) => sum + (weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0), 0);
+              const totalAllocated = getDefaultPlatforms().reduce((sum, platform) => sum + (weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0), 0);
               const balanceLeft = weeklyIncome - totalAllocated;
               return (
                 <Tr key={date.toISOString()}>
                   <Td minW="140px" maxW="180px">{date.toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</Td>
                   <Td isNumeric minW="110px"><Box as="span" fontFamily="mono">{formatAmount(weeklyIncome, 'NGN')}</Box></Td>
-                  {PLATFORMS.map(platform => {
+                  {getDefaultPlatforms().map(platform => {
                     if (platform.id === 'risevest') {
                       const ngnValue = weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0;
                       const usdValue = exchangeRateData?.rate ? ngnValue / exchangeRateData.rate : null;
@@ -111,14 +110,14 @@ export function MonthlyAllocationTable({
             })}
             {/* Total Row */}
             {(() => {
-              const totalAllocated = PLATFORMS.reduce((sum, platform) => sum + (weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0), 0);
+              const totalAllocated = getDefaultPlatforms().reduce((sum, platform) => sum + (weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0), 0);
               const balanceLeft = weeklyIncome - totalAllocated;
               const totalBalanceLeft = balanceLeft * numWeeks;
               return (
                 <Tr fontWeight="bold">
                   <Td minW="140px" maxW="180px">Total</Td>
                   <Td isNumeric minW="110px"><Box as="span" fontFamily="mono">{formatAmount(weeklyIncome * numWeeks, 'NGN')}</Box></Td>
-                  {PLATFORMS.map(platform => {
+                  {getDefaultPlatforms().map(platform => {
                     if (platform.id === 'risevest') {
                       const ngnValue = (weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0) * numWeeks;
                       const usdValue = exchangeRateData?.rate ? ngnValue / exchangeRateData.rate : null;
