@@ -36,11 +36,7 @@ export interface PlatformBalance {
 }
 
 export interface WeeklyAllocation {
-  piggyvest: number
-  fairmoneySavings: number
-  risevest: number
-  greyCard: number
-  fairmoney: number
+  [platformId: string]: number;
 }
 
 export function getDefaultPlatforms(): Platform[] {
@@ -123,10 +119,9 @@ export const INITIAL_BALANCES: PlatformBalance[] = [
   },
 ]
 
-export const INITIAL_WEEKLY_ALLOCATION: WeeklyAllocation = {
-  piggyvest: 200000,
-  fairmoneySavings: 50000,
-  risevest: 10000,
-  greyCard: 10000,
-  fairmoney: 50000,
+export function getInitialWeeklyAllocation(platforms: Platform[]): WeeklyAllocation {
+  return platforms.reduce((acc, platform) => ({
+    ...acc,
+    [platform.id]: 0
+  }), {});
 }

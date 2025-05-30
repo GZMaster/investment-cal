@@ -7,7 +7,8 @@ import {
   Box,
 } from '@chakra-ui/react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, Legend, Tooltip as RechartsTooltip } from 'recharts';
-import { getDefaultPlatforms, type PlatformBalance, type WeeklyAllocation } from '../types/budget';
+import { type PlatformBalance, type WeeklyAllocation } from '../types/budget';
+import { usePlatforms } from '../hooks/usePlatforms';
 
 interface BudgetVisualizationsProps {
   balances: PlatformBalance[];
@@ -41,34 +42,37 @@ export function BudgetVisualizations({
   numWeeks,
   exchangeRateData,
 }: BudgetVisualizationsProps) {
-  // Bar chart data: show current, expected, debt, expected debt
-  const barData = balances.map(b => {
-    const allocation = weeklyAllocation[b.platformId as keyof WeeklyAllocation] || 0;
-    let expectedBalance = b.currentBalance;
-    if (b.platformId === 'risevest' && exchangeRateData?.rate) {
-      expectedBalance += (allocation / exchangeRateData.rate) * numWeeks;
-    } else {
-      expectedBalance += allocation * numWeeks;
-    }
-    const expectedDebt = Math.max(0, b.debtBalance - expectedBalance);
+  const { platforms } = usePlatforms();
+
+  const chartData = platforms.map(platform => {
+    const balance = balances.find(b => b.platformId === platform.id);
+    const allocation = weeklyAllocation[platform.id] || 0;
+    const totalAllocation = platform.currency === 'USD' && exchangeRateData?.rate
+      ? (allocation * numWeeks) / exchangeRateData.rate
+      : allocation * numWeeks;
+
     return {
-      name: getPlatformName(b.platformId),
-      'Current Balance': b.currentBalance,
-      'Expected Balance': expectedBalance,
-      'Debt Balance': b.debtBalance,
-      'Expected Debt': expectedDebt,
+      name: platform.name,
+      'Current Balance': balance?.currentBalance || 0,
+      'Expected Balance': (balance?.currentBalance || 0) + totalAllocation,
+      'Debt Balance': balance?.debtBalance || 0,
+      'Expected Debt': Math.max(0, (balance?.debtBalance || 0) - ((balance?.currentBalance || 0) + totalAllocation)),
+      type: platform.type,
+      currency: platform.currency,
     };
   });
+
   // Pie chart data: monthly allocation
-  const totalAllocations = getDefaultPlatforms().reduce((sum, p) => sum + ((weeklyAllocation[p.id as keyof WeeklyAllocation] || 0) * numWeeks), 0);
+  const totalAllocations = platforms.reduce((sum, p) => sum + ((weeklyAllocation[p.id] || 0) * numWeeks), 0);
   const balanceLeft = Math.max(0, (numWeeks * (Object.values(weeklyAllocation).reduce((sum, v) => sum + v, 0))) - totalAllocations);
   const pieData = [
-    ...getDefaultPlatforms().map(p => ({
+    ...platforms.map(p => ({
       name: p.name,
-      value: (weeklyAllocation[p.id as keyof WeeklyAllocation] || 0) * numWeeks,
+      value: (weeklyAllocation[p.id] || 0) * numWeeks,
     })),
     { name: 'Balance Left', value: balanceLeft }
   ];
+
   return (
     <Card mt={8}>
       <CardBody>
@@ -78,7 +82,7 @@ export function BudgetVisualizations({
           <Box>
             <Heading size="md" mb={4}>Balances by Platform</Heading>
             <ResponsiveContainer width="100%" height={320}>
-              <BarChart data={barData}>
+              <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis tickFormatter={formatCurrencyShort} />

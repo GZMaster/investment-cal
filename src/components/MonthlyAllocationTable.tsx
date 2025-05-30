@@ -14,7 +14,8 @@ import {
   FormLabel,
   Select,
 } from '@chakra-ui/react';
-import { getDefaultPlatforms, type WeeklyAllocation } from '../types/budget';
+import { type WeeklyAllocation } from '../types/budget';
+import { usePlatforms } from '../hooks/usePlatforms';
 
 interface MonthlyAllocationTableProps {
   lastFridays: Date[];
@@ -43,6 +44,7 @@ export function MonthlyAllocationTable({
   yearOptions,
   exchangeRateData,
 }: MonthlyAllocationTableProps) {
+  const { platforms } = usePlatforms();
   const numWeeks = lastFridays.length;
   return (
     <Card>
@@ -71,37 +73,27 @@ export function MonthlyAllocationTable({
             <Tr>
               <Th minW="140px" maxW="180px">Date</Th>
               <Th isNumeric minW="110px">Income</Th>
-              {getDefaultPlatforms().map(platform => (
-                <Th key={platform.id} isNumeric minW="110px">{platform.name}</Th>
+              {platforms.map(platform => (
+                <Th key={platform.id} isNumeric minW="110px">{platform.name} ({platform.currency})</Th>
               ))}
               <Th isNumeric minW="110px">Balance Left</Th>
             </Tr>
           </Thead>
           <Tbody>
             {lastFridays.map((date) => {
-              const totalAllocated = getDefaultPlatforms().reduce((sum, platform) => sum + (weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0), 0);
+              const totalAllocated = platforms.reduce((sum, platform) => sum + (weeklyAllocation[platform.id] || 0), 0);
               const balanceLeft = weeklyIncome - totalAllocated;
               return (
                 <Tr key={date.toISOString()}>
                   <Td minW="140px" maxW="180px">{date.toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</Td>
                   <Td isNumeric minW="110px"><Box as="span" fontFamily="mono">{formatAmount(weeklyIncome, 'NGN')}</Box></Td>
-                  {getDefaultPlatforms().map(platform => {
-                    if (platform.id === 'risevest') {
-                      const ngnValue = weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0;
-                      const usdValue = exchangeRateData?.rate ? ngnValue / exchangeRateData.rate : null;
-                      return (
-                        <Td key={platform.id} isNumeric minW="110px">
-                          <Box as="span" fontFamily="mono">
-                            {formatAmount(ngnValue, 'NGN')}
-                            {usdValue !== null && (
-                              <Box as="span" color="gray.500" fontSize="sm"> (~${usdValue.toFixed(2)})</Box>
-                            )}
-                          </Box>
-                        </Td>
-                      );
-                    }
+                  {platforms.map(platform => {
+                    const allocation = weeklyAllocation[platform.id] || 0;
+                    const amount = platform.currency === 'USD' && exchangeRateData?.rate
+                      ? allocation / exchangeRateData.rate
+                      : allocation;
                     return (
-                      <Td key={platform.id} isNumeric minW="110px"><Box as="span" fontFamily="mono">{formatAmount(weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0, platform.currency)}</Box></Td>
+                      <Td key={platform.id} isNumeric minW="110px">{formatAmount(amount, platform.currency)}</Td>
                     );
                   })}
                   <Td isNumeric minW="110px"><Box as="span" fontFamily="mono">{formatAmount(balanceLeft, 'NGN')}</Box></Td>
@@ -110,30 +102,20 @@ export function MonthlyAllocationTable({
             })}
             {/* Total Row */}
             {(() => {
-              const totalAllocated = getDefaultPlatforms().reduce((sum, platform) => sum + (weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0), 0);
+              const totalAllocated = platforms.reduce((sum, platform) => sum + (weeklyAllocation[platform.id] || 0), 0);
               const balanceLeft = weeklyIncome - totalAllocated;
               const totalBalanceLeft = balanceLeft * numWeeks;
               return (
                 <Tr fontWeight="bold">
                   <Td minW="140px" maxW="180px">Total</Td>
                   <Td isNumeric minW="110px"><Box as="span" fontFamily="mono">{formatAmount(weeklyIncome * numWeeks, 'NGN')}</Box></Td>
-                  {getDefaultPlatforms().map(platform => {
-                    if (platform.id === 'risevest') {
-                      const ngnValue = (weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0) * numWeeks;
-                      const usdValue = exchangeRateData?.rate ? ngnValue / exchangeRateData.rate : null;
-                      return (
-                        <Td key={platform.id} isNumeric minW="110px">
-                          <Box as="span" fontFamily="mono">
-                            {formatAmount(ngnValue, 'NGN')}
-                            {usdValue !== null && (
-                              <Box as="span" color="gray.500" fontSize="sm"> (~${usdValue.toFixed(2)})</Box>
-                            )}
-                          </Box>
-                        </Td>
-                      );
-                    }
+                  {platforms.map(platform => {
+                    const allocation = (weeklyAllocation[platform.id] || 0) * numWeeks;
+                    const amount = platform.currency === 'USD' && exchangeRateData?.rate
+                      ? allocation / exchangeRateData.rate
+                      : allocation;
                     return (
-                      <Td key={platform.id} isNumeric minW="110px"><Box as="span" fontFamily="mono">{formatAmount((weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0) * numWeeks, platform.currency)}</Box></Td>
+                      <Td key={platform.id} isNumeric minW="110px">{formatAmount(amount, platform.currency)}</Td>
                     );
                   })}
                   <Td isNumeric minW="110px"><Box as="span" fontFamily="mono">{formatAmount(totalBalanceLeft, 'NGN')}</Box></Td>

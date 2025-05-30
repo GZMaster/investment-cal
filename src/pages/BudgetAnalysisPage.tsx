@@ -1,7 +1,7 @@
 import { Container, VStack, Heading, useToast } from '@chakra-ui/react';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { SEO } from '../components/SEO';
-import { type PlatformBalance, INITIAL_BALANCES, INITIAL_WEEKLY_ALLOCATION, type WeeklyAllocation, getDefaultPlatforms } from '../types/budget';
+import { type PlatformBalance, INITIAL_BALANCES, type WeeklyAllocation, getDefaultPlatforms, getInitialWeeklyAllocation } from '../types/budget';
 import { useExchangeRate } from '../hooks/useExchangeRate';
 import { SetPlatformBalancesSection } from '../components/SetPlatformBalancesSection';
 import { IncomeAndAllocationSection } from '../components/IncomeAndAllocationSection';
@@ -9,6 +9,7 @@ import { SummaryCardsSection } from '../components/SummaryCardsSection';
 import { PlatformBalancesTable } from '../components/PlatformBalancesTable';
 import { MonthlyAllocationTable } from '../components/MonthlyAllocationTable';
 import { BudgetVisualizations } from '../components/BudgetVisualizations';
+import { usePlatforms } from '../hooks/usePlatforms';
 
 // Helper: Format currency for charts (₦1.2M, ₦350.0k, ₦500)
 function formatCurrencyShort(value: number): string {
@@ -18,6 +19,7 @@ function formatCurrencyShort(value: number): string {
 }
 
 export function BudgetAnalysisPage() {
+  const { platforms } = usePlatforms();
   const [balances, setBalances] = useState<PlatformBalance[]>(INITIAL_BALANCES);
   const [weeklyIncome, setWeeklyIncome] = useState(350000);
   const [isEditing, setIsEditing] = useState(false);
@@ -28,7 +30,14 @@ export function BudgetAnalysisPage() {
   const now = new Date();
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth()); // 0-indexed
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
-  const [weeklyAllocation, setWeeklyAllocation] = useState<WeeklyAllocation>(INITIAL_WEEKLY_ALLOCATION);
+  const [weeklyAllocation, setWeeklyAllocation] = useState<WeeklyAllocation>(
+    getInitialWeeklyAllocation(platforms)
+  );
+
+  // Update weeklyAllocation when platforms change
+  useEffect(() => {
+    setWeeklyAllocation(getInitialWeeklyAllocation(platforms));
+  }, [platforms]);
 
   const getPlatformName = (platformId: string) => {
     return getDefaultPlatforms().find(p => p.id === platformId)?.name || platformId;
@@ -148,7 +157,6 @@ export function BudgetAnalysisPage() {
           isRateLoading={isRateLoading}
           rateError={rateError}
           usdToNgn={exchangeRateData?.rate}
-          getPlatformName={getPlatformName}
         />
 
         <IncomeAndAllocationSection
@@ -171,8 +179,6 @@ export function BudgetAnalysisPage() {
 
         <PlatformBalancesTable
           balances={balances}
-          getPlatformName={getPlatformName}
-          getPlatformCurrency={getPlatformCurrency}
           formatAmount={formatAmount}
           isRateLoading={isRateLoading}
           rateError={rateError}

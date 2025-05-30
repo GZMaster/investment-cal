@@ -14,9 +14,10 @@ import {
   SimpleGrid,
   Button,
   HStack,
-  Box,
 } from '@chakra-ui/react';
-import { getDefaultPlatforms, type WeeklyAllocation } from '../types/budget';
+import { type WeeklyAllocation } from '../types/budget';
+import { usePlatforms } from '../hooks/usePlatforms';
+import { useEffect } from 'react';
 
 interface IncomeAndAllocationSectionProps {
   weeklyIncome: number;
@@ -37,16 +38,38 @@ export function IncomeAndAllocationSection({
   setIsEditing,
   handleSave,
 }: IncomeAndAllocationSectionProps) {
+  const { platforms } = usePlatforms();
+
+  // Update allocation when platforms change
+  useEffect(() => {
+    setWeeklyAllocation(prev => {
+      const newAllocation = { ...prev };
+      // Remove allocations for deleted platforms
+      Object.keys(newAllocation).forEach(key => {
+        if (!platforms.some(p => p.id === key)) {
+          delete newAllocation[key];
+        }
+      });
+      // Add allocations for new platforms
+      platforms.forEach(p => {
+        if (!(p.id in newAllocation)) {
+          newAllocation[p.id] = 0;
+        }
+      });
+      return newAllocation;
+    });
+  }, [platforms, setWeeklyAllocation]);
+
   return (
     <Card>
       <CardBody>
-        <VStack spacing={6}>
+        <Heading size="md" mb={4}>Income and Allocation</Heading>
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
           <FormControl>
-            <FormLabel>Weekly Income (₦)</FormLabel>
+            <FormLabel>Weekly Income (NGN)</FormLabel>
             <NumberInput
               value={weeklyIncome}
               onChange={(_, value) => setWeeklyIncome(value)}
-              min={0}
               isDisabled={!isEditing}
             >
               <NumberInputField />
@@ -57,21 +80,23 @@ export function IncomeAndAllocationSection({
             </NumberInput>
           </FormControl>
 
-          <Heading size="md">Weekly Allocations</Heading>
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} width="100%">
-            {getDefaultPlatforms().map((platform) => (
+          <VStack align="stretch" spacing={4}>
+            {platforms.map(platform => (
               <FormControl key={platform.id}>
                 <FormLabel>
-                  {platform.name} {platform.id === 'risevest' ? '(NGN input, converts to USD)' : `(${platform.currency})`}
+                  {platform.name} ({platform.currency})
                 </FormLabel>
                 <NumberInput
-                  value={weeklyAllocation[platform.id as keyof WeeklyAllocation] || 0}
-                  onChange={(_, value) => setWeeklyAllocation(prev => ({
-                    ...prev,
-                    [platform.id]: value
-                  }))}
-                  min={0}
+                  value={weeklyAllocation[platform.id] || 0}
+                  onChange={(_, value) => {
+                    setWeeklyAllocation(prev => ({
+                      ...prev,
+                      [platform.id]: value
+                    }));
+                  }}
                   isDisabled={!isEditing}
+                  min={0}
+                  step={platform.currency === 'USD' ? 0.01 : 1000}
                 >
                   <NumberInputField />
                   <NumberInputStepper>
@@ -79,32 +104,27 @@ export function IncomeAndAllocationSection({
                     <NumberDecrementStepper />
                   </NumberInputStepper>
                 </NumberInput>
-                {platform.id === 'risevest' && (
-                  <Box fontSize="sm" color="gray.500" mt={1}>
-                    Enter amount in NGN. Conversion to USD will be shown in the table.
-                  </Box>
-                )}
               </FormControl>
             ))}
-          </SimpleGrid>
+          </VStack>
+        </SimpleGrid>
 
-          <HStack spacing={4}>
-            {isEditing ? (
-              <>
-                <Button colorScheme="blue" onClick={handleSave}>
-                  Save Changes
-                </Button>
-                <Button variant="ghost" onClick={() => setIsEditing(false)}>
-                  Cancel
-                </Button>
-              </>
-            ) : (
-              <Button colorScheme="blue" onClick={() => setIsEditing(true)}>
-                Edit Allocations
+        <HStack spacing={4}>
+          {isEditing ? (
+            <>
+              <Button colorScheme="blue" onClick={handleSave}>
+                Save Changes
               </Button>
-            )}
-          </HStack>
-        </VStack>
+              <Button variant="ghost" onClick={() => setIsEditing(false)}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <Button colorScheme="blue" onClick={() => setIsEditing(true)}>
+              Edit Allocations
+            </Button>
+          )}
+        </HStack>
       </CardBody>
     </Card>
   );
