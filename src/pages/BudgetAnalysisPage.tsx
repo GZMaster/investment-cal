@@ -1,7 +1,7 @@
 import { Container, VStack, Heading, useToast } from '@chakra-ui/react';
 import { useCallback, useState, useEffect } from 'react';
 import { SEO } from '../components/SEO';
-import { type PlatformBalance, INITIAL_BALANCES, type WeeklyAllocation, getDefaultPlatforms, getInitialWeeklyAllocation } from '../types/budget';
+import { type PlatformBalance, INITIAL_BALANCES, type WeeklyAllocation, getInitialWeeklyAllocation } from '../types/budget';
 import { useExchangeRate } from '../hooks/useExchangeRate';
 import { SetPlatformBalancesSection } from '../components/SetPlatformBalancesSection';
 import { IncomeAndAllocationSection } from '../components/IncomeAndAllocationSection';
@@ -38,14 +38,6 @@ export function BudgetAnalysisPage() {
   useEffect(() => {
     setWeeklyAllocation(getInitialWeeklyAllocation(platforms));
   }, [platforms]);
-
-  const getPlatformName = (platformId: string) => {
-    return getDefaultPlatforms().find(p => p.id === platformId)?.name || platformId;
-  };
-
-  const getPlatformCurrency = (platformId: string) => {
-    return getDefaultPlatforms().find(p => p.id === platformId)?.currency || 'NGN';
-  };
 
   const formatAmount = (amount: number, currency: string) => {
     if (currency === 'USD') {
