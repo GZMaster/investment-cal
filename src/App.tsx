@@ -6,6 +6,7 @@ import { LandingPage } from './pages/LandingPage';
 import { CalculatorPage } from './pages/CalculatorPage';
 import { BudgetAnalysisPage } from './pages/BudgetAnalysisPage';
 import theme from './theme';
+import { AssetAnalysisPage } from './pages/AssetAnalysisPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,6 +28,7 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/calculator" element={<CalculatorPage />} />
               <Route path="/budget" element={<BudgetAnalysisPage />} />
+              <Route path="/asset-analysis" element={<AssetAnalysisPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Router>

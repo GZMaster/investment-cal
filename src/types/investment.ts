@@ -38,3 +38,30 @@ export interface InvestmentConstants {
   principal: number
   monthlySavings: number
 }
+
+export interface VehicleInvestment {
+  investmentCost: number;
+  returnAmount: number;
+  investmentPeriod: number; // in months
+  cyclePeriod: number; // in months
+}
+
+export interface AssetAnalysisScenario {
+  initialSavings: number;
+  monthlySavings: number;
+  vehicleInvestment: VehicleInvestment;
+  analysisPeriod: number; // in months
+}
+
+export interface AssetAnalysisResult {
+  totalSavings: number;
+  totalInvestment: number;
+  totalReturns: number;
+  monthlyBreakdown: {
+    month: number;
+    savings: number;
+    investments: number;
+    returns: number;
+    totalBalance: number;
+  }[];
+}

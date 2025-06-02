@@ -33,6 +33,14 @@ const tools = [
     path: '/budget',
     status: 'active',
   },
+  {
+    id: 'asset-analysis',
+    title: 'Asset Analysis Tool',
+    description: 'Analyze your assets and liabilities to make informed financial decisions.',
+    icon: FaChartLine,
+    path: '/asset-analysis',
+    status: 'active',
+  },
 ];
 
 export function LandingPage() {
