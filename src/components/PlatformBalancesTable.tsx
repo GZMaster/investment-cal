@@ -12,6 +12,13 @@ import {
   Th,
   Thead,
   Tr,
+  useBreakpointValue,
+  TableContainer,
+  Stack,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
 } from '@chakra-ui/react';
 import { type PlatformBalance, type WeeklyAllocation } from '../types/budget';
 import { usePlatforms } from '../hooks/usePlatforms';
@@ -36,6 +43,7 @@ export function PlatformBalancesTable({
   weeklyAllocation,
 }: PlatformBalancesTableProps) {
   const { platforms } = usePlatforms();
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   // Ensure balances exist for all platforms
   const currentBalances = platforms.map(platform => {
@@ -49,22 +57,12 @@ export function PlatformBalancesTable({
     };
   });
 
-  return (
-    <Card>
-      <CardBody>
-        <Heading size="md" mb={4}>Platform Balances</Heading>
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Platform</Th>
-              <Th isNumeric>Current Balance</Th>
-              <Th isNumeric>Expected Balance</Th>
-              <Th isNumeric>Current Debt</Th>
-              <Th isNumeric>Expected Debt</Th>
-              <Th>Progress</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
+  if (isMobile) {
+    return (
+      <Card>
+        <CardBody>
+          <Heading size="md" mb={4}>Platform Balances</Heading>
+          <Stack spacing={4}>
             {currentBalances.map((balance) => {
               const platform = platforms.find(p => p.id === balance.platformId);
               if (!platform) return null;
@@ -86,41 +84,140 @@ export function PlatformBalancesTable({
               }
 
               return (
-                <Tr key={balance.platformId}>
-                  <Td>
-                    <Text fontWeight="medium">{platform.name}</Text>
-                    <Badge colorScheme={platform.type === 'debt' ? 'red' : 'green'}>
-                      {platform.type}
-                    </Badge>
-                  </Td>
-                  <Td isNumeric>
-                    {formatAmount(balance.currentBalance, currency)}
-                    {isUsdPlatform && (
-                      <Box fontSize="sm" color="gray.500">
-                        {isRateLoading && ' (Loading NGN...)'}
-                        {(rateError as string) && ' (Rate error)'}
-                        {usdToNgn &&
-                          ` ≈ ₦${(balance.currentBalance * usdToNgn).toLocaleString(undefined, { maximumFractionDigits: 0 })}`
-                        }
-                      </Box>
-                    )}
-                  </Td>
-                  <Td isNumeric>{formatAmount(expectedBalance, currency)}</Td>
-                  <Td isNumeric>{formatAmount(balance.debtBalance, currency)}</Td>
-                  <Td isNumeric>{formatAmount(Math.max(0, balance.debtBalance - expectedBalance), currency)}</Td>
-                  <Td>
-                    <Progress
-                      value={progress}
-                      colorScheme={platform.type === 'debt' ? 'red' : 'green'}
-                      size="sm"
-                      borderRadius="full"
-                    />
-                  </Td>
-                </Tr>
+                <Box key={balance.platformId} p={4} borderWidth="1px" borderRadius="lg">
+                  <Stack spacing={3}>
+                    <Box>
+                      <Text fontWeight="medium">{platform.name}</Text>
+                      <Badge colorScheme={platform.type === 'debt' ? 'red' : 'green'}>
+                        {platform.type}
+                      </Badge>
+                    </Box>
+                    <Stat>
+                      <StatLabel>Current Balance</StatLabel>
+                      <StatNumber>{formatAmount(balance.currentBalance, currency)}</StatNumber>
+                      {isUsdPlatform && (
+                        <StatHelpText>
+                          {isRateLoading && ' (Loading NGN...)'}
+                          {(rateError as string) && ' (Rate error)'}
+                          {usdToNgn &&
+                            ` ≈ ₦${(balance.currentBalance * usdToNgn).toLocaleString(undefined, { maximumFractionDigits: 0 })}`
+                          }
+                        </StatHelpText>
+                      )}
+                    </Stat>
+                    <Stat>
+                      <StatLabel>Expected Balance</StatLabel>
+                      <StatNumber>{formatAmount(expectedBalance, currency)}</StatNumber>
+                    </Stat>
+                    <Stat>
+                      <StatLabel>Current Debt</StatLabel>
+                      <StatNumber>{formatAmount(balance.debtBalance, currency)}</StatNumber>
+                    </Stat>
+                    <Stat>
+                      <StatLabel>Expected Debt</StatLabel>
+                      <StatNumber>{formatAmount(Math.max(0, balance.debtBalance - expectedBalance), currency)}</StatNumber>
+                    </Stat>
+                    <Box>
+                      <Text mb={2} fontSize="sm">Progress</Text>
+                      <Progress
+                        value={progress}
+                        colorScheme={platform.type === 'debt' ? 'red' : 'green'}
+                        size="sm"
+                        borderRadius="full"
+                      />
+                    </Box>
+                  </Stack>
+                </Box>
               );
             })}
-          </Tbody>
-        </Table>
+          </Stack>
+          {/* Show exchange rate info if any USD platforms are present */}
+          {platforms.some(p => p.currency === 'USD') && (
+            <Box mt={4} fontSize="sm" color="gray.500">
+              {isRateLoading && 'Fetching USD/NGN rate...'}
+              {(rateError as string) && 'Failed to fetch USD/NGN rate.'}
+              {exchangeRateData && `Current USD/NGN rate: ₦${exchangeRateData.rate.toLocaleString()}`}
+            </Box>
+          )}
+        </CardBody>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardBody>
+        <Heading size="md" mb={4}>Platform Balances</Heading>
+        <TableContainer>
+          <Table variant="simple">
+            <Thead>
+              <Tr>
+                <Th>Platform</Th>
+                <Th isNumeric>Current Balance</Th>
+                <Th isNumeric>Expected Balance</Th>
+                <Th isNumeric>Current Debt</Th>
+                <Th isNumeric>Expected Debt</Th>
+                <Th>Progress</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {currentBalances.map((balance) => {
+                const platform = platforms.find(p => p.id === balance.platformId);
+                if (!platform) return null;
+
+                const currency = platform.currency;
+                const progress = balance.expectedBalance > 0
+                  ? ((balance.currentBalance === 0 ? 1 : balance.currentBalance) / balance.expectedBalance) * 100
+                  : 0;
+                const isUsdPlatform = currency === 'USD';
+                const usdToNgn = exchangeRateData?.rate;
+
+                // Calculate expectedBalance based on allocation and numWeeks
+                let expectedBalance = balance.currentBalance;
+                const allocation = weeklyAllocation[balance.platformId] || 0;
+                if (isUsdPlatform && usdToNgn) {
+                  expectedBalance += (allocation / usdToNgn) * numWeeks;
+                } else {
+                  expectedBalance += allocation * numWeeks;
+                }
+
+                return (
+                  <Tr key={balance.platformId}>
+                    <Td>
+                      <Text fontWeight="medium">{platform.name}</Text>
+                      <Badge colorScheme={platform.type === 'debt' ? 'red' : 'green'}>
+                        {platform.type}
+                      </Badge>
+                    </Td>
+                    <Td isNumeric>
+                      {formatAmount(balance.currentBalance, currency)}
+                      {isUsdPlatform && (
+                        <Box fontSize="sm" color="gray.500">
+                          {isRateLoading && ' (Loading NGN...)'}
+                          {(rateError as string) && ' (Rate error)'}
+                          {usdToNgn &&
+                            ` ≈ ₦${(balance.currentBalance * usdToNgn).toLocaleString(undefined, { maximumFractionDigits: 0 })}`
+                          }
+                        </Box>
+                      )}
+                    </Td>
+                    <Td isNumeric>{formatAmount(expectedBalance, currency)}</Td>
+                    <Td isNumeric>{formatAmount(balance.debtBalance, currency)}</Td>
+                    <Td isNumeric>{formatAmount(Math.max(0, balance.debtBalance - expectedBalance), currency)}</Td>
+                    <Td>
+                      <Progress
+                        value={progress}
+                        colorScheme={platform.type === 'debt' ? 'red' : 'green'}
+                        size="sm"
+                        borderRadius="full"
+                      />
+                    </Td>
+                  </Tr>
+                );
+              })}
+            </Tbody>
+          </Table>
+        </TableContainer>
         {/* Show exchange rate info if any USD platforms are present */}
         {platforms.some(p => p.currency === 'USD') && (
           <Box mt={2} fontSize="sm" color="gray.500">

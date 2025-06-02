@@ -33,30 +33,6 @@ const tools = [
     path: '/budget',
     status: 'active',
   },
-  {
-    id: 'portfolio-optimizer',
-    title: 'Portfolio Optimizer',
-    description: 'Optimize your investment portfolio based on risk tolerance, market conditions, and financial goals.',
-    icon: FaChartLine,
-    path: '#',
-    status: 'coming-soon',
-  },
-  {
-    id: 'risk-analyzer',
-    title: 'Risk Analysis Tool',
-    description: 'Evaluate investment risks and potential returns with advanced risk assessment algorithms.',
-    icon: FaExchangeAlt,
-    path: '#',
-    status: 'coming-soon',
-  },
-  {
-    id: 'retirement-planner',
-    title: 'Retirement Planning Calculator',
-    description: 'Plan your retirement with comprehensive calculations and long-term investment strategies.',
-    icon: FaMoneyBillWave,
-    path: '#',
-    status: 'coming-soon',
-  },
 ];
 
 export function LandingPage() {
