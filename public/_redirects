@@ -1,0 +1,20 @@
+# Redirect all requests to index.html
+/* /index.html 200
+
+# Handle 404s
+/404 /index.html 404
+
+# Handle 500s
+/500 /index.html 500
+
+# Force HTTPS
+http://* https://:splat 301
+
+# Cache static assets
+/assets/* /assets/:splat 200
+*.js /:splat 200
+*.css /:splat 200
+*.png /:splat 200
+*.jpg /:splat 200
+*.svg /:splat 200
+*.ico /:splat 200 
