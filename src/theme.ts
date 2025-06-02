@@ -5,64 +5,92 @@ const config: ThemeConfig = {
   useSystemColorMode: false,
 }
 
-const theme = extendTheme({
-  config,
-  styles: {
-    global: {
-      body: {
-        bg: 'gray.50',
-        color: 'gray.800',
-      },
-    },
+const colors = {
+  brand: {
+    50: '#E6F6FF',
+    100: '#BAE3FF',
+    200: '#7CC4FA',
+    300: '#47A3F3',
+    400: '#2186EB',
+    500: '#0967D2',
+    600: '#0552B5',
+    700: '#03449E',
+    800: '#01337D',
+    900: '#002159',
   },
-  components: {
-    Button: {
-      baseStyle: {
-        fontWeight: 'semibold',
-        borderRadius: 'lg',
-        transition: 'all 0.2s',
+  gray: {
+    50: '#F7FAFC',
+    100: '#EDF2F7',
+    200: '#E2E8F0',
+    300: '#CBD5E0',
+    400: '#A0AEC0',
+    500: '#718096',
+    600: '#4A5568',
+    700: '#2D3748',
+    800: '#1A202C',
+    900: '#171923',
+  },
+}
+
+const components = {
+  Button: {
+    baseStyle: {
+      fontWeight: 'semibold',
+      borderRadius: 'md',
+    },
+    variants: {
+      solid: {
+        bg: 'brand.500',
+        color: 'white',
         _hover: {
-          transform: 'translateY(-2px)',
-          boxShadow: 'lg',
+          bg: 'brand.600',
         },
       },
-      variants: {
-        solid: {
-          bg: 'blue.500',
-          color: 'white',
-          _hover: {
-            bg: 'blue.600',
-          },
-        },
-      },
-    },
-    Card: {
-      baseStyle: {
-        container: {
-          borderRadius: 'xl',
-          boxShadow: 'xl',
-          transition: 'all 0.3s ease',
-          _hover: {
-            transform: 'translateY(-4px)',
-            boxShadow: '2xl',
-          },
+      outline: {
+        borderColor: 'brand.500',
+        color: 'brand.500',
+        _hover: {
+          bg: 'brand.50',
         },
       },
     },
   },
-  colors: {
-    brand: {
-      50: '#E6F6FF',
-      100: '#BAE3FF',
-      200: '#7CC4FA',
-      300: '#47A3F3',
-      400: '#2186EB',
-      500: '#0967D2',
-      600: '#0552B5',
-      700: '#03449E',
-      800: '#01337D',
-      900: '#002159',
+  Card: {
+    baseStyle: {
+      container: {
+        borderRadius: 'lg',
+        boxShadow: 'md',
+      },
     },
+  },
+  Table: {
+    baseStyle: {
+      th: {
+        fontWeight: 'semibold',
+        textTransform: 'none',
+        letterSpacing: 'normal',
+      },
+    },
+  },
+}
+
+const styles = {
+  global: (props: any) => ({
+    body: {
+      bg: props.colorMode === 'dark' ? 'gray.900' : 'gray.50',
+      color: props.colorMode === 'dark' ? 'white' : 'gray.800',
+    },
+  }),
+}
+
+export const theme = extendTheme({
+  config,
+  colors,
+  components,
+  styles,
+  fonts: {
+    heading: 'Inter, sans-serif',
+    body: 'Inter, sans-serif',
   },
   shadows: {
     xs: '0 0 0 1px rgba(0, 0, 0, 0.05)',

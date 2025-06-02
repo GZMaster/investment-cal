@@ -1,12 +1,13 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { LandingPage } from './pages/LandingPage';
-import { CalculatorPage } from './pages/CalculatorPage';
-import { BudgetAnalysisPage } from './pages/BudgetAnalysisPage';
-import theme from './theme';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { AssetAnalysisPage } from './pages/AssetAnalysisPage';
+import { BudgetAnalysisPage } from './pages/BudgetAnalysisPage';
+import { CalculatorPage } from './pages/CalculatorPage';
+import { LandingPage } from './pages/LandingPage';
+import theme from './theme';
+import { ThemeToggle } from './components/ThemeToggle';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,6 +24,8 @@ function App() {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <ChakraProvider theme={theme}>
+          <ThemeToggle />
+
           <Router basename="/">
             <Routes>
               <Route path="/" element={<LandingPage />} />

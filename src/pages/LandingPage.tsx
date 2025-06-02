@@ -1,18 +1,18 @@
 import {
+  Badge,
   Box,
   Container,
   Heading,
-  Text,
-  VStack,
-  SimpleGrid,
-  Icon,
-  useColorModeValue,
-  Badge,
   HStack,
+  Icon,
   Image,
+  SimpleGrid,
+  Text,
+  useColorModeValue,
+  VStack,
 } from '@chakra-ui/react';
+import { FaCalculator, FaChartLine, FaLock } from 'react-icons/fa';
 import { Link as RouterLink } from 'react-router-dom';
-import { FaCalculator, FaChartLine, FaExchangeAlt, FaMoneyBillWave, FaLock } from 'react-icons/fa';
 import favicon from '../assets/favicon.svg';
 import { SEO } from '../components/SEO';
 
@@ -63,6 +63,7 @@ export function LandingPage() {
           'financial management',
         ]}
       />
+
       {/* Hero Section */}
       <Box
         bg={heroBgColor}
