@@ -21,9 +21,12 @@ import {
   Tab,
   TabPanel,
   Badge,
+  Divider,
+  TableContainer,
 } from '@chakra-ui/react';
 import type { AssetAnalysisResult } from '../types/investment';
-import { formatCurrency } from '../utils/investment-calculator';
+import { formatCurrency, formatMonthNumber } from '../utils/investment-calculator';
+import { AssetAnalysisCharts } from './AssetAnalysisCharts';
 
 interface AssetAnalysisProps {
   result: AssetAnalysisResult;
@@ -63,22 +66,22 @@ export function AssetAnalysis({ result }: AssetAnalysisProps) {
   return (
     <VStack spacing={6} align="stretch" w="full">
       <StatGroup>
-        <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6} w="full">
+        <SimpleGrid columns={{ base: 2, md: 4 }} spacing={{ base: 4, md: 6 }} w="full">
           <Stat>
             <StatLabel>Total Savings</StatLabel>
-            <StatNumber>{formatCurrency(result.totalSavings)}</StatNumber>
+            <StatNumber fontSize={{ base: 'lg', md: 'xl' }}>{formatCurrency(result.totalSavings)}</StatNumber>
           </Stat>
           <Stat>
             <StatLabel>Total Investment</StatLabel>
-            <StatNumber>{formatCurrency(result.totalInvestment)}</StatNumber>
+            <StatNumber fontSize={{ base: 'lg', md: 'xl' }}>{formatCurrency(result.totalInvestment)}</StatNumber>
           </Stat>
           <Stat>
             <StatLabel>Total Returns</StatLabel>
-            <StatNumber>{formatCurrency(result.totalReturns)}</StatNumber>
+            <StatNumber fontSize={{ base: 'lg', md: 'xl' }}>{formatCurrency(result.totalReturns)}</StatNumber>
           </Stat>
           <Stat>
             <StatLabel>Total ROI</StatLabel>
-            <StatNumber>{totalROI.toFixed(2)}%</StatNumber>
+            <StatNumber fontSize={{ base: 'lg', md: 'xl' }}>{totalROI.toFixed(2)}%</StatNumber>
             <Text fontSize="sm" color="gray.500">
               {monthlyROI.toFixed(2)}% monthly
             </Text>
@@ -86,215 +89,223 @@ export function AssetAnalysis({ result }: AssetAnalysisProps) {
         </SimpleGrid>
       </StatGroup>
 
+      <Divider />
+
+      <AssetAnalysisCharts result={result} />
+
+      <Divider />
+
       <Tabs variant="enclosed" colorScheme="blue">
-        <TabList>
+        <TabList overflowX="auto" whiteSpace="nowrap">
           <Tab>Monthly Overview</Tab>
           <Tab>Investment Cycles</Tab>
           <Tab>Returns Analysis</Tab>
         </TabList>
 
         <TabPanels>
-          <TabPanel>
+          <TabPanel px={{ base: 0, md: 4 }}>
             <Box
               bg={bgColor}
-              p={6}
+              p={{ base: 4, md: 6 }}
               borderRadius="lg"
               borderWidth="1px"
               borderColor={borderColor}
-              overflowX="auto"
             >
               <Heading size="md" mb={4}>Monthly Breakdown</Heading>
-              <Table variant="simple">
-                <Thead>
-                  <Tr>
-                    <Th>Month</Th>
-                    <Th isNumeric>Savings</Th>
-                    <Th isNumeric>Investments</Th>
-                    <Th isNumeric>Returns</Th>
-                    <Th isNumeric>Total Balance</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {result.monthlyBreakdown.map((month) => (
-                    <Tr key={month.month}>
-                      <Td>{month.month}</Td>
-                      <Td isNumeric>{formatCurrency(month.savings)}</Td>
-                      <Td isNumeric>{formatCurrency(month.investments)}</Td>
-                      <Td isNumeric>{formatCurrency(month.returns)}</Td>
-                      <Td isNumeric>{formatCurrency(month.totalBalance)}</Td>
+              <TableContainer overflowX="auto">
+                <Table variant="simple" size={{ base: 'sm', md: 'md' }}>
+                  <Thead>
+                    <Tr>
+                      <Th>Month</Th>
+                      <Th isNumeric>Savings</Th>
+                      <Th isNumeric>Investments</Th>
+                      <Th isNumeric>Returns</Th>
+                      <Th isNumeric>Total Balance</Th>
                     </Tr>
-                  ))}
-                </Tbody>
-              </Table>
+                  </Thead>
+                  <Tbody>
+                    {result.monthlyBreakdown.map((month) => (
+                      <Tr key={month.month}>
+                        <Td>{formatMonthNumber(month.month)}</Td>
+                        <Td isNumeric>{formatCurrency(month.savings)}</Td>
+                        <Td isNumeric>{formatCurrency(month.investments)}</Td>
+                        <Td isNumeric>{formatCurrency(month.returns)}</Td>
+                        <Td isNumeric>{formatCurrency(month.totalBalance)}</Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
             </Box>
           </TabPanel>
 
-          <TabPanel>
+          <TabPanel px={{ base: 0, md: 4 }}>
             <Box
               bg={bgColor}
-              p={6}
+              p={{ base: 4, md: 6 }}
               borderRadius="lg"
               borderWidth="1px"
               borderColor={borderColor}
-              overflowX="auto"
             >
               <Heading size="md" mb={4}>Investment Cycles</Heading>
-              <Table variant="simple">
-                <Thead>
-                  <Tr>
-                    <Th>Investment Month</Th>
-                    <Th isNumeric>Amount</Th>
-                    <Th isNumeric>Vehicles</Th>
-                    <Th isNumeric>Monthly Return</Th>
-                    <Th isNumeric>Total Expected Return</Th>
-                    <Th>Return Period</Th>
-                    <Th>Status</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {investmentCycles.map((cycle) => {
-                    const monthsElapsed = result.monthlyBreakdown.length - cycle.month;
-                    const totalReturned = cycle.monthlyReturn * Math.min(monthsElapsed, 12);
-                    const isCompleted = monthsElapsed > 12 || totalReturned >= cycle.totalExpectedReturn;
-                    const status = monthsElapsed > 12
-                      ? 'Completed (12 months)'
-                      : totalReturned >= cycle.totalExpectedReturn
-                        ? 'Completed (Full Return)'
-                        : 'Active';
+              <TableContainer overflowX="auto">
+                <Table variant="simple" size={{ base: 'sm', md: 'md' }}>
+                  <Thead>
+                    <Tr>
+                      <Th>Investment Month</Th>
+                      <Th isNumeric>Amount</Th>
+                      <Th isNumeric>Vehicles</Th>
+                      <Th isNumeric>Monthly Return</Th>
+                      <Th isNumeric>Total Expected Return</Th>
+                      <Th>Return Period</Th>
+                      <Th>Status</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {investmentCycles.map((cycle) => {
+                      const monthsElapsed = result.monthlyBreakdown.length - cycle.month;
+                      const totalReturned = cycle.monthlyReturn * Math.min(monthsElapsed, 12);
+                      const status = monthsElapsed > 12
+                        ? 'Completed (12 months)'
+                        : totalReturned >= cycle.totalExpectedReturn
+                          ? 'Completed (Full Return)'
+                          : 'Active';
 
-                    return (
-                      <Tr key={cycle.month}>
-                        <Td>{cycle.month}</Td>
-                        <Td isNumeric>{formatCurrency(cycle.investmentAmount)}</Td>
-                        <Td isNumeric>{cycle.numberOfVehicles}</Td>
-                        <Td isNumeric>{formatCurrency(cycle.monthlyReturn)}</Td>
-                        <Td isNumeric>{formatCurrency(cycle.totalExpectedReturn)}</Td>
-                        <Td>{cycle.returnPeriod}</Td>
-                        <Td>
-                          <Badge
-                            colorScheme={
-                              monthsElapsed > 12
-                                ? 'green'
-                                : totalReturned >= cycle.totalExpectedReturn
-                                  ? 'blue'
-                                  : 'yellow'
-                            }
-                          >
-                            {status}
-                          </Badge>
-                        </Td>
-                      </Tr>
-                    );
-                  })}
-                </Tbody>
-              </Table>
+                      return (
+                        <Tr key={cycle.month}>
+                          <Td>{formatMonthNumber(cycle.month)}</Td>
+                          <Td isNumeric>{formatCurrency(cycle.investmentAmount)}</Td>
+                          <Td isNumeric>{cycle.numberOfVehicles}</Td>
+                          <Td isNumeric>{formatCurrency(cycle.monthlyReturn)}</Td>
+                          <Td isNumeric>{formatCurrency(cycle.totalExpectedReturn)}</Td>
+                          <Td>{cycle.returnPeriod}</Td>
+                          <Td>
+                            <Badge
+                              colorScheme={
+                                monthsElapsed > 12
+                                  ? 'green'
+                                  : totalReturned >= cycle.totalExpectedReturn
+                                    ? 'blue'
+                                    : 'yellow'
+                              }
+                            >
+                              {status}
+                            </Badge>
+                          </Td>
+                        </Tr>
+                      );
+                    })}
+                  </Tbody>
+                </Table>
+              </TableContainer>
             </Box>
           </TabPanel>
 
-          <TabPanel>
+          <TabPanel px={{ base: 0, md: 4 }}>
             <Box
               bg={bgColor}
-              p={6}
+              p={{ base: 4, md: 6 }}
               borderRadius="lg"
               borderWidth="1px"
               borderColor={borderColor}
-              overflowX="auto"
             >
               <Heading size="md" mb={4}>Returns Analysis</Heading>
-              <Table variant="simple">
-                <Thead>
-                  <Tr>
-                    <Th>Period</Th>
-                    <Th isNumeric>Total Investment</Th>
-                    <Th isNumeric>Total Returns</Th>
-                    <Th isNumeric>Net Profit</Th>
-                    <Th isNumeric>ROI</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  <Tr>
-                    <Td>Year 1</Td>
-                    <Td isNumeric>
-                      {formatCurrency(
-                        result.monthlyBreakdown
-                          .filter((m) => m.month <= 12)
-                          .reduce((sum, m) => sum + m.investments, 0)
-                      )}
-                    </Td>
-                    <Td isNumeric>
-                      {formatCurrency(
-                        result.monthlyBreakdown
-                          .filter((m) => m.month <= 12)
-                          .reduce((sum, m) => sum + m.returns, 0)
-                      )}
-                    </Td>
-                    <Td isNumeric>
-                      {formatCurrency(
-                        result.monthlyBreakdown
-                          .filter((m) => m.month <= 12)
-                          .reduce((sum, m) => sum + m.returns - m.investments, 0)
-                      )}
-                    </Td>
-                    <Td isNumeric>
-                      {(
-                        (result.monthlyBreakdown
-                          .filter((m) => m.month <= 12)
-                          .reduce((sum, m) => sum + m.returns - m.investments, 0) /
+              <TableContainer overflowX="auto">
+                <Table variant="simple" size={{ base: 'sm', md: 'md' }}>
+                  <Thead>
+                    <Tr>
+                      <Th>Period</Th>
+                      <Th isNumeric>Total Investment</Th>
+                      <Th isNumeric>Total Returns</Th>
+                      <Th isNumeric>Net Profit</Th>
+                      <Th isNumeric>ROI</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    <Tr>
+                      <Td>Year 1</Td>
+                      <Td isNumeric>
+                        {formatCurrency(
                           result.monthlyBreakdown
                             .filter((m) => m.month <= 12)
-                            .reduce((sum, m) => sum + m.investments, 0)) *
-                        100
-                      ).toFixed(2)}
-                      %
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Year 2</Td>
-                    <Td isNumeric>
-                      {formatCurrency(
-                        result.monthlyBreakdown
-                          .filter((m) => m.month > 12)
-                          .reduce((sum, m) => sum + m.investments, 0)
-                      )}
-                    </Td>
-                    <Td isNumeric>
-                      {formatCurrency(
-                        result.monthlyBreakdown
-                          .filter((m) => m.month > 12)
-                          .reduce((sum, m) => sum + m.returns, 0)
-                      )}
-                    </Td>
-                    <Td isNumeric>
-                      {formatCurrency(
-                        result.monthlyBreakdown
-                          .filter((m) => m.month > 12)
-                          .reduce((sum, m) => sum + m.returns - m.investments, 0)
-                      )}
-                    </Td>
-                    <Td isNumeric>
-                      {(
-                        (result.monthlyBreakdown
-                          .filter((m) => m.month > 12)
-                          .reduce((sum, m) => sum + m.returns - m.investments, 0) /
+                            .reduce((sum, m) => sum + m.investments, 0)
+                        )}
+                      </Td>
+                      <Td isNumeric>
+                        {formatCurrency(
+                          result.monthlyBreakdown
+                            .filter((m) => m.month <= 12)
+                            .reduce((sum, m) => sum + m.returns, 0)
+                        )}
+                      </Td>
+                      <Td isNumeric>
+                        {formatCurrency(
+                          result.monthlyBreakdown
+                            .filter((m) => m.month <= 12)
+                            .reduce((sum, m) => sum + m.returns - m.investments, 0)
+                        )}
+                      </Td>
+                      <Td isNumeric>
+                        {(
+                          (result.monthlyBreakdown
+                            .filter((m) => m.month <= 12)
+                            .reduce((sum, m) => sum + m.returns - m.investments, 0) /
+                            result.monthlyBreakdown
+                              .filter((m) => m.month <= 12)
+                              .reduce((sum, m) => sum + m.investments, 0)) *
+                          100
+                        ).toFixed(2)}
+                        %
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Year 2</Td>
+                      <Td isNumeric>
+                        {formatCurrency(
                           result.monthlyBreakdown
                             .filter((m) => m.month > 12)
-                            .reduce((sum, m) => sum + m.investments, 0)) *
-                        100
-                      ).toFixed(2)}
-                      %
-                    </Td>
-                  </Tr>
-                  <Tr fontWeight="bold">
-                    <Td>Total</Td>
-                    <Td isNumeric>{formatCurrency(result.totalInvestment)}</Td>
-                    <Td isNumeric>{formatCurrency(result.totalReturns)}</Td>
-                    <Td isNumeric>
-                      {formatCurrency(result.totalReturns - result.totalInvestment)}
-                    </Td>
-                    <Td isNumeric>{totalROI.toFixed(2)}%</Td>
-                  </Tr>
-                </Tbody>
-              </Table>
+                            .reduce((sum, m) => sum + m.investments, 0)
+                        )}
+                      </Td>
+                      <Td isNumeric>
+                        {formatCurrency(
+                          result.monthlyBreakdown
+                            .filter((m) => m.month > 12)
+                            .reduce((sum, m) => sum + m.returns, 0)
+                        )}
+                      </Td>
+                      <Td isNumeric>
+                        {formatCurrency(
+                          result.monthlyBreakdown
+                            .filter((m) => m.month > 12)
+                            .reduce((sum, m) => sum + m.returns - m.investments, 0)
+                        )}
+                      </Td>
+                      <Td isNumeric>
+                        {(
+                          (result.monthlyBreakdown
+                            .filter((m) => m.month > 12)
+                            .reduce((sum, m) => sum + m.returns - m.investments, 0) /
+                            result.monthlyBreakdown
+                              .filter((m) => m.month > 12)
+                              .reduce((sum, m) => sum + m.investments, 0)) *
+                          100
+                        ).toFixed(2)}
+                        %
+                      </Td>
+                    </Tr>
+                    <Tr fontWeight="bold">
+                      <Td>Total</Td>
+                      <Td isNumeric>{formatCurrency(result.totalInvestment)}</Td>
+                      <Td isNumeric>{formatCurrency(result.totalReturns)}</Td>
+                      <Td isNumeric>
+                        {formatCurrency(result.totalReturns - result.totalInvestment)}
+                      </Td>
+                      <Td isNumeric>{totalROI.toFixed(2)}%</Td>
+                    </Tr>
+                  </Tbody>
+                </Table>
+              </TableContainer>
             </Box>
           </TabPanel>
         </TabPanels>

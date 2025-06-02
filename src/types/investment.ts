@@ -51,6 +51,7 @@ export interface AssetAnalysisScenario {
   monthlySavings: number;
   vehicleInvestment: VehicleInvestment;
   analysisPeriod: number; // in months
+  vehiclesPerCycle: number; // number of vehicles to buy per cycle
 }
 
 export interface AssetAnalysisResult {

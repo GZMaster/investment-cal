@@ -168,3 +168,10 @@ export function calculateBreakevenPoint(
     100
   )
 }
+
+export function formatMonthNumber(monthNumber: number): string {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const year = Math.floor((monthNumber - 1) / 12) + 1;
+  const monthIndex = (monthNumber - 1) % 12;
+  return `${months[monthIndex]} Y${year}`;
+}

@@ -6,6 +6,7 @@ export function calculateAssetAnalysis(scenario: AssetAnalysisScenario): AssetAn
     monthlySavings,
     vehicleInvestment,
     analysisPeriod,
+    vehiclesPerCycle,
   } = scenario;
 
   const {
@@ -33,15 +34,14 @@ export function calculateAssetAnalysis(scenario: AssetAnalysisScenario): AssetAn
     currentSavings += monthlySavings;
 
     // Check for investment opportunities (every cyclePeriod months)
-    if (month % cyclePeriod === 0 && currentSavings >= investmentCost) {
-      const investmentsThisMonth = Math.floor(currentSavings / investmentCost);
-      const investmentAmount = investmentsThisMonth * investmentCost;
+    if (month % cyclePeriod === 0 && currentSavings >= investmentCost * vehiclesPerCycle) {
+      const investmentAmount = investmentCost * vehiclesPerCycle;
 
       currentSavings -= investmentAmount;
       totalInvestment += investmentAmount;
 
       // Add new investments to active investments
-      for (let i = 0; i < investmentsThisMonth; i++) {
+      for (let i = 0; i < vehiclesPerCycle; i++) {
         activeInvestments.push({
           startMonth: month,
           monthlyReturn: returnAmount / investmentPeriod, // Monthly return amount

@@ -12,7 +12,7 @@ import {
   Box,
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import type { AssetAnalysisScenario, VehicleInvestment } from '../types/investment';
+import type { AssetAnalysisScenario } from '../types/investment';
 
 interface AssetAnalysisFormProps {
   onSubmit: (scenario: AssetAnalysisScenario) => void;
@@ -32,6 +32,7 @@ export function AssetAnalysisForm({ onSubmit }: AssetAnalysisFormProps) {
       cyclePeriod: 3,
     },
     analysisPeriod: 24,
+    vehiclesPerCycle: 1,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -173,6 +174,27 @@ export function AssetAnalysisForm({ onSubmit }: AssetAnalysisFormProps) {
             }
             min={1}
             max={12}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Vehicles per Cycle</FormLabel>
+          <NumberInput
+            value={scenario.vehiclesPerCycle}
+            onChange={(_, value) =>
+              setScenario((prev) => ({
+                ...prev,
+                vehiclesPerCycle: value,
+              }))
+            }
+            min={1}
+            max={10}
           >
             <NumberInputField />
             <NumberInputStepper>
