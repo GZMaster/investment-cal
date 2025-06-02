@@ -11,6 +11,7 @@ import { AssetAnalysisForm } from '../components/AssetAnalysisForm';
 import { AssetAnalysis } from '../components/AssetAnalysis';
 import { calculateAssetAnalysis } from '../utils/asset-analysis-calculator';
 import type { AssetAnalysisScenario, AssetAnalysisResult } from '../types/investment';
+import { BackButton } from '../components/BackButton';
 
 export function AssetAnalysisPage() {
   const [result, setResult] = useState<AssetAnalysisResult | null>(null);
@@ -24,6 +25,7 @@ export function AssetAnalysisPage() {
   return (
     <Box minH="100vh" bg={bgColor} py={8}>
       <Container maxW="container.xl">
+        <BackButton />
         <VStack spacing={8} align="stretch">
           <Box textAlign="center">
             <Heading size="xl" mb={4}>Vehicle Investment Analysis</Heading>

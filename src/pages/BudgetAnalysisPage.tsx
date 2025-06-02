@@ -1,4 +1,4 @@
-import { Container, VStack, Heading, useToast } from '@chakra-ui/react';
+import { Container, VStack, Heading, useToast, Box, useColorModeValue } from '@chakra-ui/react';
 import { useCallback, useState, useEffect } from 'react';
 import { SEO } from '../components/SEO';
 import { type PlatformBalance, INITIAL_BALANCES, type WeeklyAllocation, getInitialWeeklyAllocation } from '../types/budget';
@@ -10,6 +10,7 @@ import { PlatformBalancesTable } from '../components/PlatformBalancesTable';
 import { MonthlyAllocationTable } from '../components/MonthlyAllocationTable';
 import { BudgetVisualizations } from '../components/BudgetVisualizations';
 import { usePlatforms } from '../hooks/usePlatforms';
+import { BackButton } from '../components/BackButton';
 
 // Helper: Format currency for charts (₦1.2M, ₦350.0k, ₦500)
 function formatCurrencyShort(value: number): string {
@@ -19,6 +20,7 @@ function formatCurrencyShort(value: number): string {
 }
 
 export function BudgetAnalysisPage() {
+  const bgColor = useColorModeValue('white', 'gray.800');
   const { platforms } = usePlatforms();
   const [balances, setBalances] = useState<PlatformBalance[]>(INITIAL_BALANCES);
   const [weeklyIncome, setWeeklyIncome] = useState(350000);
@@ -118,89 +120,92 @@ export function BudgetAnalysisPage() {
   const yearOptions = Array.from({ length: 5 }, (_, i) => now.getFullYear() - 2 + i);
 
   return (
-    <Container maxW="container.xl" py={8}>
-      <SEO
-        title="Budget Analysis"
-        description="Track your spending, savings, and debt management across different platforms. Get detailed allocation plans and financial insights with our comprehensive budget analysis tool."
-        keywords={[
-          'budget analysis',
-          'financial planning',
-          'debt management',
-          'savings tracker',
-          'budget allocation',
-          'financial management',
-        ]}
-      />
-      <VStack spacing={8} align="stretch">
-        <Heading>Budget Analysis</Heading>
-
-        <SetPlatformBalancesSection
-          balances={balances}
-          isEditing={isEditingBalances}
-          pendingBalances={pendingBalances}
-          setPendingBalances={setPendingBalances}
-          setIsEditing={setIsEditingBalances}
-          onSave={pending => {
-            if (pending) setBalances(pending);
-            setIsEditingBalances(false);
-            setPendingBalances(null);
-            toast({ title: 'Balances Updated', status: 'success', duration: 2000, isClosable: true });
-          }}
-          isRateLoading={isRateLoading}
-          rateError={rateError}
-          usdToNgn={exchangeRateData?.rate}
+    <Box minH="100vh" bg={bgColor} py={8}>
+      <Container maxW="container.xl">
+        <BackButton />
+        <SEO
+          title="Budget Analysis"
+          description="Track your spending, savings, and debt management across different platforms. Get detailed allocation plans and financial insights with our comprehensive budget analysis tool."
+          keywords={[
+            'budget analysis',
+            'financial planning',
+            'debt management',
+            'savings tracker',
+            'budget allocation',
+            'financial management',
+          ]}
         />
+        <VStack spacing={8} align="stretch">
+          <Heading>Budget Analysis</Heading>
 
-        <IncomeAndAllocationSection
-          weeklyIncome={weeklyIncome}
-          setWeeklyIncome={setWeeklyIncome}
-          weeklyAllocation={weeklyAllocation}
-          setWeeklyAllocation={setWeeklyAllocation}
-          isEditing={isEditing}
-          setIsEditing={setIsEditing}
-          handleSave={handleSave}
-        />
+          <SetPlatformBalancesSection
+            balances={balances}
+            isEditing={isEditingBalances}
+            pendingBalances={pendingBalances}
+            setPendingBalances={setPendingBalances}
+            setIsEditing={setIsEditingBalances}
+            onSave={pending => {
+              if (pending) setBalances(pending);
+              setIsEditingBalances(false);
+              setPendingBalances(null);
+              toast({ title: 'Balances Updated', status: 'success', duration: 2000, isClosable: true });
+            }}
+            isRateLoading={isRateLoading}
+            rateError={rateError}
+            usdToNgn={exchangeRateData?.rate}
+          />
 
-        <SummaryCardsSection
-          totalSavings={totalSavings}
-          totalDebt={totalDebt}
-          monthlyIncome={monthlyIncome}
-          weeklyIncome={weeklyIncome}
-          formatAmount={formatAmount}
-        />
+          <IncomeAndAllocationSection
+            weeklyIncome={weeklyIncome}
+            setWeeklyIncome={setWeeklyIncome}
+            weeklyAllocation={weeklyAllocation}
+            setWeeklyAllocation={setWeeklyAllocation}
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
+            handleSave={handleSave}
+          />
 
-        <PlatformBalancesTable
-          balances={balances}
-          formatAmount={formatAmount}
-          isRateLoading={isRateLoading}
-          rateError={rateError}
-          exchangeRateData={exchangeRateData}
-          numWeeks={numWeeks}
-          weeklyAllocation={weeklyAllocation}
-        />
+          <SummaryCardsSection
+            totalSavings={totalSavings}
+            totalDebt={totalDebt}
+            monthlyIncome={monthlyIncome}
+            weeklyIncome={weeklyIncome}
+            formatAmount={formatAmount}
+          />
 
-        <MonthlyAllocationTable
-          lastFridays={lastFridays}
-          weeklyIncome={weeklyIncome}
-          weeklyAllocation={weeklyAllocation}
-          formatAmount={formatAmount}
-          selectedMonth={selectedMonth}
-          setSelectedMonth={setSelectedMonth}
-          selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
-          monthNames={monthNames}
-          yearOptions={yearOptions}
-          exchangeRateData={exchangeRateData}
-        />
+          <PlatformBalancesTable
+            balances={balances}
+            formatAmount={formatAmount}
+            isRateLoading={isRateLoading}
+            rateError={rateError}
+            exchangeRateData={exchangeRateData}
+            numWeeks={numWeeks}
+            weeklyAllocation={weeklyAllocation}
+          />
 
-        <BudgetVisualizations
-          balances={balances}
-          weeklyAllocation={weeklyAllocation}
-          formatCurrencyShort={formatCurrencyShort}
-          numWeeks={numWeeks}
-          exchangeRateData={exchangeRateData}
-        />
-      </VStack>
-    </Container>
+          <MonthlyAllocationTable
+            lastFridays={lastFridays}
+            weeklyIncome={weeklyIncome}
+            weeklyAllocation={weeklyAllocation}
+            formatAmount={formatAmount}
+            selectedMonth={selectedMonth}
+            setSelectedMonth={setSelectedMonth}
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
+            monthNames={monthNames}
+            yearOptions={yearOptions}
+            exchangeRateData={exchangeRateData}
+          />
+
+          <BudgetVisualizations
+            balances={balances}
+            weeklyAllocation={weeklyAllocation}
+            formatCurrencyShort={formatCurrencyShort}
+            numWeeks={numWeeks}
+            exchangeRateData={exchangeRateData}
+          />
+        </VStack>
+      </Container>
+    </Box>
   );
 } 
