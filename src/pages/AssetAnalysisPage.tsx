@@ -7,6 +7,7 @@ import {
   useColorModeValue,
   Box,
 } from '@chakra-ui/react';
+import { Helmet } from 'react-helmet-async';
 import { AssetAnalysisForm } from '../components/AssetAnalysisForm';
 import { AssetAnalysis } from '../components/AssetAnalysis';
 import { calculateAssetAnalysis } from '../utils/asset-analysis-calculator';
@@ -24,6 +25,12 @@ export function AssetAnalysisPage() {
 
   return (
     <Box minH="100vh" bg={bgColor} py={8}>
+      <Helmet>
+        <title>Vehicle Investment Analysis | Investment Tools Suite</title>
+        <meta name="description" content="Analyze your vehicle investment strategy with monthly savings and returns. Get detailed breakdowns, charts, and ROI insights." />
+        <meta property="og:title" content="Vehicle Investment Analysis | Investment Tools Suite" />
+        <meta property="og:description" content="Analyze your vehicle investment strategy with monthly savings and returns. Get detailed breakdowns, charts, and ROI insights." />
+      </Helmet>
       <Container maxW="container.xl">
         <BackButton />
         <VStack spacing={8} align="stretch">

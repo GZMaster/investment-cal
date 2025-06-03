@@ -10,11 +10,13 @@ import {
   Text,
   useColorModeValue,
   VStack,
+  Tooltip,
 } from '@chakra-ui/react';
-import { FaCalculator, FaChartLine, FaLock } from 'react-icons/fa';
+import { FaCalculator, FaChartLine, FaCar, FaLock } from 'react-icons/fa';
 import { Link as RouterLink } from 'react-router-dom';
 import favicon from '../assets/favicon.svg';
 import { SEO } from '../components/SEO';
+import { Helmet } from 'react-helmet-async';
 
 const tools = [
   {
@@ -34,11 +36,11 @@ const tools = [
     status: 'active',
   },
   {
-    id: 'asset-analysis',
-    title: 'Asset Analysis Tool',
-    description: 'Analyze your assets and liabilities to make informed financial decisions.',
-    icon: FaChartLine,
-    path: '/asset-analysis',
+    id: 'vehicle-analysis',
+    title: 'Vehicle Investment Analysis Tool',
+    description: 'Analyze your vehicle investment strategy with monthly savings and returns. Get detailed breakdowns, charts, and ROI insights.',
+    icon: FaCar,
+    path: '/vehicle-analysis',
     status: 'active',
   },
 ];
@@ -50,19 +52,13 @@ export function LandingPage() {
   const textColor = useColorModeValue('gray.600', 'gray.400');
 
   return (
-    <Box>
-      <SEO
-        title="Home"
-        description="A comprehensive collection of investment tools to help you make better financial decisions. Compare investment strategies, analyze budgets, and optimize your portfolio."
-        keywords={[
-          'investment tools',
-          'financial planning',
-          'budget analysis',
-          'investment calculator',
-          'portfolio optimization',
-          'financial management',
-        ]}
-      />
+    <Box minH="100vh" bg={bgColor}>
+      <Helmet>
+        <title>Investment Tools Suite | Analyze, Compare, and Optimize Investments</title>
+        <meta name="description" content="A comprehensive collection of tools to help you make better investment decisions and manage your portfolio effectively. Analyze, compare, and optimize your investments with ease." />
+        <meta property="og:title" content="Investment Tools Suite | Analyze, Compare, and Optimize Investments" />
+        <meta property="og:description" content="A comprehensive collection of tools to help you make better investment decisions and manage your portfolio effectively. Analyze, compare, and optimize your investments with ease." />
+      </Helmet>
 
       {/* Hero Section */}
       <Box
@@ -101,43 +97,45 @@ export function LandingPage() {
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
             {tools.map((tool) => {
               const cardContent = (
-                <Box
-                  key={tool.id}
-                  p={6}
-                  bg={bgColor}
-                  borderRadius="xl"
-                  boxShadow="xl"
-                  border="1px solid"
-                  borderColor={borderColor}
-                  transition="all 0.2s"
-                  _hover={tool.status === 'active' ? {
-                    transform: 'translateY(-4px)',
-                    boxShadow: '2xl',
-                    borderColor: 'blue.400',
-                  } : {}}
-                  position="relative"
-                  opacity={tool.status === 'coming-soon' ? 0.7 : 1}
-                  cursor={tool.status === 'active' ? 'pointer' : 'default'}
-                >
-                  <VStack align="start" spacing={4}>
-                    <HStack spacing={4} width="100%" justify="space-between">
-                      <Icon as={tool.icon} w={10} h={10} color="blue.500" />
-                      {tool.status === 'coming-soon' && (
-                        <Badge colorScheme="purple" fontSize="sm">Coming Soon</Badge>
-                      )}
-                    </HStack>
-                    <Heading size="md">{tool.title}</Heading>
-                    <Text color={textColor}>
-                      {tool.description}
-                    </Text>
-                    <HStack spacing={2} color={tool.status === 'active' ? 'blue.500' : 'purple.500'}>
-                      <Icon as={tool.status === 'active' ? FaCalculator : FaLock} />
-                      <Text fontSize="sm" fontWeight="medium">
-                        {tool.status === 'active' ? 'Try Tool →' : 'Coming Soon'}
+                <Tooltip label={tool.status === 'active' ? `Open ${tool.title}` : 'Coming soon!'} hasArrow>
+                  <Box
+                    key={tool.id}
+                    p={6}
+                    bg={bgColor}
+                    borderRadius="xl"
+                    boxShadow="xl"
+                    border="1px solid"
+                    borderColor={borderColor}
+                    transition="all 0.2s"
+                    _hover={tool.status === 'active' ? {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '2xl',
+                      borderColor: 'blue.400',
+                    } : {}}
+                    position="relative"
+                    opacity={tool.status === 'coming-soon' ? 0.7 : 1}
+                    cursor={tool.status === 'active' ? 'pointer' : 'default'}
+                  >
+                    <VStack align="start" spacing={4}>
+                      <HStack spacing={4} width="100%" justify="space-between">
+                        <Icon as={tool.icon} w={10} h={10} color="blue.500" />
+                        {tool.status === 'coming-soon' && (
+                          <Badge colorScheme="purple" fontSize="sm">Coming Soon</Badge>
+                        )}
+                      </HStack>
+                      <Heading size="md">{tool.title}</Heading>
+                      <Text color={textColor}>
+                        {tool.description}
                       </Text>
-                    </HStack>
-                  </VStack>
-                </Box>
+                      <HStack spacing={2} color={tool.status === 'active' ? 'blue.500' : 'purple.500'}>
+                        <Icon as={tool.status === 'active' ? FaCalculator : FaLock} />
+                        <Text fontSize="sm" fontWeight="medium">
+                          {tool.status === 'active' ? 'Try Tool →' : 'Coming Soon'}
+                        </Text>
+                      </HStack>
+                    </VStack>
+                  </Box>
+                </Tooltip>
               );
 
               return tool.status === 'active' ? (

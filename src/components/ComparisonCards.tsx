@@ -5,6 +5,7 @@ import {
   Badge,
   useColorModeValue,
   Icon,
+  Tooltip,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { FaTrophy, FaChartLine } from 'react-icons/fa';
@@ -36,20 +37,22 @@ export function ComparisonCards({ result }: ComparisonCardsProps) {
         border="1px solid"
         borderColor={borderColor}
         boxShadow="lg"
-        whileHover={{ scale: 1.02 }}
-        transition={{ duration: 0.2 }}
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
+        whileHover={{ scale: 1.04 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
       >
-        <Icon
-          as={FaChartLine}
-          w={6}
-          h={6}
-          color="green.500"
-          position="absolute"
-          top={4}
-          left={4}
-        />
+        <Tooltip label="Compound Strategy" hasArrow>
+          <Icon
+            as={FaChartLine}
+            w={6}
+            h={6}
+            color="green.500"
+            position="absolute"
+            top={4}
+            left={4}
+          />
+        </Tooltip>
         <Text fontSize="xl" fontWeight="bold" mb={4} ml={8}>
           Strategy A: Compound in PiggyVest
         </Text>
@@ -60,21 +63,25 @@ export function ComparisonCards({ result }: ComparisonCardsProps) {
           Reinvest all interest at 18% annually
         </Text>
         {!isTwoTierWinner && (
-          <Badge
-            colorScheme="yellow"
-            position="absolute"
-            top={4}
-            right={4}
-            px={3}
-            py={1}
-            borderRadius="full"
-            display="flex"
-            alignItems="center"
-            gap={2}
-          >
-            <Icon as={FaTrophy} />
-            WINNER! +{formatCurrency(Math.abs(difference))}
-          </Badge>
+          <Tooltip label="Best result for this scenario" hasArrow>
+            <Badge
+              colorScheme="yellow"
+              position="absolute"
+              top={4}
+              right={4}
+              px={3}
+              py={1}
+              borderRadius="full"
+              display="flex"
+              alignItems="center"
+              gap={2}
+              fontSize="md"
+              boxShadow="md"
+            >
+              <Icon as={FaTrophy} />
+              WINNER! +{formatCurrency(Math.abs(difference))}
+            </Badge>
+          </Tooltip>
         )}
       </MotionBox>
 
@@ -86,20 +93,22 @@ export function ComparisonCards({ result }: ComparisonCardsProps) {
         border="1px solid"
         borderColor={borderColor}
         boxShadow="lg"
-        whileHover={{ scale: 1.02 }}
-        transition={{ duration: 0.2 }}
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
+        whileHover={{ scale: 1.04 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
       >
-        <Icon
-          as={FaChartLine}
-          w={6}
-          h={6}
-          color="purple.500"
-          position="absolute"
-          top={4}
-          left={4}
-        />
+        <Tooltip label="Two-Tier Strategy" hasArrow>
+          <Icon
+            as={FaChartLine}
+            w={6}
+            h={6}
+            color="purple.500"
+            position="absolute"
+            top={4}
+            left={4}
+          />
+        </Tooltip>
         <Text fontSize="xl" fontWeight="bold" mb={4} ml={8}>
           Strategy B: Two-Tier Investment
         </Text>
@@ -110,21 +119,25 @@ export function ComparisonCards({ result }: ComparisonCardsProps) {
           Transfer interest to USD + appreciation
         </Text>
         {isTwoTierWinner && (
-          <Badge
-            colorScheme="yellow"
-            position="absolute"
-            top={4}
-            right={4}
-            px={3}
-            py={1}
-            borderRadius="full"
-            display="flex"
-            alignItems="center"
-            gap={2}
-          >
-            <Icon as={FaTrophy} />
-            WINNER! +{formatCurrency(Math.abs(difference))}
-          </Badge>
+          <Tooltip label="Best result for this scenario" hasArrow>
+            <Badge
+              colorScheme="yellow"
+              position="absolute"
+              top={4}
+              right={4}
+              px={3}
+              py={1}
+              borderRadius="full"
+              display="flex"
+              alignItems="center"
+              gap={2}
+              fontSize="md"
+              boxShadow="md"
+            >
+              <Icon as={FaTrophy} />
+              WINNER! +{formatCurrency(Math.abs(difference))}
+            </Badge>
+          </Tooltip>
         )}
       </MotionBox>
     </SimpleGrid>

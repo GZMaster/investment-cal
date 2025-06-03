@@ -16,9 +16,12 @@ import {
   Button,
   Box,
 } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
 import { type PlatformBalance } from '../types/budget';
 import { PlatformManager } from './PlatformManager';
 import { usePlatforms } from '../hooks/usePlatforms';
+
+const MotionCard = motion(Card);
 
 interface SetPlatformBalancesSectionProps {
   balances: PlatformBalance[];
@@ -58,17 +61,20 @@ export function SetPlatformBalancesSection({
   });
 
   return (
-    <Card>
+    <MotionCard
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      mb={6}
+    >
       <CardBody>
         <Heading size="md" mb={4}>Set Platform Balances (Start of Month)</Heading>
-
         <PlatformManager
           platforms={platforms}
           onAddPlatform={addPlatform}
           onUpdatePlatform={updatePlatform}
           onDeletePlatform={deletePlatform}
         />
-
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4} mb={4}>
           {(isEditing ? (pendingBalances ?? currentBalances) : currentBalances).map((balance, idx) => {
             const platform = platforms.find(p => p.id === balance.platformId);
@@ -168,6 +174,6 @@ export function SetPlatformBalancesSection({
           )}
         </HStack>
       </CardBody>
-    </Card>
+    </MotionCard>
   );
 } 

@@ -11,6 +11,7 @@ import { MonthlyAllocationTable } from '../components/MonthlyAllocationTable';
 import { BudgetVisualizations } from '../components/BudgetVisualizations';
 import { usePlatforms } from '../hooks/usePlatforms';
 import { BackButton } from '../components/BackButton';
+import { Helmet } from 'react-helmet-async';
 
 // Helper: Format currency for charts (₦1.2M, ₦350.0k, ₦500)
 function formatCurrencyShort(value: number): string {
@@ -121,6 +122,12 @@ export function BudgetAnalysisPage() {
 
   return (
     <Box minH="100vh" bg={bgColor} py={8}>
+      <Helmet>
+        <title>Budget Analysis Tool | Investment Tools Suite</title>
+        <meta name="description" content="Track your spending, savings, and debt management across different platforms. Get detailed allocation plans and financial insights with our comprehensive budget analysis tool." />
+        <meta property="og:title" content="Budget Analysis Tool | Investment Tools Suite" />
+        <meta property="og:description" content="Track your spending, savings, and debt management across different platforms. Get detailed allocation plans and financial insights with our comprehensive budget analysis tool." />
+      </Helmet>
       <Container maxW="container.xl">
         <BackButton />
         <SEO

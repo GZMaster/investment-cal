@@ -31,7 +31,7 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/calculator" element={<CalculatorPage />} />
               <Route path="/budget" element={<BudgetAnalysisPage />} />
-              <Route path="/asset-analysis" element={<AssetAnalysisPage />} />
+              <Route path="/vehicle-analysis" element={<AssetAnalysisPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Router>
