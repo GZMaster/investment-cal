@@ -1,29 +1,24 @@
 import {
-  Badge,
   Box,
   Card,
   CardBody,
   Heading,
   Progress,
+  Stack,
   Table,
+  TableContainer,
   Tbody,
   Td,
   Text,
   Th,
   Thead,
-  Tr,
-  useBreakpointValue,
-  TableContainer,
-  Stack,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
   Tooltip,
+  Tr,
+  useBreakpointValue
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { type PlatformBalance, type WeeklyAllocation } from '../types/budget';
 import { usePlatforms } from '../hooks/usePlatforms';
+import { type PlatformBalance, type WeeklyAllocation } from '../types/budget';
 
 const MotionTr = motion(Tr);
 
@@ -40,8 +35,6 @@ interface PlatformBalancesTableProps {
 export function PlatformBalancesTable({
   balances,
   formatAmount,
-  isRateLoading,
-  rateError,
   exchangeRateData,
   numWeeks,
   weeklyAllocation,
@@ -67,7 +60,7 @@ export function PlatformBalancesTable({
         <CardBody>
           <Heading size="md" mb={4}>Platform Balances</Heading>
           <Stack spacing={4}>
-            {currentBalances.map((balance, i) => {
+            {currentBalances.map((balance) => {
               const platform = platforms.find(p => p.id === balance.platformId);
               if (!platform) return null;
               const currency = platform.currency;

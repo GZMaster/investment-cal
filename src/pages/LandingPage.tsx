@@ -8,15 +8,14 @@ import {
   Image,
   SimpleGrid,
   Text,
+  Tooltip,
   useColorModeValue,
   VStack,
-  Tooltip,
 } from '@chakra-ui/react';
-import { FaCalculator, FaChartLine, FaCar, FaLock } from 'react-icons/fa';
+import { Helmet } from 'react-helmet-async';
+import { FaCalculator, FaCar, FaChartLine, FaLock } from 'react-icons/fa';
 import { Link as RouterLink } from 'react-router-dom';
 import favicon from '../assets/favicon.svg';
-import { SEO } from '../components/SEO';
-import { Helmet } from 'react-helmet-async';
 
 const tools = [
   {
