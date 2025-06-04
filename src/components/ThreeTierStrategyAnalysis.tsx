@@ -29,6 +29,7 @@ import {
 import { FaMoneyBillWave, FaChartLine, FaCar, FaDollarSign } from 'react-icons/fa';
 import type { ThreeTierStrategyResult } from '../types/investment';
 import { formatCurrency, formatMonthNumber } from '../utils/investment-calculator';
+import { ThreeTierStrategyCharts } from './ThreeTierStrategyCharts';
 
 interface ThreeTierStrategyAnalysisProps {
   result: ThreeTierStrategyResult;
@@ -110,6 +111,8 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
               </StatHelpText>
             </Stat>
           </SimpleGrid>
+
+          <ThreeTierStrategyCharts result={result} />
         </VStack>
       </Box>
 
