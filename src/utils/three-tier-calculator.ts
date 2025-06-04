@@ -1,5 +1,4 @@
 import type { ThreeTierStrategyScenario, ThreeTierStrategyResult } from '../types/investment';
-import { formatMonthNumber } from '../utils/investment-calculator';
 
 export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario): ThreeTierStrategyResult {
   const {
