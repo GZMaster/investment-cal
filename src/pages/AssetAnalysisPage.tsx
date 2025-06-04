@@ -8,6 +8,7 @@ import {
 import { Helmet } from 'react-helmet-async';
 import { AssetAnalysisForm } from '../components/AssetAnalysisForm';
 import { AssetAnalysis } from '../components/AssetAnalysis';
+import { AssetAnalysisSummary } from '../components/AssetAnalysisSummary';
 import { calculateAssetAnalysis } from '../utils/asset-analysis-calculator';
 import type { AssetAnalysisScenario, AssetAnalysisResult } from '../types/investment';
 import { BackButton } from '../components/BackButton';
@@ -56,7 +57,12 @@ export function AssetAnalysisPage() {
 
           <AssetAnalysisForm onSubmit={handleSubmit} />
 
-          {result && <AssetAnalysis result={result} />}
+          {result && (
+            <>
+              <AssetAnalysisSummary result={result} />
+              <AssetAnalysis result={result} />
+            </>
+          )}
         </VStack>
       </Container>
     </Box>
