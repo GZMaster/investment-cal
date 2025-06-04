@@ -12,6 +12,7 @@ import { calculateAssetAnalysis } from '../utils/asset-analysis-calculator';
 import type { AssetAnalysisScenario, AssetAnalysisResult } from '../types/investment';
 import { BackButton } from '../components/BackButton';
 import { Header } from '../components/Header';
+import { SEO } from '../components/SEO';
 
 export function AssetAnalysisPage() {
   const [result, setResult] = useState<AssetAnalysisResult | null>(null);
@@ -32,6 +33,21 @@ export function AssetAnalysisPage() {
       </Helmet>
       <Container maxW="container.xl">
         <BackButton />
+        <SEO
+          title="Vehicle Investment Analysis"
+          description="Analyze your vehicle investment strategy with monthly savings and returns. Get detailed breakdowns, charts, and ROI insights."
+          keywords={[
+            'vehicle investment analysis',
+            'investment strategy',
+            'vehicle investment',
+            'investment returns',
+            'financial planning',
+            'investment analysis',
+            'return on investment',
+            'investment strategy',
+          ]}
+        />
+
         <VStack spacing={8} align="stretch">
           <Header
             title="Vehicle Investment Analysis"
