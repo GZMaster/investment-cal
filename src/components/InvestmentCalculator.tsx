@@ -50,7 +50,10 @@ export function InvestmentCalculator() {
   return (
     <VStack spacing={0} align="stretch">
       <Fade in={true}>
-        <Header />
+        <Header
+          title="Investment Calculator"
+          description="Calculate your investment returns and analyze different investment scenarios with our comprehensive calculator."
+        />
       </Fade>
 
       <ScaleFade initialScale={0.9} in={true}>

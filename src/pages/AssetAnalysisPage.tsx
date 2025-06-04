@@ -2,8 +2,6 @@ import { useState } from 'react';
 import {
   Container,
   VStack,
-  Heading,
-  Text,
   useColorModeValue,
   Box,
 } from '@chakra-ui/react';
@@ -13,6 +11,7 @@ import { AssetAnalysis } from '../components/AssetAnalysis';
 import { calculateAssetAnalysis } from '../utils/asset-analysis-calculator';
 import type { AssetAnalysisScenario, AssetAnalysisResult } from '../types/investment';
 import { BackButton } from '../components/BackButton';
+import { Header } from '../components/Header';
 
 export function AssetAnalysisPage() {
   const [result, setResult] = useState<AssetAnalysisResult | null>(null);
@@ -34,12 +33,10 @@ export function AssetAnalysisPage() {
       <Container maxW="container.xl">
         <BackButton />
         <VStack spacing={8} align="stretch">
-          <Box textAlign="center">
-            <Heading size="xl" mb={4}>Vehicle Investment Analysis</Heading>
-            <Text fontSize="lg" color="gray.600">
-              Analyze your vehicle investment strategy with monthly savings and returns
-            </Text>
-          </Box>
+          <Header
+            title="Vehicle Investment Analysis"
+            description="Analyze your vehicle investment strategy with monthly savings and returns. Get detailed breakdowns, charts, and ROI insights."
+          />
 
           <AssetAnalysisForm onSubmit={handleSubmit} />
 

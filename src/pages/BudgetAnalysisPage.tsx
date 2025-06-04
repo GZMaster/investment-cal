@@ -1,4 +1,4 @@
-import { Container, VStack, Heading, useToast, Box, useColorModeValue } from '@chakra-ui/react';
+import { Container, VStack, useToast, Box, useColorModeValue } from '@chakra-ui/react';
 import { useCallback, useState, useEffect } from 'react';
 import { SEO } from '../components/SEO';
 import { type PlatformBalance, INITIAL_BALANCES, type WeeklyAllocation, getInitialWeeklyAllocation } from '../types/budget';
@@ -12,6 +12,7 @@ import { BudgetVisualizations } from '../components/BudgetVisualizations';
 import { usePlatforms } from '../hooks/usePlatforms';
 import { BackButton } from '../components/BackButton';
 import { Helmet } from 'react-helmet-async';
+import { Header } from '../components/Header';
 
 // Helper: Format currency for charts (₦1.2M, ₦350.0k, ₦500)
 function formatCurrencyShort(value: number): string {
@@ -143,7 +144,10 @@ export function BudgetAnalysisPage() {
           ]}
         />
         <VStack spacing={8} align="stretch">
-          <Heading>Budget Analysis</Heading>
+          <Header
+            title="Budget Analysis"
+            description="Track your spending, savings, and debt management across different platforms. Get detailed allocation plans and financial insights."
+          />
 
           <SetPlatformBalancesSection
             balances={balances}
