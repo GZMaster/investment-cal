@@ -93,10 +93,11 @@ export function PlatformManager({
             borderRadius="md"
             shadow="sm"
             justify="space-between"
+            _dark={{ bg: 'gray.600' }}
           >
             <Box>
-              <Text fontWeight="medium">{platform.name}</Text>
-              <Text fontSize="sm" color="gray.500">
+              <Text fontWeight="medium" _dark={{ color: 'white' }}>{platform.name}</Text>
+              <Text fontSize="sm" color="gray.500" _dark={{ color: 'gray.400' }}>
                 {platform.type} • {platform.currency}
               </Text>
             </Box>
