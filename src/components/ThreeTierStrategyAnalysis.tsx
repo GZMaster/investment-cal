@@ -24,10 +24,11 @@ import {
   TabPanels,
   Tab,
   TabPanel,
+  Badge,
 } from '@chakra-ui/react';
 import { FaMoneyBillWave, FaChartLine, FaCar, FaDollarSign } from 'react-icons/fa';
 import type { ThreeTierStrategyResult } from '../types/investment';
-import { formatCurrency } from '../utils/investment-calculator';
+import { formatCurrency, formatMonthNumber } from '../utils/investment-calculator';
 
 interface ThreeTierStrategyAnalysisProps {
   result: ThreeTierStrategyResult;
@@ -139,6 +140,31 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
                     <StatNumber>{result.piggyVestResults.roi.toFixed(2)}%</StatNumber>
                   </Stat>
                 </SimpleGrid>
+
+                <TableContainer>
+                  <Table variant="simple" size="sm">
+                    <Thead>
+                      <Tr>
+                        <Th>Month</Th>
+                        <Th isNumeric>Balance</Th>
+                        <Th isNumeric>Interest</Th>
+                        <Th isNumeric>Savings</Th>
+                        <Th isNumeric>Total</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {result.monthlyBreakdown.map((month) => (
+                        <Tr key={month.month}>
+                          <Td>{formatMonthNumber(month.month)}</Td>
+                          <Td isNumeric>{formatCurrency(month.piggyVestBalance)}</Td>
+                          <Td isNumeric>{formatCurrency(month.piggyVestInterest)}</Td>
+                          <Td isNumeric>{formatCurrency(month.monthlyPiggyVestSavings || 0)}</Td>
+                          <Td isNumeric>{formatCurrency(month.piggyVestBalance + month.piggyVestInterest)}</Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
               </VStack>
             </TabPanel>
 
@@ -159,6 +185,37 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
                     <StatNumber>{formatCurrency(result.riseVestResults.currencyGain)}</StatNumber>
                   </Stat>
                 </SimpleGrid>
+
+                <TableContainer>
+                  <Table variant="simple" size="sm">
+                    <Thead>
+                      <Tr>
+                        <Th>Month</Th>
+                        <Th isNumeric>USD Balance</Th>
+                        <Th isNumeric>NGN Value</Th>
+                        <Th isNumeric>Interest</Th>
+                        <Th isNumeric>Currency Gain</Th>
+                        <Th isNumeric>Total</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {result.monthlyBreakdown.map((month) => (
+                        <Tr key={month.month}>
+                          <Td>{formatMonthNumber(month.month)}</Td>
+                          <Td isNumeric>
+                            {month.exchangeRate
+                              ? `$${(month.riseVestBalance / month.exchangeRate).toFixed(2)}`
+                              : '-'}
+                          </Td>
+                          <Td isNumeric>{formatCurrency(month.riseVestBalance)}</Td>
+                          <Td isNumeric>{formatCurrency(month.riseVestInterest)}</Td>
+                          <Td isNumeric>{formatCurrency(month.currencyGain)}</Td>
+                          <Td isNumeric>{formatCurrency(month.riseVestBalance + month.riseVestInterest + month.currencyGain)}</Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
               </VStack>
             </TabPanel>
 
@@ -179,6 +236,60 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
                     <StatNumber>{result.vehicleResults.completedCycles}</StatNumber>
                   </Stat>
                 </SimpleGrid>
+
+                <TableContainer>
+                  <Table variant="simple" size="sm">
+                    <Thead>
+                      <Tr>
+                        <Th>Month</Th>
+                        <Th isNumeric>Balance</Th>
+                        <Th isNumeric>Returns</Th>
+                        <Th isNumeric>Investment</Th>
+                        <Th>Status</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {result.monthlyBreakdown.map((month) => {
+                        const isInvestmentMonth = month.month % 3 === 0;
+                        const monthsSinceLastInvestment = month.month % 3;
+                        const isReturningMonth = monthsSinceLastInvestment > 0 && monthsSinceLastInvestment <= 12;
+
+                        let vehicleStatus = '';
+                        if (isInvestmentMonth) {
+                          vehicleStatus = 'New Investment';
+                        } else if (isReturningMonth) {
+                          vehicleStatus = 'Returning';
+                        }
+
+                        return (
+                          <Tr key={month.month}>
+                            <Td>{formatMonthNumber(month.month)}</Td>
+                            <Td isNumeric>{formatCurrency(month.vehicleBalance)}</Td>
+                            <Td isNumeric>{formatCurrency(month.vehicleReturns)}</Td>
+                            <Td isNumeric>
+                              {isInvestmentMonth ? formatCurrency(month.vehicleInvestment || 0) : '-'}
+                            </Td>
+                            <Td>
+                              {vehicleStatus && (
+                                <Badge
+                                  colorScheme={
+                                    isInvestmentMonth
+                                      ? 'blue'
+                                      : isReturningMonth
+                                        ? 'green'
+                                        : 'gray'
+                                  }
+                                >
+                                  {vehicleStatus}
+                                </Badge>
+                              )}
+                            </Td>
+                          </Tr>
+                        );
+                      })}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
               </VStack>
             </TabPanel>
 
@@ -193,19 +304,49 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
                       <Th isNumeric>Vehicle</Th>
                       <Th isNumeric>Total</Th>
                       <Th isNumeric>Currency Gain</Th>
+                      <Th>Vehicle Status</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {result.monthlyBreakdown.map((month) => (
-                      <Tr key={month.month}>
-                        <Td>{month.month}</Td>
-                        <Td isNumeric>{formatCurrency(month.piggyVestBalance)}</Td>
-                        <Td isNumeric>{formatCurrency(month.riseVestBalance)}</Td>
-                        <Td isNumeric>{formatCurrency(month.vehicleBalance)}</Td>
-                        <Td isNumeric>{formatCurrency(month.totalBalance)}</Td>
-                        <Td isNumeric>{formatCurrency(month.currencyGain)}</Td>
-                      </Tr>
-                    ))}
+                    {result.monthlyBreakdown.map((month) => {
+                      // Calculate vehicle investment status
+                      const isInvestmentMonth = month.month % 3 === 0;
+                      const monthsSinceLastInvestment = month.month % 3;
+                      const isReturningMonth = monthsSinceLastInvestment > 0 && monthsSinceLastInvestment <= 12;
+
+                      let vehicleStatus = '';
+                      if (isInvestmentMonth) {
+                        vehicleStatus = 'New Investment';
+                      } else if (isReturningMonth) {
+                        vehicleStatus = 'Returning';
+                      }
+
+                      return (
+                        <Tr key={month.month}>
+                          <Td>{formatMonthNumber(month.month)}</Td>
+                          <Td isNumeric>{formatCurrency(month.piggyVestBalance)}</Td>
+                          <Td isNumeric>{formatCurrency(month.riseVestBalance)}</Td>
+                          <Td isNumeric>{formatCurrency(month.vehicleBalance)}</Td>
+                          <Td isNumeric>{formatCurrency(month.totalBalance)}</Td>
+                          <Td isNumeric>{formatCurrency(month.currencyGain)}</Td>
+                          <Td>
+                            {vehicleStatus && (
+                              <Badge
+                                colorScheme={
+                                  isInvestmentMonth
+                                    ? 'blue'
+                                    : isReturningMonth
+                                      ? 'green'
+                                      : 'gray'
+                                }
+                              >
+                                {vehicleStatus}
+                              </Badge>
+                            )}
+                          </Td>
+                        </Tr>
+                      );
+                    })}
                   </Tbody>
                 </Table>
               </TableContainer>
@@ -230,6 +371,6 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
           </Text>
         </VStack>
       </Box>
-    </VStack>
+    </VStack >
   );
 } 

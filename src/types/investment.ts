@@ -132,5 +132,8 @@ export interface ThreeTierStrategyResult {
     riseVestInterest: number;
     vehicleReturns: number;
     currencyGain: number;
+    monthlyPiggyVestSavings: number;
+    exchangeRate: number;
+    vehicleInvestment: number;
   }[];
 }

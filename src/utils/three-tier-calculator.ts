@@ -92,6 +92,7 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
     totalReturns += monthlyReturns;
 
     // Record monthly breakdown
+    const isInvestmentMonth = month % vehicleInvestment.cyclePeriod === 0 && piggyVestBalance >= vehicleInvestment.investmentCost * vehiclesPerCycle;
     monthlyBreakdown.push({
       month,
       piggyVestBalance,
@@ -102,6 +103,9 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
       riseVestInterest: riseVestInterest * currentExchangeRate,
       vehicleReturns,
       currencyGain: usdAppreciation * currentExchangeRate,
+      monthlyPiggyVestSavings,
+      exchangeRate: currentExchangeRate,
+      vehicleInvestment: isInvestmentMonth ? vehicleInvestment.investmentCost * vehiclesPerCycle : 0,
     });
   }
 
