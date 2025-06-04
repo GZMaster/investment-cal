@@ -42,22 +42,22 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
 
   return (
     <VStack spacing={8} align="stretch">
-      <Box bg={bgColor} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
-        <VStack spacing={6} align="stretch">
-          <Heading size="md">Overall Strategy Summary</Heading>
+      <Box bg={bgColor} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+        <VStack spacing={{ base: 4, md: 6 }} align="stretch">
+          <Heading size={{ base: "sm", md: "md" }}>Overall Strategy Summary</Heading>
 
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6}>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={{ base: 4, md: 6 }}>
             <Stat>
               <StatLabel>
                 <HStack>
                   <Icon as={FaMoneyBillWave} color="blue.500" />
-                  <Text>Total Investment</Text>
+                  <Text fontSize={{ base: "sm", md: "md" }}>Total Investment</Text>
                 </HStack>
               </StatLabel>
-              <StatNumber fontSize={{ base: 'lg', md: 'xl' }}>
+              <StatNumber fontSize={{ base: 'md', md: 'xl' }}>
                 {formatCurrency(result.totalInvestment)}
               </StatNumber>
-              <StatHelpText>
+              <StatHelpText fontSize={{ base: "xs", md: "sm" }}>
                 <StatArrow type="increase" />
                 Combined across all tiers
               </StatHelpText>
@@ -67,13 +67,13 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
               <StatLabel>
                 <HStack>
                   <Icon as={FaChartLine} color="green.500" />
-                  <Text>Total Returns</Text>
+                  <Text fontSize={{ base: "sm", md: "md" }}>Total Returns</Text>
                 </HStack>
               </StatLabel>
-              <StatNumber fontSize={{ base: 'lg', md: 'xl' }}>
+              <StatNumber fontSize={{ base: 'md', md: 'xl' }}>
                 {formatCurrency(result.totalReturns)}
               </StatNumber>
-              <StatHelpText>
+              <StatHelpText fontSize={{ base: "xs", md: "sm" }}>
                 <StatArrow type="increase" />
                 {result.totalROI.toFixed(2)}% ROI
               </StatHelpText>
@@ -83,13 +83,13 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
               <StatLabel>
                 <HStack>
                   <Icon as={FaDollarSign} color="purple.500" />
-                  <Text>USD Portfolio</Text>
+                  <Text fontSize={{ base: "sm", md: "md" }}>USD Portfolio</Text>
                 </HStack>
               </StatLabel>
-              <StatNumber fontSize={{ base: 'lg', md: 'xl' }}>
+              <StatNumber fontSize={{ base: 'md', md: 'xl' }}>
                 ${result.riseVestResults.finalUsdBalance.toFixed(2)}
               </StatNumber>
-              <StatHelpText>
+              <StatHelpText fontSize={{ base: "xs", md: "sm" }}>
                 <StatArrow type="increase" />
                 {formatCurrency(result.riseVestResults.currencyGain)} currency gain
               </StatHelpText>
@@ -99,13 +99,13 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
               <StatLabel>
                 <HStack>
                   <Icon as={FaCar} color="orange.500" />
-                  <Text>Vehicle Investments</Text>
+                  <Text fontSize={{ base: "sm", md: "md" }}>Vehicle Investments</Text>
                 </HStack>
               </StatLabel>
-              <StatNumber fontSize={{ base: 'lg', md: 'xl' }}>
+              <StatNumber fontSize={{ base: 'md', md: 'xl' }}>
                 {result.vehicleResults.completedCycles} cycles
               </StatNumber>
-              <StatHelpText>
+              <StatHelpText fontSize={{ base: "xs", md: "sm" }}>
                 <StatArrow type="increase" />
                 {result.vehicleResults.roi.toFixed(2)}% ROI
               </StatHelpText>
@@ -116,13 +116,18 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
         </VStack>
       </Box>
 
-      <Box bg={bgColor} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
-        <Tabs variant="enclosed">
-          <TabList>
-            <Tab>PiggyVest Tier</Tab>
-            <Tab>RiseVest Tier</Tab>
-            <Tab>Vehicle Tier</Tab>
-            <Tab>Monthly Breakdown</Tab>
+      <Box bg={bgColor} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+        <Tabs variant="enclosed" size={{ base: "sm", md: "md" }}>
+          <TabList overflowX="auto" css={{
+            scrollbarWidth: 'none',
+            '::-webkit-scrollbar': {
+              display: 'none'
+            }
+          }}>
+            <Tab whiteSpace="nowrap">PiggyVest Tier</Tab>
+            <Tab whiteSpace="nowrap">RiseVest Tier</Tab>
+            <Tab whiteSpace="nowrap">Vehicle Tier</Tab>
+            <Tab whiteSpace="nowrap">Monthly Breakdown</Tab>
           </TabList>
 
           <TabPanels>
@@ -297,17 +302,17 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
             </TabPanel>
 
             <TabPanel>
-              <TableContainer>
-                <Table variant="simple" size="sm">
+              <TableContainer overflowX="auto" maxW="100vw">
+                <Table variant="simple" size={{ base: "sm", md: "md" }}>
                   <Thead>
                     <Tr>
-                      <Th>Month</Th>
-                      <Th isNumeric>PiggyVest</Th>
-                      <Th isNumeric>RiseVest</Th>
-                      <Th isNumeric>Vehicle</Th>
-                      <Th isNumeric>Total</Th>
-                      <Th isNumeric>Currency Gain</Th>
-                      <Th>Vehicle Status</Th>
+                      <Th whiteSpace="nowrap">Month</Th>
+                      <Th isNumeric whiteSpace="nowrap">PiggyVest</Th>
+                      <Th isNumeric whiteSpace="nowrap">RiseVest</Th>
+                      <Th isNumeric whiteSpace="nowrap">Vehicle</Th>
+                      <Th isNumeric whiteSpace="nowrap">Total</Th>
+                      <Th isNumeric whiteSpace="nowrap">Currency Gain</Th>
+                      <Th whiteSpace="nowrap">Vehicle Status</Th>
                     </Tr>
                   </Thead>
                   <Tbody>

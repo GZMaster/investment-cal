@@ -29,6 +29,7 @@ export function ThreeTierStrategyForm({ onSubmit }: ThreeTierStrategyFormProps) 
     initialPiggyVestBalance: 10000000,
     monthlyPiggyVestSavings: 1000000,
     piggyVestInterestRate: 18, // 18% annual interest
+    piggyVestInterestReinvestPercentage: 100, // Default to 100% reinvestment
 
     // RiseVest Tier
     initialRiseVestBalance: 0,
@@ -112,6 +113,25 @@ export function ThreeTierStrategyForm({ onSubmit }: ThreeTierStrategyFormProps) 
             min={0}
             max={100}
             step={0.1}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Interest Reinvestment to RiseVest (%)</FormLabel>
+          <NumberInput
+            value={scenario.piggyVestInterestReinvestPercentage}
+            onChange={(_, value) =>
+              setScenario((prev) => ({ ...prev, piggyVestInterestReinvestPercentage: value }))
+            }
+            min={0}
+            max={100}
+            step={1}
           >
             <NumberInputField />
             <NumberInputStepper>

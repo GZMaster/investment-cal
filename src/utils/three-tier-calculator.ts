@@ -12,6 +12,7 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
     vehicleInvestment,
     vehiclesPerCycle,
     analysisPeriod,
+    piggyVestInterestReinvestPercentage,
   } = scenario;
 
   // Initialize results
@@ -39,17 +40,26 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
   const monthlyUsdAppreciationRate = usdAppreciationRate / 100 / 12;
 
   for (let month = 1; month <= analysisPeriod; month++) {
-    // Calculate PiggyVest interest
-    const piggyVestInterest = piggyVestBalance * monthlyPiggyVestRate;
-    piggyVestBalance += piggyVestInterest + monthlyPiggyVestSavings;
-
-    // Calculate RiseVest interest and USD appreciation
-    const riseVestInterest = riseVestBalance * monthlyRiseVestRate;
-    const usdAppreciation = riseVestBalance * monthlyUsdAppreciationRate;
-    riseVestBalance += riseVestInterest;
-
     // Calculate current exchange rate with appreciation
     const currentExchangeRate = exchangeRate * Math.pow(1 + monthlyUsdAppreciationRate, month);
+
+    // Calculate PiggyVest interest
+    const piggyVestInterest = piggyVestBalance * monthlyPiggyVestRate;
+
+    // Calculate how much interest to reinvest in RiseVest
+    const interestToReinvest = piggyVestInterest * (piggyVestInterestReinvestPercentage / 100);
+    const interestToKeep = piggyVestInterest - interestToReinvest;
+
+    // Convert reinvested interest to USD and add to RiseVest balance
+    const piggyVestInterestInUsd = interestToReinvest / currentExchangeRate;
+    riseVestBalance += piggyVestInterestInUsd;
+
+    // Calculate RiseVest interest on the new balance
+    const riseVestInterest = riseVestBalance * monthlyRiseVestRate;
+    riseVestBalance += riseVestInterest;
+
+    // Add monthly savings and remaining interest to PiggyVest
+    piggyVestBalance += monthlyPiggyVestSavings + interestToKeep;
 
     // Process vehicle investments
     let vehicleReturns = 0;
@@ -78,6 +88,9 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
         investment.totalReturned += returnAmount;
         vehicleReturns += returnAmount;
         vehicleBalance += returnAmount;
+
+        // Add vehicle returns back to PiggyVest balance
+        piggyVestBalance += returnAmount;
       }
     });
 
@@ -88,7 +101,7 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
     activeVehicleInvestments.splice(0, completedInvestments.length);
 
     // Calculate total returns for the month
-    const monthlyReturns = piggyVestInterest + (riseVestInterest * currentExchangeRate) + vehicleReturns;
+    const monthlyReturns = (riseVestInterest * currentExchangeRate) + vehicleReturns;
     totalReturns += monthlyReturns;
 
     // Record monthly breakdown
@@ -102,7 +115,7 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
       piggyVestInterest,
       riseVestInterest: riseVestInterest * currentExchangeRate,
       vehicleReturns,
-      currencyGain: usdAppreciation * currentExchangeRate,
+      currencyGain: (riseVestBalance * currentExchangeRate) - (riseVestBalance * exchangeRate),
       monthlyPiggyVestSavings,
       exchangeRate: currentExchangeRate,
       vehicleInvestment: isInvestmentMonth ? vehicleInvestment.investmentCost * vehiclesPerCycle : 0,

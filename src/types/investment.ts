@@ -71,25 +71,26 @@ export interface ThreeTierStrategyScenario {
   // PiggyVest Tier
   initialPiggyVestBalance: number;
   monthlyPiggyVestSavings: number;
-  piggyVestInterestRate: number; // Annual interest rate
+  piggyVestInterestRate: number;
+  piggyVestInterestReinvestPercentage: number;
 
   // RiseVest Tier
   initialRiseVestBalance: number;
-  riseVestInterestRate: number; // Annual interest rate
-  usdAppreciationRate: number; // Annual USD appreciation rate
-  exchangeRate: number; // Current NGN/USD exchange rate
+  riseVestInterestRate: number;
+  usdAppreciationRate: number;
+  exchangeRate: number;
 
   // Vehicle Investment Tier
   vehicleInvestment: {
     investmentCost: number;
     returnAmount: number;
-    investmentPeriod: number; // in months
-    cyclePeriod: number; // in months
+    investmentPeriod: number;
+    cyclePeriod: number;
   };
   vehiclesPerCycle: number;
 
   // Analysis Settings
-  analysisPeriod: number; // in months
+  analysisPeriod: number;
 }
 
 export interface ThreeTierStrategyResult {
