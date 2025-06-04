@@ -13,7 +13,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet-async';
-import { FaCalculator, FaCar, FaChartLine, FaLock } from 'react-icons/fa';
+import { FaCalculator, FaCar, FaChartLine, FaLock, FaLayerGroup } from 'react-icons/fa';
 import { Link as RouterLink } from 'react-router-dom';
 import favicon from '../assets/favicon.svg';
 import { FeaturesSection } from '../components/FeaturesSection';
@@ -42,6 +42,14 @@ const tools = [
     description: 'Analyze your vehicle investment strategy with monthly savings and returns. Get detailed breakdowns, charts, and ROI insights.',
     icon: FaCar,
     path: '/vehicle-analysis',
+    status: 'active',
+  },
+  {
+    id: 'three-tier-strategy',
+    title: '3-Tier Investment Strategy',
+    description: 'Combine PiggyVest savings, RiseVest USD investments, and vehicle investments in one comprehensive strategy.',
+    icon: FaLayerGroup,
+    path: '/three-tier-strategy',
     status: 'active',
   },
 ];

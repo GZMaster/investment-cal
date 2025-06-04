@@ -66,3 +66,71 @@ export interface AssetAnalysisResult {
     totalBalance: number;
   }[];
 }
+
+export interface ThreeTierStrategyScenario {
+  // PiggyVest Tier
+  initialPiggyVestBalance: number;
+  monthlyPiggyVestSavings: number;
+  piggyVestInterestRate: number; // Annual interest rate
+
+  // RiseVest Tier
+  initialRiseVestBalance: number;
+  riseVestInterestRate: number; // Annual interest rate
+  usdAppreciationRate: number; // Annual USD appreciation rate
+  exchangeRate: number; // Current NGN/USD exchange rate
+
+  // Vehicle Investment Tier
+  vehicleInvestment: {
+    investmentCost: number;
+    returnAmount: number;
+    investmentPeriod: number; // in months
+    cyclePeriod: number; // in months
+  };
+  vehiclesPerCycle: number;
+
+  // Analysis Settings
+  analysisPeriod: number; // in months
+}
+
+export interface ThreeTierStrategyResult {
+  // Overall Results
+  totalInvestment: number;
+  totalReturns: number;
+  totalROI: number;
+
+  // Tier-specific Results
+  piggyVestResults: {
+    totalInvestment: number;
+    totalReturns: number;
+    finalBalance: number;
+    roi: number;
+  };
+  riseVestResults: {
+    totalInvestment: number;
+    totalReturns: number;
+    finalBalance: number;
+    roi: number;
+    finalUsdBalance: number;
+    currencyGain: number;
+  };
+  vehicleResults: {
+    totalInvestment: number;
+    totalReturns: number;
+    finalBalance: number;
+    roi: number;
+    completedCycles: number;
+  };
+
+  // Monthly Breakdown
+  monthlyBreakdown: {
+    month: number;
+    piggyVestBalance: number;
+    riseVestBalance: number;
+    vehicleBalance: number;
+    totalBalance: number;
+    piggyVestInterest: number;
+    riseVestInterest: number;
+    vehicleReturns: number;
+    currencyGain: number;
+  }[];
+}

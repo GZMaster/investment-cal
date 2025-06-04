@@ -6,6 +6,7 @@ import { AssetAnalysisPage } from './pages/AssetAnalysisPage';
 import { BudgetAnalysisPage } from './pages/BudgetAnalysisPage';
 import { CalculatorPage } from './pages/CalculatorPage';
 import { LandingPage } from './pages/LandingPage';
+import { ThreeTierStrategyPage } from './pages/ThreeTierStrategyPage';
 import theme from './theme';
 import { ThemeToggle } from './components/ThemeToggle';
 
@@ -32,6 +33,7 @@ function App() {
               <Route path="/calculator" element={<CalculatorPage />} />
               <Route path="/budget" element={<BudgetAnalysisPage />} />
               <Route path="/vehicle-analysis" element={<AssetAnalysisPage />} />
+              <Route path="/three-tier-strategy" element={<ThreeTierStrategyPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Router>
