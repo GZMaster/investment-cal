@@ -16,6 +16,8 @@ import { Helmet } from 'react-helmet-async';
 import { FaCalculator, FaCar, FaChartLine, FaLock } from 'react-icons/fa';
 import { Link as RouterLink } from 'react-router-dom';
 import favicon from '../assets/favicon.svg';
+import { FeaturesSection } from '../components/FeaturesSection';
+import { Footer } from '../components/Footer';
 
 const tools = [
   {
@@ -150,6 +152,12 @@ export function LandingPage() {
           </SimpleGrid>
         </VStack>
       </Container>
+
+      {/* Features Section */}
+      <FeaturesSection />
+
+      {/* Footer */}
+      <Footer />
     </Box>
   );
 } 
