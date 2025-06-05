@@ -41,7 +41,7 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
 
   for (let month = 1; month <= analysisPeriod; month++) {
     // Calculate current exchange rate with appreciation
-    const currentExchangeRate = exchangeRate * Math.pow(1 + monthlyUsdAppreciationRate, month);
+    const currentExchangeRate = exchangeRate * (1 + monthlyUsdAppreciationRate) ** month;
 
     // Calculate PiggyVest interest
     const piggyVestInterest = piggyVestBalance * monthlyPiggyVestRate;
@@ -81,7 +81,7 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
     }
 
     // Process returns from active vehicle investments
-    activeVehicleInvestments.forEach((investment) => {
+    for (const investment of activeVehicleInvestments) {
       const monthsSinceStart = month - investment.startMonth;
       if (monthsSinceStart > 0 && monthsSinceStart <= vehicleInvestment.investmentPeriod && investment.totalReturned < investment.totalExpected) {
         const returnAmount = investment.monthlyReturn;
@@ -92,7 +92,7 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
         // Add vehicle returns back to PiggyVest balance
         piggyVestBalance += returnAmount;
       }
-    });
+    }
 
     // Remove completed investments
     const completedInvestments = activeVehicleInvestments.filter(
@@ -123,7 +123,7 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
   }
 
   // Calculate final results
-  const finalExchangeRate = exchangeRate * Math.pow(1 + monthlyUsdAppreciationRate, analysisPeriod);
+  const finalExchangeRate = exchangeRate * (1 + monthlyUsdAppreciationRate) ** analysisPeriod;
   const finalRiseVestBalance = riseVestBalance * finalExchangeRate;
   const currencyGain = finalRiseVestBalance - (initialRiseVestBalance * exchangeRate);
 
