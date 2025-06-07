@@ -43,6 +43,8 @@ export function ThreeTierStrategyForm({ onSubmit }: ThreeTierStrategyFormProps) 
       returnAmount: 5600000,
       investmentPeriod: 12,
       cyclePeriod: 3,
+      investmentCostAppreciationRate: 0, // Default to 0% appreciation
+      returnAmountAppreciationRate: 0, // Default to 0% appreciation
     },
     vehiclesPerCycle: 1,
 
@@ -329,6 +331,56 @@ export function ThreeTierStrategyForm({ onSubmit }: ThreeTierStrategyFormProps) 
             }
             min={1}
             max={10}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Annual Investment Cost Appreciation Rate (%)</FormLabel>
+          <NumberInput
+            value={scenario.vehicleInvestment.investmentCostAppreciationRate}
+            onChange={(_, value) =>
+              setScenario((prev) => ({
+                ...prev,
+                vehicleInvestment: {
+                  ...prev.vehicleInvestment,
+                  investmentCostAppreciationRate: value,
+                },
+              }))
+            }
+            min={0}
+            max={100}
+            step={0.1}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Annual Return Amount Appreciation Rate (%)</FormLabel>
+          <NumberInput
+            value={scenario.vehicleInvestment.returnAmountAppreciationRate}
+            onChange={(_, value) =>
+              setScenario((prev) => ({
+                ...prev,
+                vehicleInvestment: {
+                  ...prev.vehicleInvestment,
+                  returnAmountAppreciationRate: value,
+                },
+              }))
+            }
+            min={0}
+            max={100}
+            step={0.1}
           >
             <NumberInputField />
             <NumberInputStepper>

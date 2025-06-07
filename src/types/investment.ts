@@ -86,6 +86,8 @@ export interface ThreeTierStrategyScenario {
     returnAmount: number;
     investmentPeriod: number;
     cyclePeriod: number;
+    investmentCostAppreciationRate: number; // Annual appreciation rate for investment cost
+    returnAmountAppreciationRate: number; // Annual appreciation rate for return amount
   };
   vehiclesPerCycle: number;
 

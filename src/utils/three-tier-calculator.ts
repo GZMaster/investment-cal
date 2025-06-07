@@ -38,10 +38,17 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
   const monthlyPiggyVestRate = piggyVestInterestRate / 100 / 12;
   const monthlyRiseVestRate = riseVestInterestRate / 100 / 12;
   const monthlyUsdAppreciationRate = usdAppreciationRate / 100 / 12;
+  const monthlyInvestmentCostAppreciationRate = vehicleInvestment.investmentCostAppreciationRate / 100 / 12;
+  const monthlyReturnAmountAppreciationRate = vehicleInvestment.returnAmountAppreciationRate / 100 / 12;
 
   for (let month = 1; month <= analysisPeriod; month++) {
     // Calculate current exchange rate with appreciation
     const currentExchangeRate = exchangeRate * (1 + monthlyUsdAppreciationRate) ** month;
+
+    // Calculate current vehicle investment cost and return amount with appreciation
+    const currentInvestmentCost = vehicleInvestment.investmentCost * (1 + monthlyInvestmentCostAppreciationRate) ** month;
+    const currentReturnAmount = vehicleInvestment.returnAmount * (1 + monthlyReturnAmountAppreciationRate) ** month;
+    const currentMonthlyReturn = currentReturnAmount / vehicleInvestment.investmentPeriod;
 
     // Calculate PiggyVest interest
     const piggyVestInterest = piggyVestBalance * monthlyPiggyVestRate;
@@ -63,8 +70,8 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
 
     // Process vehicle investments
     let vehicleReturns = 0;
-    if (month % vehicleInvestment.cyclePeriod === 0 && piggyVestBalance >= vehicleInvestment.investmentCost * vehiclesPerCycle) {
-      const investmentAmount = vehicleInvestment.investmentCost * vehiclesPerCycle;
+    if (month % vehicleInvestment.cyclePeriod === 0 && piggyVestBalance >= currentInvestmentCost * vehiclesPerCycle) {
+      const investmentAmount = currentInvestmentCost * vehiclesPerCycle;
       piggyVestBalance -= investmentAmount;
       totalInvestment += investmentAmount;
 
@@ -73,9 +80,9 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
         activeVehicleInvestments.push({
           startMonth: month,
           investmentAmount,
-          monthlyReturn: vehicleInvestment.returnAmount / vehicleInvestment.investmentPeriod,
+          monthlyReturn: currentMonthlyReturn,
           totalReturned: 0,
-          totalExpected: vehicleInvestment.returnAmount,
+          totalExpected: currentReturnAmount,
         });
       }
     }
@@ -105,7 +112,7 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
     totalReturns += monthlyReturns;
 
     // Record monthly breakdown
-    const isInvestmentMonth = month % vehicleInvestment.cyclePeriod === 0 && piggyVestBalance >= vehicleInvestment.investmentCost * vehiclesPerCycle;
+    const isInvestmentMonth = month % vehicleInvestment.cyclePeriod === 0 && piggyVestBalance >= currentInvestmentCost * vehiclesPerCycle;
     monthlyBreakdown.push({
       month,
       piggyVestBalance,
@@ -118,7 +125,7 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
       currencyGain: (riseVestBalance * currentExchangeRate) - (riseVestBalance * exchangeRate),
       monthlyPiggyVestSavings,
       exchangeRate: currentExchangeRate,
-      vehicleInvestment: isInvestmentMonth ? vehicleInvestment.investmentCost * vehiclesPerCycle : 0,
+      vehicleInvestment: isInvestmentMonth ? currentInvestmentCost * vehiclesPerCycle : 0,
     });
   }
 
