@@ -349,7 +349,7 @@ export function ThreeTierStrategyForm({ onSubmit }: ThreeTierStrategyFormProps) 
               setScenario((prev) => ({ ...prev, analysisPeriod: value }))
             }
             min={1}
-            max={60}
+            max={120}
           >
             <NumberInputField />
             <NumberInputStepper>
