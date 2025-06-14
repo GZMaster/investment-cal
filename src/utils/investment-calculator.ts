@@ -45,9 +45,9 @@ export function calculateMonthlyData(
     useRealTimeRate,
   } = scenario
 
-  const monthlyAppreciationRate = useRealTimeRate ? 0 : (1 + appreciation / 100) ** (1 / 12) - 1
+  const monthlyAppreciationRate = useRealTimeRate ? (1 + appreciation / 100) ** (1 / 12) - 1 : (1 + appreciation / 100) ** (1 / 12) - 1
   const effectiveRate = useRealTimeRate
-    ? (realTimeRate ?? baseExchangeRate)
+    ? (realTimeRate ?? baseExchangeRate) * (1 + monthlyAppreciationRate) ** month
     : baseExchangeRate * (1 + monthlyAppreciationRate) ** month
   const monthlyPiggyVestRate = piggyVestAnnualRate / 12
   const monthlyRiseVestRate = riseVestAnnualRate / 12
