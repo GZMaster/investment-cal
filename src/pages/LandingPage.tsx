@@ -13,7 +13,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet-async';
-import { FaCalculator, FaCar, FaChartLine, FaLock, FaLayerGroup } from 'react-icons/fa';
+import { FaCalculator, FaCar, FaChartLine, FaLock, FaLayerGroup, FaShoppingCart } from 'react-icons/fa';
 import { Link as RouterLink } from 'react-router-dom';
 import favicon from '../assets/favicon.svg';
 import { FeaturesSection } from '../components/FeaturesSection';
@@ -50,6 +50,14 @@ const tools = [
     description: 'Combine PiggyVest savings, RiseVest USD investments, and vehicle investments in one comprehensive strategy.',
     icon: FaLayerGroup,
     path: '/three-tier-strategy',
+    status: 'active',
+  },
+  {
+    id: 'shopping-list',
+    title: 'Shopping List Manager',
+    description: 'Manage your shopping list with price tracking, categories, and budget management. Keep track of items you want to buy and their costs.',
+    icon: FaShoppingCart,
+    path: '/shopping-list',
     status: 'active',
   },
 ];
