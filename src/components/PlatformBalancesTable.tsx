@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { usePlatforms } from '../hooks/usePlatforms';
-import { type PlatformBalance, type WeeklyAllocation } from '../types/budget';
+import type { PlatformBalance, WeeklyAllocation } from '../types/budget';
 
 const MotionTr = motion(Tr);
 

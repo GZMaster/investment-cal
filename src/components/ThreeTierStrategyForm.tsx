@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import type { ThreeTierStrategyScenario } from '../types/investment';
+import { getSavingsPlatformName, getInvestmentPlatformName } from '../utils/platform-utils';
 
 interface ThreeTierStrategyFormProps {
   onSubmit: (scenario: ThreeTierStrategyScenario) => void;
@@ -24,16 +25,19 @@ export function ThreeTierStrategyForm({ onSubmit }: ThreeTierStrategyFormProps) 
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
-  const [scenario, setScenario] = useState<ThreeTierStrategyScenario>({
-    // PiggyVest Tier
-    initialPiggyVestBalance: 10000000,
-    monthlyPiggyVestSavings: 1000000,
-    piggyVestInterestRate: 18, // 18% annual interest
-    piggyVestInterestReinvestPercentage: 100, // Default to 100% reinvestment
+  const savingsPlatformName = getSavingsPlatformName();
+  const investmentPlatformName = getInvestmentPlatformName();
 
-    // RiseVest Tier
-    initialRiseVestBalance: 0,
-    riseVestInterestRate: 8, // 8% annual interest
+  const [scenario, setScenario] = useState<ThreeTierStrategyScenario>({
+    // Savings Platform Tier
+    initialSavingsPlatformBalance: 10000000,
+    monthlySavingsPlatformSavings: 1000000,
+    savingsPlatformInterestRate: 18, // 18% annual interest
+    savingsPlatformInterestReinvestPercentage: 100, // Default to 100% reinvestment
+
+    // Investment Platform Tier
+    initialInvestmentPlatformBalance: 0,
+    investmentPlatformInterestRate: 8, // 8% annual interest
     usdAppreciationRate: 7.2, // 7.2% annual USD appreciation
     exchangeRate: 1650, // Current NGN/USD rate
 
@@ -68,13 +72,13 @@ export function ThreeTierStrategyForm({ onSubmit }: ThreeTierStrategyFormProps) 
       borderColor={borderColor}
     >
       <VStack spacing={6} align="stretch">
-        <Heading size="md">PiggyVest Tier</Heading>
+        <Heading size="md">{savingsPlatformName} Tier</Heading>
         <FormControl>
           <FormLabel>Initial Balance</FormLabel>
           <NumberInput
-            value={scenario.initialPiggyVestBalance}
+            value={scenario.initialSavingsPlatformBalance}
             onChange={(_, value) =>
-              setScenario((prev) => ({ ...prev, initialPiggyVestBalance: value }))
+              setScenario((prev) => ({ ...prev, initialSavingsPlatformBalance: value }))
             }
             min={0}
             step={100000}
@@ -90,9 +94,9 @@ export function ThreeTierStrategyForm({ onSubmit }: ThreeTierStrategyFormProps) 
         <FormControl>
           <FormLabel>Monthly Savings</FormLabel>
           <NumberInput
-            value={scenario.monthlyPiggyVestSavings}
+            value={scenario.monthlySavingsPlatformSavings}
             onChange={(_, value) =>
-              setScenario((prev) => ({ ...prev, monthlyPiggyVestSavings: value }))
+              setScenario((prev) => ({ ...prev, monthlySavingsPlatformSavings: value }))
             }
             min={0}
             step={100000}
@@ -108,9 +112,9 @@ export function ThreeTierStrategyForm({ onSubmit }: ThreeTierStrategyFormProps) 
         <FormControl>
           <FormLabel>Annual Interest Rate (%)</FormLabel>
           <NumberInput
-            value={scenario.piggyVestInterestRate}
+            value={scenario.savingsPlatformInterestRate}
             onChange={(_, value) =>
-              setScenario((prev) => ({ ...prev, piggyVestInterestRate: value }))
+              setScenario((prev) => ({ ...prev, savingsPlatformInterestRate: value }))
             }
             min={0}
             max={100}
@@ -125,11 +129,11 @@ export function ThreeTierStrategyForm({ onSubmit }: ThreeTierStrategyFormProps) 
         </FormControl>
 
         <FormControl>
-          <FormLabel>Interest Reinvestment to RiseVest (%)</FormLabel>
+          <FormLabel>Interest Reinvestment to {investmentPlatformName} (%)</FormLabel>
           <NumberInput
-            value={scenario.piggyVestInterestReinvestPercentage}
+            value={scenario.savingsPlatformInterestReinvestPercentage}
             onChange={(_, value) =>
-              setScenario((prev) => ({ ...prev, piggyVestInterestReinvestPercentage: value }))
+              setScenario((prev) => ({ ...prev, savingsPlatformInterestReinvestPercentage: value }))
             }
             min={0}
             max={100}
@@ -145,13 +149,13 @@ export function ThreeTierStrategyForm({ onSubmit }: ThreeTierStrategyFormProps) 
 
         <Divider />
 
-        <Heading size="md">RiseVest Tier</Heading>
+        <Heading size="md">{investmentPlatformName} Tier</Heading>
         <FormControl>
           <FormLabel>Initial USD Balance</FormLabel>
           <NumberInput
-            value={scenario.initialRiseVestBalance}
+            value={scenario.initialInvestmentPlatformBalance}
             onChange={(_, value) =>
-              setScenario((prev) => ({ ...prev, initialRiseVestBalance: value }))
+              setScenario((prev) => ({ ...prev, initialInvestmentPlatformBalance: value }))
             }
             min={0}
             step={100}
@@ -167,9 +171,9 @@ export function ThreeTierStrategyForm({ onSubmit }: ThreeTierStrategyFormProps) 
         <FormControl>
           <FormLabel>Annual Interest Rate (%)</FormLabel>
           <NumberInput
-            value={scenario.riseVestInterestRate}
+            value={scenario.investmentPlatformInterestRate}
             onChange={(_, value) =>
-              setScenario((prev) => ({ ...prev, riseVestInterestRate: value }))
+              setScenario((prev) => ({ ...prev, investmentPlatformInterestRate: value }))
             }
             min={0}
             max={100}

@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import { FaTrophy, FaChartLine } from 'react-icons/fa';
 import type { InvestmentResult } from '../types/investment';
 import { formatCurrency } from '../utils/investment-calculator';
+import { getSavingsPlatformName } from '../utils/platform-utils';
 
 const MotionBox = motion(Box);
 
@@ -22,6 +23,8 @@ export function ComparisonCards({ result }: ComparisonCardsProps) {
   const { compoundEarnings, twoTierEarnings } = result;
   const difference = twoTierEarnings - compoundEarnings;
   const isTwoTierWinner = difference > 0;
+
+  const savingsPlatformName = getSavingsPlatformName();
 
   const compoundBg = useColorModeValue('green.50', 'green.900');
   const twoTierBg = useColorModeValue('purple.50', 'purple.900');
@@ -54,7 +57,7 @@ export function ComparisonCards({ result }: ComparisonCardsProps) {
           />
         </Tooltip>
         <Text fontSize="xl" fontWeight="bold" mb={4} ml={8}>
-          Strategy A: Compound in PiggyVest
+          Strategy A: Compound in {savingsPlatformName}
         </Text>
         <Text fontSize="3xl" fontWeight="bold" mb={2} color="green.600">
           {formatCurrency(compoundEarnings)}

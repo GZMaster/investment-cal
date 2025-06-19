@@ -20,7 +20,7 @@ import {
   SimpleGrid,
   VStack,
 } from '@chakra-ui/react';
-import { type WeeklyAllocation } from '../types/budget';
+import type { WeeklyAllocation } from '../types/budget';
 import { usePlatforms } from '../hooks/usePlatforms';
 
 interface MonthlyAllocationTableProps {

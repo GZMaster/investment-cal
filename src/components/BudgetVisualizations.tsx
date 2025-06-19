@@ -8,7 +8,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, Legend, Tooltip as RechartsTooltip } from 'recharts';
-import { type PlatformBalance, type WeeklyAllocation } from '../types/budget';
+import type { PlatformBalance, WeeklyAllocation } from '../types/budget';
 import { usePlatforms } from '../hooks/usePlatforms';
 
 interface BudgetVisualizationsProps {

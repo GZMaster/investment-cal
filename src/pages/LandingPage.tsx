@@ -18,6 +18,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import favicon from '../assets/favicon.svg';
 import { FeaturesSection } from '../components/FeaturesSection';
 import { Footer } from '../components/Footer';
+import { getSavingsPlatformName, getInvestmentPlatformName } from '../utils/platform-utils';
 
 const tools = [
   {
@@ -47,7 +48,7 @@ const tools = [
   {
     id: 'three-tier-strategy',
     title: '3-Tier Investment Strategy',
-    description: 'Combine PiggyVest savings, RiseVest USD investments, and vehicle investments in one comprehensive strategy.',
+    description: `Combine ${getSavingsPlatformName()} savings, ${getInvestmentPlatformName()} USD investments, and vehicle investments in one comprehensive strategy.`,
     icon: FaLayerGroup,
     path: '/three-tier-strategy',
     status: 'active',

@@ -15,7 +15,7 @@ import {
   Button,
   HStack,
 } from '@chakra-ui/react';
-import { type WeeklyAllocation } from '../types/budget';
+import type { WeeklyAllocation } from '../types/budget';
 import { usePlatforms } from '../hooks/usePlatforms';
 import { useEffect } from 'react';
 
@@ -45,17 +45,17 @@ export function IncomeAndAllocationSection({
     setWeeklyAllocation(prev => {
       const newAllocation = { ...prev };
       // Remove allocations for deleted platforms
-      Object.keys(newAllocation).forEach(key => {
+      for (const key of Object.keys(newAllocation)) {
         if (!platforms.some(p => p.id === key)) {
           delete newAllocation[key];
         }
-      });
+      }
       // Add allocations for new platforms
-      platforms.forEach(p => {
+      for (const p of platforms) {
         if (!(p.id in newAllocation)) {
           newAllocation[p.id] = 0;
         }
-      });
+      }
       return newAllocation;
     });
   }, [platforms, setWeeklyAllocation]);

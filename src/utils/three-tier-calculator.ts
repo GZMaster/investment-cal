@@ -2,24 +2,24 @@ import type { ThreeTierStrategyScenario, ThreeTierStrategyResult } from '../type
 
 export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario): ThreeTierStrategyResult {
   const {
-    initialPiggyVestBalance,
-    monthlyPiggyVestSavings,
-    piggyVestInterestRate,
-    initialRiseVestBalance,
-    riseVestInterestRate,
+    initialSavingsPlatformBalance,
+    monthlySavingsPlatformSavings,
+    savingsPlatformInterestRate,
+    initialInvestmentPlatformBalance,
+    investmentPlatformInterestRate,
     usdAppreciationRate,
     exchangeRate,
     vehicleInvestment,
     vehiclesPerCycle,
     analysisPeriod,
-    piggyVestInterestReinvestPercentage,
+    savingsPlatformInterestReinvestPercentage,
   } = scenario;
 
   // Initialize results
-  let piggyVestBalance = initialPiggyVestBalance;
-  let riseVestBalance = initialRiseVestBalance;
+  let savingsPlatformBalance = initialSavingsPlatformBalance;
+  let investmentPlatformBalance = initialInvestmentPlatformBalance;
   let vehicleBalance = 0;
-  let totalInvestment = initialPiggyVestBalance + (initialRiseVestBalance * exchangeRate);
+  let totalInvestment = initialSavingsPlatformBalance + (initialInvestmentPlatformBalance * exchangeRate);
   let totalReturns = 0;
 
   // Track active vehicle investments
@@ -35,8 +35,8 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
   const monthlyBreakdown: ThreeTierStrategyResult['monthlyBreakdown'] = [];
 
   // Calculate monthly rates
-  const monthlyPiggyVestRate = piggyVestInterestRate / 100 / 12;
-  const monthlyRiseVestRate = riseVestInterestRate / 100 / 12;
+  const monthlySavingsPlatformRate = savingsPlatformInterestRate / 100 / 12;
+  const monthlyInvestmentPlatformRate = investmentPlatformInterestRate / 100 / 12;
   const monthlyUsdAppreciationRate = usdAppreciationRate / 100 / 12;
   const monthlyInvestmentCostAppreciationRate = vehicleInvestment.investmentCostAppreciationRate / 100 / 12;
   const monthlyReturnAmountAppreciationRate = vehicleInvestment.returnAmountAppreciationRate / 100 / 12;
@@ -50,29 +50,29 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
     const currentReturnAmount = vehicleInvestment.returnAmount * (1 + monthlyReturnAmountAppreciationRate) ** month;
     const currentMonthlyReturn = currentReturnAmount / vehicleInvestment.investmentPeriod;
 
-    // Calculate PiggyVest interest
-    const piggyVestInterest = piggyVestBalance * monthlyPiggyVestRate;
+    // Calculate savings platform interest
+    const savingsPlatformInterest = savingsPlatformBalance * monthlySavingsPlatformRate;
 
-    // Calculate how much interest to reinvest in RiseVest
-    const interestToReinvest = piggyVestInterest * (piggyVestInterestReinvestPercentage / 100);
-    const interestToKeep = piggyVestInterest - interestToReinvest;
+    // Calculate how much interest to reinvest in investment platform
+    const interestToReinvest = savingsPlatformInterest * (savingsPlatformInterestReinvestPercentage / 100);
+    const interestToKeep = savingsPlatformInterest - interestToReinvest;
 
-    // Convert reinvested interest to USD and add to RiseVest balance
-    const piggyVestInterestInUsd = interestToReinvest / currentExchangeRate;
-    riseVestBalance += piggyVestInterestInUsd;
+    // Convert reinvested interest to USD and add to investment platform balance
+    const savingsPlatformInterestInUsd = interestToReinvest / currentExchangeRate;
+    investmentPlatformBalance += savingsPlatformInterestInUsd;
 
-    // Calculate RiseVest interest on the new balance
-    const riseVestInterest = riseVestBalance * monthlyRiseVestRate;
-    riseVestBalance += riseVestInterest;
+    // Calculate investment platform interest on the new balance
+    const investmentPlatformInterest = investmentPlatformBalance * monthlyInvestmentPlatformRate;
+    investmentPlatformBalance += investmentPlatformInterest;
 
-    // Add monthly savings and remaining interest to PiggyVest
-    piggyVestBalance += monthlyPiggyVestSavings + interestToKeep;
+    // Add monthly savings and remaining interest to savings platform
+    savingsPlatformBalance += monthlySavingsPlatformSavings + interestToKeep;
 
     // Process vehicle investments
     let vehicleReturns = 0;
-    if (month % vehicleInvestment.cyclePeriod === 0 && piggyVestBalance >= currentInvestmentCost * vehiclesPerCycle) {
+    if (month % vehicleInvestment.cyclePeriod === 0 && savingsPlatformBalance >= currentInvestmentCost * vehiclesPerCycle) {
       const investmentAmount = currentInvestmentCost * vehiclesPerCycle;
-      piggyVestBalance -= investmentAmount;
+      savingsPlatformBalance -= investmentAmount;
       totalInvestment += investmentAmount;
 
       // Add new investments
@@ -96,8 +96,8 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
         vehicleReturns += returnAmount;
         vehicleBalance += returnAmount;
 
-        // Add vehicle returns back to PiggyVest balance
-        piggyVestBalance += returnAmount;
+        // Add vehicle returns back to savings platform balance
+        savingsPlatformBalance += returnAmount;
       }
     }
 
@@ -108,22 +108,22 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
     activeVehicleInvestments.splice(0, completedInvestments.length);
 
     // Calculate total returns for the month
-    const monthlyReturns = (riseVestInterest * currentExchangeRate) + vehicleReturns;
+    const monthlyReturns = (investmentPlatformInterest * currentExchangeRate) + vehicleReturns;
     totalReturns += monthlyReturns;
 
     // Record monthly breakdown
-    const isInvestmentMonth = month % vehicleInvestment.cyclePeriod === 0 && piggyVestBalance >= currentInvestmentCost * vehiclesPerCycle;
+    const isInvestmentMonth = month % vehicleInvestment.cyclePeriod === 0 && savingsPlatformBalance >= currentInvestmentCost * vehiclesPerCycle;
     monthlyBreakdown.push({
       month,
-      piggyVestBalance,
-      riseVestBalance: riseVestBalance * currentExchangeRate,
+      savingsPlatformBalance,
+      investmentPlatformBalance: investmentPlatformBalance * currentExchangeRate,
       vehicleBalance,
-      totalBalance: piggyVestBalance + (riseVestBalance * currentExchangeRate) + vehicleBalance,
-      piggyVestInterest,
-      riseVestInterest: riseVestInterest * currentExchangeRate,
+      totalBalance: savingsPlatformBalance + (investmentPlatformBalance * currentExchangeRate) + vehicleBalance,
+      savingsPlatformInterest,
+      investmentPlatformInterest: investmentPlatformInterest * currentExchangeRate,
       vehicleReturns,
-      currencyGain: (riseVestBalance * currentExchangeRate) - (riseVestBalance * exchangeRate),
-      monthlyPiggyVestSavings,
+      currencyGain: (investmentPlatformBalance * currentExchangeRate) - (investmentPlatformBalance * exchangeRate),
+      monthlySavingsPlatformSavings,
       exchangeRate: currentExchangeRate,
       vehicleInvestment: isInvestmentMonth ? currentInvestmentCost * vehiclesPerCycle : 0,
     });
@@ -131,28 +131,28 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
 
   // Calculate final results
   const finalExchangeRate = exchangeRate * (1 + monthlyUsdAppreciationRate) ** analysisPeriod;
-  const finalRiseVestBalance = riseVestBalance * finalExchangeRate;
-  const currencyGain = finalRiseVestBalance - (initialRiseVestBalance * exchangeRate);
+  const finalInvestmentPlatformBalance = investmentPlatformBalance * finalExchangeRate;
+  const currencyGain = finalInvestmentPlatformBalance - (initialInvestmentPlatformBalance * exchangeRate);
 
   return {
     totalInvestment,
     totalReturns,
     totalROI: (totalReturns / totalInvestment) * 100,
 
-    piggyVestResults: {
-      totalInvestment: initialPiggyVestBalance + (monthlyPiggyVestSavings * analysisPeriod),
-      totalReturns: piggyVestBalance - (initialPiggyVestBalance + (monthlyPiggyVestSavings * analysisPeriod)),
-      finalBalance: piggyVestBalance,
-      roi: ((piggyVestBalance - (initialPiggyVestBalance + (monthlyPiggyVestSavings * analysisPeriod))) /
-        (initialPiggyVestBalance + (monthlyPiggyVestSavings * analysisPeriod))) * 100,
+    savingsPlatformResults: {
+      totalInvestment: initialSavingsPlatformBalance + (monthlySavingsPlatformSavings * analysisPeriod),
+      totalReturns: savingsPlatformBalance - (initialSavingsPlatformBalance + (monthlySavingsPlatformSavings * analysisPeriod)),
+      finalBalance: savingsPlatformBalance,
+      roi: ((savingsPlatformBalance - (initialSavingsPlatformBalance + (monthlySavingsPlatformSavings * analysisPeriod))) /
+        (initialSavingsPlatformBalance + (monthlySavingsPlatformSavings * analysisPeriod))) * 100,
     },
 
-    riseVestResults: {
-      totalInvestment: initialRiseVestBalance * exchangeRate,
-      totalReturns: finalRiseVestBalance - (initialRiseVestBalance * exchangeRate),
-      finalBalance: finalRiseVestBalance,
-      roi: ((finalRiseVestBalance - (initialRiseVestBalance * exchangeRate)) / (initialRiseVestBalance * exchangeRate)) * 100,
-      finalUsdBalance: riseVestBalance,
+    investmentPlatformResults: {
+      totalInvestment: initialInvestmentPlatformBalance * exchangeRate,
+      totalReturns: finalInvestmentPlatformBalance - (initialInvestmentPlatformBalance * exchangeRate),
+      finalBalance: finalInvestmentPlatformBalance,
+      roi: ((finalInvestmentPlatformBalance - (initialInvestmentPlatformBalance * exchangeRate)) / (initialInvestmentPlatformBalance * exchangeRate)) * 100,
+      finalUsdBalance: investmentPlatformBalance,
       currencyGain,
     },
 

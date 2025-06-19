@@ -18,6 +18,7 @@ import { FaTable } from 'react-icons/fa';
 import type { InvestmentScenario } from '../types/investment';
 import { calculateMonthlyData } from '../utils/investment-calculator';
 import { formatCurrency } from '../utils/investment-calculator';
+import { getSavingsPlatformName } from '../utils/platform-utils';
 
 const MotionBox = motion(Box);
 
@@ -31,21 +32,24 @@ export function InvestmentTable({ scenario }: InvestmentTableProps) {
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const iconColor = useColorModeValue('blue.500', 'blue.300');
+  const hoverBgColor = useColorModeValue('gray.50', 'gray.700');
 
   const monthlyData = Array.from({ length: totalMonths }, (_, i) =>
     calculateMonthlyData(i + 1, totalMonths, scenario)
   );
 
   const visibleColumns = useBreakpointValue({
-    base: ['month', 'piggyVestBalance', 'totalEarnings'],
-    sm: ['month', 'piggyVestBalance', 'nairaInterest', 'totalEarnings'],
-    md: ['month', 'piggyVestBalance', 'nairaInterest', 'usdValue', 'totalEarnings'],
-    lg: ['month', 'piggyVestBalance', 'nairaInterest', 'usdAdded', 'cumulativeUSD', 'usdInterest', 'exchangeRate', 'usdValue', 'totalEarnings'],
+    base: ['month', 'savingsPlatformBalance', 'totalEarnings'],
+    sm: ['month', 'savingsPlatformBalance', 'nairaInterest', 'totalEarnings'],
+    md: ['month', 'savingsPlatformBalance', 'nairaInterest', 'usdValue', 'totalEarnings'],
+    lg: ['month', 'savingsPlatformBalance', 'nairaInterest', 'usdAdded', 'cumulativeUSD', 'usdInterest', 'exchangeRate', 'usdValue', 'totalEarnings'],
   });
+
+  const savingsPlatformName = getSavingsPlatformName();
 
   const columnLabels: Record<string, string> = {
     month: 'Month',
-    piggyVestBalance: 'PiggyVest Balance',
+    savingsPlatformBalance: `${savingsPlatformName} Balance`,
     nairaInterest: 'Naira Interest',
     usdAdded: 'USD Added',
     cumulativeUSD: 'Cumulative USD',
@@ -106,7 +110,7 @@ export function InvestmentTable({ scenario }: InvestmentTableProps) {
           <Thead>
             <Tr>
               {visibleColumns?.map((column) => (
-                <Th key={column} isNumeric={column !== 'month'}>
+                <Th key={column} color={iconColor} fontSize="sm">
                   {columnLabels[column]}
                 </Th>
               ))}
@@ -114,10 +118,10 @@ export function InvestmentTable({ scenario }: InvestmentTableProps) {
           </Thead>
           <Tbody>
             {monthlyData.map((data) => (
-              <Tr key={data.month}>
+              <Tr key={data.month} _hover={{ bg: hoverBgColor }}>
                 {visibleColumns?.map((column) => (
-                  <Td key={`${data.month}-${column}`} isNumeric={column !== 'month'}>
-                    {column === 'month' ? data.month : formatValue(column, data[column as keyof typeof data] as number)}
+                  <Td key={column} fontSize="sm">
+                    {formatValue(column, data[column as keyof typeof data] as number)}
                   </Td>
                 ))}
               </Tr>

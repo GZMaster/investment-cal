@@ -1,5 +1,7 @@
 import { action, createStore } from 'easy-peasy';
 import type { ShoppingItem } from '../types/shopping';
+import type { GlobalPlatformSettings, PlatformConfig } from '../types/platform';
+import { DEFAULT_PLATFORM_CONFIG } from '../types/platform';
 
 // Local storage keys
 const STORAGE_KEYS = {
@@ -7,6 +9,7 @@ const STORAGE_KEYS = {
   BUDGET: 'shopping-list-budget',
   CURRENCY: 'shopping-list-currency',
   CATEGORIES: 'shopping-list-categories',
+  PLATFORM_SETTINGS: 'platform-settings',
 };
 
 // Helper functions for localStorage
@@ -54,12 +57,17 @@ const loadCategories = (): string[] => loadFromStorage(STORAGE_KEYS.CATEGORIES, 
   'Electronics', 'Clothing', 'Food', 'Home', 'Transport', 'Entertainment'
 ]);
 
+const loadPlatformSettings = (): GlobalPlatformSettings => {
+  return loadFromStorage(STORAGE_KEYS.PLATFORM_SETTINGS, DEFAULT_PLATFORM_CONFIG);
+};
+
 const shoppingStore = {
   // State - Load from localStorage or use defaults
   items: loadItems(),
   totalBudget: loadBudget(),
   currency: loadCurrency(),
   categories: loadCategories(),
+  platformSettings: loadPlatformSettings(),
 
   // Actions
   addItem: action((state: any, payload: Omit<ShoppingItem, 'id' | 'createdAt' | 'isCompleted'>) => {
@@ -129,6 +137,42 @@ const shoppingStore = {
     state.currency = 'NGN';
     state.categories = ['Electronics', 'Clothing', 'Food', 'Home', 'Transport', 'Entertainment'];
     clearStorage();
+  }),
+
+  // Platform Settings Actions
+  updatePlatformSettings: action((state: any, payload: Partial<GlobalPlatformSettings>) => {
+    state.platformSettings = { ...state.platformSettings, ...payload };
+    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
+  }),
+
+  updatePrimarySavingsPlatform: action((state: any, payload: PlatformConfig) => {
+    state.platformSettings.primarySavingsPlatform = payload;
+    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
+  }),
+
+  updatePrimaryInvestmentPlatform: action((state: any, payload: PlatformConfig) => {
+    state.platformSettings.primaryInvestmentPlatform = payload;
+    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
+  }),
+
+  setDefaultCurrency: action((state: any, payload: 'NGN' | 'USD') => {
+    state.platformSettings.defaultCurrency = payload;
+    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
+  }),
+
+  setExchangeRate: action((state: any, payload: number) => {
+    state.platformSettings.exchangeRate = payload;
+    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
+  }),
+
+  setPlatformConfigured: action((state: any, payload: boolean) => {
+    state.platformSettings.isConfigured = payload;
+    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
+  }),
+
+  resetPlatformSettings: action((state: any) => {
+    state.platformSettings = DEFAULT_PLATFORM_CONFIG;
+    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
   }),
 };
 

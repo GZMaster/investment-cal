@@ -27,6 +27,7 @@ import type { TooltipProps } from 'recharts';
 import type { InvestmentScenario, InvestmentResult } from '../types/investment';
 import { calculateMonthlyData } from '../utils/investment-calculator';
 import { formatCurrency } from '../utils/investment-calculator';
+import { getSavingsPlatformName, getInvestmentPlatformName } from '../utils/platform-utils';
 
 const MotionBox = motion(Box);
 
@@ -86,6 +87,9 @@ export function VisualizationSection({ scenario, result }: VisualizationSectionP
   const pieRadius = useBreakpointValue({ base: 100, md: 150 });
   const gridColumns = useBreakpointValue({ base: 1, md: 2 });
 
+  const savingsPlatformName = getSavingsPlatformName();
+  const investmentPlatformName = getInvestmentPlatformName();
+
   // Prepare data for charts
   const monthlyData = Array.from({ length: totalMonths }, (_, i) =>
     calculateMonthlyData(i + 1, totalMonths, scenario)
@@ -93,15 +97,15 @@ export function VisualizationSection({ scenario, result }: VisualizationSectionP
 
   const lineChartData = monthlyData.map((data) => ({
     month: data.month,
-    piggyVestBalance: data.piggyVestBalance,
-    usdValue: data.usdValue,
-    totalEarnings: data.totalEarnings,
+    [savingsPlatformName]: data.savingsPlatformBalance,
+    'USD Value': data.usdValue,
+    'Total Earnings': data.totalEarnings,
   }));
 
   const barChartData = monthlyData.map((data) => ({
     month: data.month,
-    nairaInterest: data.nairaInterest,
-    usdInterest: data.usdInterest * data.exchangeRate,
+    'Naira Interest': data.nairaInterest,
+    'USD Interest': data.usdInterest * data.exchangeRate,
   }));
 
   const exchangeRateData = monthlyData.map((data) => ({
@@ -111,9 +115,16 @@ export function VisualizationSection({ scenario, result }: VisualizationSectionP
   }));
 
   const pieChartData = [
-    { name: 'PiggyVest Interest', value: result.compoundEarnings },
-    { name: 'RiseVest Interest', value: result.twoTierEarnings - result.compoundEarnings },
-    { name: 'Currency Gain', value: result.currencyGain },
+    {
+      name: `${savingsPlatformName} Interest`,
+      value: result.compoundEarnings,
+      color: '#8884d8',
+    },
+    {
+      name: `${investmentPlatformName} USD Interest`,
+      value: result.twoTierEarnings - result.compoundEarnings,
+      color: '#82ca9d',
+    },
   ];
 
   const containerVariants = {
@@ -158,21 +169,21 @@ export function VisualizationSection({ scenario, result }: VisualizationSectionP
                 <Legend />
                 <Line
                   type="monotone"
-                  dataKey="piggyVestBalance"
+                  dataKey={savingsPlatformName}
                   stroke="#8884d8"
-                  name="PiggyVest Balance"
+                  name={`${savingsPlatformName} Balance`}
                   strokeWidth={2}
                 />
                 <Line
                   type="monotone"
-                  dataKey="usdValue"
+                  dataKey="USD Value"
                   stroke="#82ca9d"
                   name="USD Value"
                   strokeWidth={2}
                 />
                 <Line
                   type="monotone"
-                  dataKey="totalEarnings"
+                  dataKey="Total Earnings"
                   stroke="#ffc658"
                   name="Total Earnings"
                   strokeWidth={2}
@@ -193,7 +204,7 @@ export function VisualizationSection({ scenario, result }: VisualizationSectionP
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
           <Heading size="md" mb={4}>Monthly Interest Comparison</Heading>
           <Box height={chartHeight}>
@@ -204,8 +215,8 @@ export function VisualizationSection({ scenario, result }: VisualizationSectionP
                 <YAxis tickFormatter={formatCurrencyTooltip} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                <Bar dataKey="nairaInterest" fill="#8884d8" name="Naira Interest" />
-                <Bar dataKey="usdInterest" fill="#82ca9d" name="USD Interest (in Naira)" />
+                <Bar dataKey="Naira Interest" fill="#8884d8" />
+                <Bar dataKey="USD Interest" fill="#82ca9d" />
               </BarChart>
             </ResponsiveContainer>
           </Box>
@@ -222,7 +233,7 @@ export function VisualizationSection({ scenario, result }: VisualizationSectionP
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
         >
           <Heading size="md" mb={4}>USD Exchange Rate Trend</Heading>
           <Box height={chartHeight}>
@@ -264,7 +275,7 @@ export function VisualizationSection({ scenario, result }: VisualizationSectionP
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          transition={{ duration: 0.5, delay: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
           gridColumn={gridColumns === 1 ? '1' : 'span 2'}
         >
           <Heading size="md" mb={4}>Investment Composition</Heading>
@@ -283,7 +294,7 @@ export function VisualizationSection({ scenario, result }: VisualizationSectionP
                   dataKey="value"
                 >
                   {pieChartData.map((entry) => (
-                    <Cell key={`cell-${entry.name}`} fill={COLORS[pieChartData.indexOf(entry) % COLORS.length]} />
+                    <Cell key={`cell-${entry.name}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip formatter={formatCurrencyTooltip} />
@@ -291,6 +302,44 @@ export function VisualizationSection({ scenario, result }: VisualizationSectionP
               </PieChart>
             </ResponsiveContainer>
           </Box>
+        </MotionBox>
+
+        {/* Summary Statistics */}
+        <MotionBox
+          p={6}
+          bg={bgColor}
+          borderRadius="xl"
+          borderWidth="1px"
+          borderColor={borderColor}
+          boxShadow="lg"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ duration: 0.5, delay: 1.0 }}
+        >
+          <Heading size="md" mb={4}>Summary Statistics</Heading>
+          <VStack spacing={3} align="stretch">
+            <Box>
+              <Text fontWeight="bold" color="gray.600">Compound Strategy Earnings:</Text>
+              <Text fontSize="lg" fontWeight="bold">{formatCurrency(result.compoundEarnings)}</Text>
+            </Box>
+            <Box>
+              <Text fontWeight="bold" color="gray.600">Two-Tier Strategy Earnings:</Text>
+              <Text fontSize="lg" fontWeight="bold">{formatCurrency(result.twoTierEarnings)}</Text>
+            </Box>
+            <Box>
+              <Text fontWeight="bold" color="gray.600">Additional Earnings:</Text>
+              <Text fontSize="lg" fontWeight="bold" color="green.500">
+                {formatCurrency(result.twoTierEarnings - result.compoundEarnings)}
+              </Text>
+            </Box>
+            <Box>
+              <Text fontWeight="bold" color="gray.600">Currency Gain:</Text>
+              <Text fontSize="lg" fontWeight="bold" color="blue.500">
+                {formatCurrency(result.currencyGain)}
+              </Text>
+            </Box>
+          </VStack>
         </MotionBox>
       </SimpleGrid>
     </VStack>

@@ -11,6 +11,7 @@ import { ThreeTierStrategyPage } from './pages/ThreeTierStrategyPage';
 import { ShoppingListPage } from './pages/ShoppingListPage';
 import theme from './theme';
 import { ThemeToggle } from './components/ThemeToggle';
+import { PlatformConfigWidget } from './components/PlatformConfigWidget';
 import { store } from './store/shopping-store';
 
 const queryClient = new QueryClient({
@@ -30,6 +31,7 @@ function App() {
         <StoreProvider store={store}>
           <ChakraProvider theme={theme}>
             <ThemeToggle />
+            <PlatformConfigWidget />
 
             <Router basename="/">
               <Routes>

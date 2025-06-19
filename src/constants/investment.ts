@@ -5,8 +5,8 @@ export const DEFAULT_SCENARIO: InvestmentScenario = {
   appreciation: 0,
   principal: 10000000,
   monthlySavings: 1000000,
-  piggyVestAnnualRate: 0.18,
-  riseVestAnnualRate: 0.08,
+  savingsPlatformAnnualRate: 0.18,
+  investmentPlatformAnnualRate: 0.08,
   baseExchangeRate: 1650,
   useRealTimeRate: false,
 }
@@ -32,12 +32,12 @@ export const INVESTMENT_RANGES = {
     max: 10000000,
     step: 100000,
   },
-  piggyVestAnnualRate: {
+  savingsPlatformAnnualRate: {
     min: 0.05,
     max: 0.3,
     step: 0.01,
   },
-  riseVestAnnualRate: {
+  investmentPlatformAnnualRate: {
     min: 0.05,
     max: 0.2,
     step: 0.01,

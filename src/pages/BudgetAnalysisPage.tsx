@@ -56,7 +56,7 @@ export function BudgetAnalysisPage() {
     const updatedBalances = balances.map(balance => {
       const allocation = weeklyAllocation[balance.platformId as keyof WeeklyAllocation] || 0;
       if (balance.platformId === 'risevest' && exchangeRateData?.rate) {
-        // Convert NGN allocation to USD for RiseVest
+        // Convert NGN allocation to USD for investment platform
         const usdAllocation = allocation / exchangeRateData.rate;
         return {
           ...balance,

@@ -17,7 +17,7 @@ import {
   Box,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { type PlatformBalance } from '../types/budget';
+import type { PlatformBalance } from '../types/budget';
 import { PlatformManager } from './PlatformManager';
 import { usePlatforms } from '../hooks/usePlatforms';
 

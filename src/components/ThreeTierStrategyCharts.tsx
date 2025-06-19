@@ -2,6 +2,7 @@ import { Box, useBreakpointValue } from '@chakra-ui/react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, CartesianGrid } from 'recharts';
 import type { ThreeTierStrategyResult } from '../types/investment';
 import { formatMonthNumber } from '../utils/investment-calculator';
+import { getSavingsPlatformName, getInvestmentPlatformName } from '../utils/platform-utils';
 
 interface Props {
   result: ThreeTierStrategyResult;
@@ -12,10 +13,13 @@ export function ThreeTierStrategyCharts({ result }: Props) {
   const fontSize = useBreakpointValue({ base: 12, md: 14 });
   const tickCount = useBreakpointValue({ base: 5, md: 10 }) ?? 5;
 
+  const savingsPlatformName = getSavingsPlatformName();
+  const investmentPlatformName = getInvestmentPlatformName();
+
   const data = result.monthlyBreakdown.map((month) => ({
     month: formatMonthNumber(month.month),
-    PiggyVest: month.piggyVestBalance,
-    RiseVest: month.riseVestBalance,
+    [savingsPlatformName]: month.savingsPlatformBalance,
+    [investmentPlatformName]: month.investmentPlatformBalance,
     Vehicle: month.vehicleBalance,
     Total: month.totalBalance,
   }));
@@ -41,22 +45,22 @@ export function ThreeTierStrategyCharts({ result }: Props) {
     };
   });
 
-  // Prepare PiggyVest data
-  const piggyVestData = result.monthlyBreakdown.map((month) => ({
+  // Prepare savings platform data
+  const savingsPlatformData = result.monthlyBreakdown.map((month) => ({
     month: formatMonthNumber(month.month),
-    Balance: month.piggyVestBalance,
-    Interest: month.piggyVestInterest,
-    Savings: month.monthlyPiggyVestSavings,
-    Total: month.piggyVestBalance + month.piggyVestInterest,
+    Balance: month.savingsPlatformBalance,
+    Interest: month.savingsPlatformInterest,
+    Savings: month.monthlySavingsPlatformSavings,
+    Total: month.savingsPlatformBalance + month.savingsPlatformInterest,
   }));
 
-  // Prepare RiseVest data
-  const riseVestData = result.monthlyBreakdown.map((month) => ({
+  // Prepare investment platform data
+  const investmentPlatformData = result.monthlyBreakdown.map((month) => ({
     month: formatMonthNumber(month.month),
-    Balance: month.riseVestBalance,
-    Interest: month.riseVestInterest,
+    Balance: month.investmentPlatformBalance,
+    Interest: month.investmentPlatformInterest,
     CurrencyGain: month.currencyGain,
-    USDValue: month.riseVestBalance / month.exchangeRate,
+    USDValue: month.investmentPlatformBalance / month.exchangeRate,
   }));
 
   return (
@@ -79,8 +83,8 @@ export function ThreeTierStrategyCharts({ result }: Props) {
               contentStyle={{ fontSize }}
             />
             <Legend wrapperStyle={{ fontSize }} />
-            <Line type="monotone" dataKey="PiggyVest" stroke="#3182ce" />
-            <Line type="monotone" dataKey="RiseVest" stroke="#805ad5" />
+            <Line type="monotone" dataKey={savingsPlatformName} stroke="#3182ce" />
+            <Line type="monotone" dataKey={investmentPlatformName} stroke="#805ad5" />
             <Line type="monotone" dataKey="Vehicle" stroke="#ed8936" />
             <Line type="monotone" dataKey="Total" stroke="#38a169" strokeWidth={2} />
           </LineChart>
@@ -121,15 +125,15 @@ export function ThreeTierStrategyCharts({ result }: Props) {
         </ResponsiveContainer>
       </Box>
 
-      {/* PiggyVest Chart */}
+      {/* Savings Platform Chart */}
       <Box w="full" h={chartHeight} mt={8}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={piggyVestData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+          <BarChart data={savingsPlatformData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="month"
               tick={{ fontSize }}
-              interval={Math.floor(piggyVestData.length / tickCount)}
+              interval={Math.floor(savingsPlatformData.length / tickCount)}
             />
             <YAxis
               tick={{ fontSize }}
@@ -149,15 +153,15 @@ export function ThreeTierStrategyCharts({ result }: Props) {
         </ResponsiveContainer>
       </Box>
 
-      {/* RiseVest Chart */}
+      {/* Investment Platform Chart */}
       <Box w="full" h={chartHeight} mt={8}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={riseVestData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+          <BarChart data={investmentPlatformData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="month"
               tick={{ fontSize }}
-              interval={Math.floor(riseVestData.length / tickCount)}
+              interval={Math.floor(investmentPlatformData.length / tickCount)}
             />
             <YAxis
               yAxisId="left"

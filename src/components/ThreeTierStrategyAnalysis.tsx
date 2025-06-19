@@ -29,6 +29,7 @@ import {
 import { FaMoneyBillWave, FaChartLine, FaCar, FaDollarSign } from 'react-icons/fa';
 import type { ThreeTierStrategyResult } from '../types/investment';
 import { formatCurrency, formatMonthNumber } from '../utils/investment-calculator';
+import { getSavingsPlatformName, getInvestmentPlatformName } from '../utils/platform-utils';
 import { ThreeTierStrategyCharts } from './ThreeTierStrategyCharts';
 
 interface ThreeTierStrategyAnalysisProps {
@@ -39,6 +40,9 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const textColor = useColorModeValue('gray.600', 'gray.400');
+
+  const savingsPlatformName = getSavingsPlatformName();
+  const investmentPlatformName = getInvestmentPlatformName();
 
   return (
     <VStack spacing={8} align="stretch">
@@ -87,11 +91,11 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
                 </HStack>
               </StatLabel>
               <StatNumber fontSize={{ base: 'md', md: 'xl' }}>
-                ${result.riseVestResults.finalUsdBalance.toFixed(2)}
+                ${result.investmentPlatformResults.finalUsdBalance.toFixed(2)}
               </StatNumber>
               <StatHelpText fontSize={{ base: "xs", md: "sm" }}>
                 <StatArrow type="increase" />
-                {formatCurrency(result.riseVestResults.currencyGain)} currency gain
+                {formatCurrency(result.investmentPlatformResults.currencyGain)} currency gain
               </StatHelpText>
             </Stat>
 
@@ -124,8 +128,8 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
               display: 'none'
             }
           }}>
-            <Tab whiteSpace="nowrap">PiggyVest Tier</Tab>
-            <Tab whiteSpace="nowrap">RiseVest Tier</Tab>
+            <Tab whiteSpace="nowrap">{savingsPlatformName} Tier</Tab>
+            <Tab whiteSpace="nowrap">{investmentPlatformName} Tier</Tab>
             <Tab whiteSpace="nowrap">Vehicle Tier</Tab>
             <Tab whiteSpace="nowrap">Monthly Breakdown</Tab>
           </TabList>
@@ -133,19 +137,19 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
           <TabPanels>
             <TabPanel>
               <VStack spacing={4} align="stretch">
-                <Heading size="sm">PiggyVest Performance</Heading>
+                <Heading size="sm">{savingsPlatformName} Performance</Heading>
                 <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
                   <Stat>
                     <StatLabel>Total Investment</StatLabel>
-                    <StatNumber>{formatCurrency(result.piggyVestResults.totalInvestment)}</StatNumber>
+                    <StatNumber>{formatCurrency(result.savingsPlatformResults.totalInvestment)}</StatNumber>
                   </Stat>
                   <Stat>
                     <StatLabel>Total Returns</StatLabel>
-                    <StatNumber>{formatCurrency(result.piggyVestResults.totalReturns)}</StatNumber>
+                    <StatNumber>{formatCurrency(result.savingsPlatformResults.totalReturns)}</StatNumber>
                   </Stat>
                   <Stat>
                     <StatLabel>ROI</StatLabel>
-                    <StatNumber>{result.piggyVestResults.roi.toFixed(2)}%</StatNumber>
+                    <StatNumber>{result.savingsPlatformResults.roi.toFixed(2)}%</StatNumber>
                   </Stat>
                 </SimpleGrid>
 
@@ -164,10 +168,10 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
                       {result.monthlyBreakdown.map((month) => (
                         <Tr key={month.month}>
                           <Td>{formatMonthNumber(month.month)}</Td>
-                          <Td isNumeric>{formatCurrency(month.piggyVestBalance)}</Td>
-                          <Td isNumeric>{formatCurrency(month.piggyVestInterest)}</Td>
-                          <Td isNumeric>{formatCurrency(month.monthlyPiggyVestSavings || 0)}</Td>
-                          <Td isNumeric>{formatCurrency(month.piggyVestBalance + month.piggyVestInterest)}</Td>
+                          <Td isNumeric>{formatCurrency(month.savingsPlatformBalance)}</Td>
+                          <Td isNumeric>{formatCurrency(month.savingsPlatformInterest)}</Td>
+                          <Td isNumeric>{formatCurrency(month.monthlySavingsPlatformSavings || 0)}</Td>
+                          <Td isNumeric>{formatCurrency(month.savingsPlatformBalance + month.savingsPlatformInterest)}</Td>
                         </Tr>
                       ))}
                     </Tbody>
@@ -178,19 +182,19 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
 
             <TabPanel>
               <VStack spacing={4} align="stretch">
-                <Heading size="sm">RiseVest Performance</Heading>
+                <Heading size="sm">{investmentPlatformName} Performance</Heading>
                 <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
                   <Stat>
                     <StatLabel>Total Investment</StatLabel>
-                    <StatNumber>{formatCurrency(result.riseVestResults.totalInvestment)}</StatNumber>
+                    <StatNumber>{formatCurrency(result.investmentPlatformResults.totalInvestment)}</StatNumber>
                   </Stat>
                   <Stat>
                     <StatLabel>Total Returns</StatLabel>
-                    <StatNumber>{formatCurrency(result.riseVestResults.totalReturns)}</StatNumber>
+                    <StatNumber>{formatCurrency(result.investmentPlatformResults.totalReturns)}</StatNumber>
                   </Stat>
                   <Stat>
                     <StatLabel>Currency Gain</StatLabel>
-                    <StatNumber>{formatCurrency(result.riseVestResults.currencyGain)}</StatNumber>
+                    <StatNumber>{formatCurrency(result.investmentPlatformResults.currencyGain)}</StatNumber>
                   </Stat>
                 </SimpleGrid>
 
@@ -212,13 +216,13 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
                           <Td>{formatMonthNumber(month.month)}</Td>
                           <Td isNumeric>
                             {month.exchangeRate
-                              ? `$${(month.riseVestBalance / month.exchangeRate).toFixed(2)}`
+                              ? `$${(month.investmentPlatformBalance / month.exchangeRate).toFixed(2)}`
                               : '-'}
                           </Td>
-                          <Td isNumeric>{formatCurrency(month.riseVestBalance)}</Td>
-                          <Td isNumeric>{formatCurrency(month.riseVestInterest)}</Td>
+                          <Td isNumeric>{formatCurrency(month.investmentPlatformBalance)}</Td>
+                          <Td isNumeric>{formatCurrency(month.investmentPlatformInterest)}</Td>
                           <Td isNumeric>{formatCurrency(month.currencyGain)}</Td>
-                          <Td isNumeric>{formatCurrency(month.riseVestBalance + month.riseVestInterest + month.currencyGain)}</Td>
+                          <Td isNumeric>{formatCurrency(month.investmentPlatformBalance + month.investmentPlatformInterest + month.currencyGain)}</Td>
                         </Tr>
                       ))}
                     </Tbody>
@@ -307,8 +311,8 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
                   <Thead>
                     <Tr>
                       <Th whiteSpace="nowrap">Month</Th>
-                      <Th isNumeric whiteSpace="nowrap">PiggyVest</Th>
-                      <Th isNumeric whiteSpace="nowrap">RiseVest</Th>
+                      <Th isNumeric whiteSpace="nowrap">{savingsPlatformName}</Th>
+                      <Th isNumeric whiteSpace="nowrap">{investmentPlatformName}</Th>
                       <Th isNumeric whiteSpace="nowrap">Vehicle</Th>
                       <Th isNumeric whiteSpace="nowrap">Total</Th>
                       <Th isNumeric whiteSpace="nowrap">Currency Gain</Th>
@@ -332,8 +336,8 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
                       return (
                         <Tr key={month.month}>
                           <Td>{formatMonthNumber(month.month)}</Td>
-                          <Td isNumeric>{formatCurrency(month.piggyVestBalance)}</Td>
-                          <Td isNumeric>{formatCurrency(month.riseVestBalance)}</Td>
+                          <Td isNumeric>{formatCurrency(month.savingsPlatformBalance)}</Td>
+                          <Td isNumeric>{formatCurrency(month.investmentPlatformBalance)}</Td>
                           <Td isNumeric>{formatCurrency(month.vehicleBalance)}</Td>
                           <Td isNumeric>{formatCurrency(month.totalBalance)}</Td>
                           <Td isNumeric>{formatCurrency(month.currencyGain)}</Td>
@@ -367,15 +371,15 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
         <VStack spacing={4} align="stretch">
           <Heading size="md">Strategy Insights</Heading>
           <Text color={textColor}>
-            This 3-tier strategy combines the benefits of high-yield savings (PiggyVest), USD exposure (RiseVest),
+            This 3-tier strategy combines the benefits of high-yield savings ({savingsPlatformName}), USD exposure ({investmentPlatformName}),
             and vehicle investments. The strategy has generated a total ROI of {result.totalROI.toFixed(2)}% over
             the analysis period, with {result.vehicleResults.completedCycles} completed vehicle investment cycles
-            and a USD portfolio value of ${result.riseVestResults.finalUsdBalance.toFixed(2)}.
+            and a USD portfolio value of ${result.investmentPlatformResults.finalUsdBalance.toFixed(2)}.
           </Text>
           <Text color={textColor}>
-            The currency gain from USD appreciation contributed {formatCurrency(result.riseVestResults.currencyGain)}
+            The currency gain from USD appreciation contributed {formatCurrency(result.investmentPlatformResults.currencyGain)}
             to your total returns, while vehicle investments generated {formatCurrency(result.vehicleResults.totalReturns)}
-            in returns. Your PiggyVest savings grew to {formatCurrency(result.piggyVestResults.finalBalance)}.
+            in returns. Your {savingsPlatformName} savings grew to {formatCurrency(result.savingsPlatformResults.finalBalance)}.
           </Text>
         </VStack>
       </Box>

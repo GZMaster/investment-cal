@@ -3,8 +3,8 @@ export interface InvestmentScenario {
   appreciation: number
   principal: number
   monthlySavings: number
-  piggyVestAnnualRate: number
-  riseVestAnnualRate: number
+  savingsPlatformAnnualRate: number
+  investmentPlatformAnnualRate: number
   baseExchangeRate: number
   useRealTimeRate: boolean
 }
@@ -20,7 +20,7 @@ export interface InvestmentResult {
 
 export interface MonthlyData {
   month: string
-  piggyVestBalance: number
+  savingsPlatformBalance: number
   nairaInterest: number
   usdAdded: number
   cumulativeUSD: number
@@ -68,15 +68,15 @@ export interface AssetAnalysisResult {
 }
 
 export interface ThreeTierStrategyScenario {
-  // PiggyVest Tier
-  initialPiggyVestBalance: number;
-  monthlyPiggyVestSavings: number;
-  piggyVestInterestRate: number;
-  piggyVestInterestReinvestPercentage: number;
+  // Savings Platform Tier
+  initialSavingsPlatformBalance: number;
+  monthlySavingsPlatformSavings: number;
+  savingsPlatformInterestRate: number;
+  savingsPlatformInterestReinvestPercentage: number;
 
-  // RiseVest Tier
-  initialRiseVestBalance: number;
-  riseVestInterestRate: number;
+  // Investment Platform Tier
+  initialInvestmentPlatformBalance: number;
+  investmentPlatformInterestRate: number;
   usdAppreciationRate: number;
   exchangeRate: number;
 
@@ -102,13 +102,13 @@ export interface ThreeTierStrategyResult {
   totalROI: number;
 
   // Tier-specific Results
-  piggyVestResults: {
+  savingsPlatformResults: {
     totalInvestment: number;
     totalReturns: number;
     finalBalance: number;
     roi: number;
   };
-  riseVestResults: {
+  investmentPlatformResults: {
     totalInvestment: number;
     totalReturns: number;
     finalBalance: number;
@@ -127,15 +127,15 @@ export interface ThreeTierStrategyResult {
   // Monthly Breakdown
   monthlyBreakdown: {
     month: number;
-    piggyVestBalance: number;
-    riseVestBalance: number;
+    savingsPlatformBalance: number;
+    investmentPlatformBalance: number;
     vehicleBalance: number;
     totalBalance: number;
-    piggyVestInterest: number;
-    riseVestInterest: number;
+    savingsPlatformInterest: number;
+    investmentPlatformInterest: number;
     vehicleReturns: number;
     currencyGain: number;
-    monthlyPiggyVestSavings: number;
+    monthlySavingsPlatformSavings: number;
     exchangeRate: number;
     vehicleInvestment: number;
   }[];

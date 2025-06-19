@@ -37,8 +37,8 @@ export function calculateMonthlyData(
 ): MonthlyData {
   const {
     baseExchangeRate,
-    piggyVestAnnualRate,
-    riseVestAnnualRate,
+    savingsPlatformAnnualRate,
+    investmentPlatformAnnualRate,
     monthlySavings,
     principal,
     appreciation,
@@ -49,27 +49,27 @@ export function calculateMonthlyData(
   const effectiveRate = useRealTimeRate
     ? (realTimeRate ?? baseExchangeRate) * (1 + monthlyAppreciationRate) ** month
     : baseExchangeRate * (1 + monthlyAppreciationRate) ** month
-  const monthlyPiggyVestRate = piggyVestAnnualRate / 12
-  const monthlyRiseVestRate = riseVestAnnualRate / 12
+  const monthlySavingsPlatformRate = savingsPlatformAnnualRate / 12
+  const monthlyInvestmentPlatformRate = investmentPlatformAnnualRate / 12
 
-  // Calculate current PiggyVest balance including monthly additions
-  const piggyVestBalance = principal + monthlySavings * (month - 1)
-  // Calculate current month's PiggyVest interest
-  const piggyVestInterest = piggyVestBalance * monthlyPiggyVestRate
+  // Calculate current savings platform balance including monthly additions
+  const savingsPlatformBalance = principal + monthlySavings * (month - 1)
+  // Calculate current month's savings platform interest
+  const savingsPlatformInterest = savingsPlatformBalance * monthlySavingsPlatformRate
 
-  // Convert PiggyVest interest to USD for RiseVest
-  const monthlyUSDConversion = piggyVestInterest / baseExchangeRate
+  // Convert savings platform interest to USD for investment platform
+  const monthlyUSDConversion = savingsPlatformInterest / baseExchangeRate
   const cumulativeUSD = monthlyUSDConversion * month
-  const usdInterest = cumulativeUSD * monthlyRiseVestRate
+  const usdInterest = cumulativeUSD * monthlyInvestmentPlatformRate
   const usdValue = cumulativeUSD * effectiveRate
 
-  // Total earnings = PiggyVest interest + RiseVest USD interest converted to Naira
-  const totalEarnings = piggyVestInterest + usdInterest * effectiveRate
+  // Total earnings = savings platform interest + investment platform USD interest converted to Naira
+  const totalEarnings = savingsPlatformInterest + usdInterest * effectiveRate
 
   return {
     month: `${MONTH_NAMES[(month - 1) % 12]}${totalMonths > 12 ? ` Y${Math.ceil(month / 12)}` : ''}`,
-    piggyVestBalance,
-    nairaInterest: piggyVestInterest,
+    savingsPlatformBalance,
+    nairaInterest: savingsPlatformInterest,
     usdAdded: monthlyUSDConversion,
     cumulativeUSD,
     usdInterest,
@@ -87,10 +87,10 @@ export function calculateInvestmentResult(
     appreciation,
     timePeriod,
     baseExchangeRate,
-    riseVestAnnualRate,
+    investmentPlatformAnnualRate,
     monthlySavings,
     principal,
-    piggyVestAnnualRate,
+    savingsPlatformAnnualRate,
     useRealTimeRate,
   } = scenario
 
@@ -98,48 +98,48 @@ export function calculateInvestmentResult(
   const finalExchangeRate = useRealTimeRate
     ? (realTimeRate ?? baseExchangeRate) * (1 + appreciation / 100) ** timePeriod
     : baseExchangeRate * (1 + appreciation / 100) ** timePeriod
-  const monthlyPiggyVestRate = piggyVestAnnualRate / 12
-  const monthlyRiseVestRate = riseVestAnnualRate / 12
+  const monthlySavingsPlatformRate = savingsPlatformAnnualRate / 12
+  const monthlyInvestmentPlatformRate = investmentPlatformAnnualRate / 12
 
   let currentPrincipal = principal
-  let totalPiggyVestInterest = 0
+  let totalSavingsPlatformInterest = 0
   let cumulativeUSD = 0
   let totalUSDInterest = 0
 
   // Calculate month by month
   for (let month = 1; month <= totalMonths; month++) {
-    // Add monthly savings to PiggyVest at the start of the month
+    // Add monthly savings to savings platform at the start of the month
     if (month > 1) {
       currentPrincipal += monthlySavings
     }
 
-    // Calculate PiggyVest interest for this month
-    const piggyVestInterest = currentPrincipal * monthlyPiggyVestRate
-    totalPiggyVestInterest += piggyVestInterest
+    // Calculate savings platform interest for this month
+    const savingsPlatformInterest = currentPrincipal * monthlySavingsPlatformRate
+    totalSavingsPlatformInterest += savingsPlatformInterest
 
-    // Convert PiggyVest interest to USD for RiseVest
-    const monthlyUSDConversion = piggyVestInterest / baseExchangeRate
+    // Convert savings platform interest to USD for investment platform
+    const monthlyUSDConversion = savingsPlatformInterest / baseExchangeRate
     cumulativeUSD += monthlyUSDConversion
 
-    // Calculate RiseVest USD interest
-    const usdInterest = cumulativeUSD * monthlyRiseVestRate
+    // Calculate investment platform USD interest
+    const usdInterest = cumulativeUSD * monthlyInvestmentPlatformRate
     totalUSDInterest += usdInterest
   }
 
   const finalUSDValue = (cumulativeUSD + totalUSDInterest) * finalExchangeRate
   const currencyAppreciationGain = cumulativeUSD * (finalExchangeRate - baseExchangeRate)
 
-  // For comparison, calculate what would happen if we kept everything in PiggyVest
+  // For comparison, calculate what would happen if we kept everything in savings platform
   const compoundEarnings = calculateCompoundEarnings(
     timePeriod,
     principal,
-    piggyVestAnnualRate,
+    savingsPlatformAnnualRate,
     monthlySavings,
   )
 
-  // Total earnings = PiggyVest interest + RiseVest USD interest converted to Naira
+  // Total earnings = savings platform interest + investment platform USD interest converted to Naira
   const totalTwoTierEarnings =
-    totalPiggyVestInterest + totalUSDInterest * finalExchangeRate + currencyAppreciationGain
+    totalSavingsPlatformInterest + totalUSDInterest * finalExchangeRate + currencyAppreciationGain
 
   return {
     compoundEarnings,
