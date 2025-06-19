@@ -106,9 +106,8 @@ export function LandingPage() {
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
             {tools.map((tool) => {
               const cardContent = (
-                <Tooltip label={tool.status === 'active' ? `Open ${tool.title}` : 'Coming soon!'} hasArrow>
+                <Tooltip label={tool.status === 'active' ? `Open ${tool.title}` : 'Coming soon!'} hasArrow key={tool.id}>
                   <Box
-                    key={tool.id}
                     p={6}
                     bg={bgColor}
                     borderRadius="xl"

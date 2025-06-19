@@ -120,8 +120,8 @@ export const INITIAL_BALANCES: PlatformBalance[] = [
 ]
 
 export function getInitialWeeklyAllocation(platforms: Platform[]): WeeklyAllocation {
-  return platforms.reduce((acc, platform) => ({
-    ...acc,
-    [platform.id]: 0
-  }), {});
+  return platforms.reduce((acc, platform) => {
+    acc[platform.id] = 0;
+    return acc;
+  }, {} as WeeklyAllocation);
 }

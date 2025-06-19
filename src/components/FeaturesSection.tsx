@@ -97,9 +97,9 @@ export function FeaturesSection() {
           </Stack>
 
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={10}>
-            {features.map((feature, index) => (
+            {features.map((feature) => (
               <Feature
-                key={index}
+                key={feature.title}
                 title={feature.title}
                 text={feature.text}
                 icon={feature.icon}
