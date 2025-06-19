@@ -36,8 +36,6 @@ interface VisualizationSectionProps {
   result: InvestmentResult;
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-
 const formatCurrencyTooltip = (value: number) => formatCurrency(value);
 const formatExchangeRateTooltip = (value: number) => `₦${value.toLocaleString()}`;
 
