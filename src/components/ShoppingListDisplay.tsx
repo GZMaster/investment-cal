@@ -13,18 +13,13 @@ import {
   useDisclosure,
   VStack,
 } from '@chakra-ui/react';
-import { useStoreActions, useStoreState } from 'easy-peasy';
 import { useState } from 'react';
 import { FaCheck, FaChevronDown, FaChevronUp, FaTrash } from 'react-icons/fa';
 import type { ShoppingItem } from '../types/shopping';
+import { useShoppingStore } from '../hooks/useShoppingStore';
 
 export function ShoppingListDisplay() {
-  const items = useStoreState((state: any) => state.items);
-  const removeItem = useStoreActions((actions: any) => actions.removeItem);
-  const toggleItem = useStoreActions((actions: any) => actions.toggleItem);
-  const clearCompleted = useStoreActions((actions: any) => actions.clearCompleted);
-  const currency = useStoreState((state: any) => state.currency);
-
+  const { items, removeItem, toggleItem, clearCompleted, currency } = useShoppingStore();
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const { isOpen: showCompleted, onToggle: toggleShowCompleted } = useDisclosure();
 

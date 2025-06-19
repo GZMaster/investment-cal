@@ -12,7 +12,7 @@ import { ShoppingListPage } from './pages/ShoppingListPage';
 import theme from './theme';
 import { ThemeToggle } from './components/ThemeToggle';
 import { PlatformConfigWidget } from './components/PlatformConfigWidget';
-import { store } from './store/shopping-store';
+import { store } from './store/global-store';
 
 const queryClient = new QueryClient({
   defaultOptions: {

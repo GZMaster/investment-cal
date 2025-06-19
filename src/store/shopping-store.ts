@@ -1,15 +1,12 @@
-import { action, createStore } from 'easy-peasy';
+import { action } from 'easy-peasy';
 import type { ShoppingItem } from '../types/shopping';
-import type { GlobalPlatformSettings, PlatformConfig } from '../types/platform';
-import { DEFAULT_PLATFORM_CONFIG } from '../types/platform';
 
-// Local storage keys
-const STORAGE_KEYS = {
+// Local storage keys for shopping list
+const SHOPPING_STORAGE_KEYS = {
   ITEMS: 'shopping-list-items',
   BUDGET: 'shopping-list-budget',
   CURRENCY: 'shopping-list-currency',
   CATEGORIES: 'shopping-list-categories',
-  PLATFORM_SETTINGS: 'platform-settings',
 };
 
 // Helper functions for localStorage
@@ -31,9 +28,9 @@ const loadFromStorage = (key: string, defaultValue: any) => {
   }
 };
 
-const clearStorage = () => {
+const clearShoppingStorage = () => {
   try {
-    for (const key of Object.values(STORAGE_KEYS)) {
+    for (const key of Object.values(SHOPPING_STORAGE_KEYS)) {
       localStorage.removeItem(key);
     }
   } catch (error) {
@@ -43,7 +40,7 @@ const clearStorage = () => {
 
 // Load initial data from localStorage
 const loadItems = (): ShoppingItem[] => {
-  const storedItems = loadFromStorage(STORAGE_KEYS.ITEMS, []);
+  const storedItems = loadFromStorage(SHOPPING_STORAGE_KEYS.ITEMS, []);
   return storedItems.map((item: any) => ({
     ...item,
     createdAt: new Date(item.createdAt),
@@ -51,25 +48,20 @@ const loadItems = (): ShoppingItem[] => {
   }));
 };
 
-const loadBudget = (): number => loadFromStorage(STORAGE_KEYS.BUDGET, 1000000);
-const loadCurrency = (): 'NGN' | 'USD' => loadFromStorage(STORAGE_KEYS.CURRENCY, 'NGN');
-const loadCategories = (): string[] => loadFromStorage(STORAGE_KEYS.CATEGORIES, [
+const loadBudget = (): number => loadFromStorage(SHOPPING_STORAGE_KEYS.BUDGET, 1000000);
+const loadCurrency = (): 'NGN' | 'USD' => loadFromStorage(SHOPPING_STORAGE_KEYS.CURRENCY, 'NGN');
+const loadCategories = (): string[] => loadFromStorage(SHOPPING_STORAGE_KEYS.CATEGORIES, [
   'Electronics', 'Clothing', 'Food', 'Home', 'Transport', 'Entertainment'
 ]);
 
-const loadPlatformSettings = (): GlobalPlatformSettings => {
-  return loadFromStorage(STORAGE_KEYS.PLATFORM_SETTINGS, DEFAULT_PLATFORM_CONFIG);
-};
-
-const shoppingStore = {
+export const shoppingStore = {
   // State - Load from localStorage or use defaults
   items: loadItems(),
   totalBudget: loadBudget(),
   currency: loadCurrency(),
   categories: loadCategories(),
-  platformSettings: loadPlatformSettings(),
 
-  // Actions
+  // Shopping List Actions
   addItem: action((state: any, payload: Omit<ShoppingItem, 'id' | 'createdAt' | 'isCompleted'>) => {
     const newItem: ShoppingItem = {
       ...payload,
@@ -78,7 +70,7 @@ const shoppingStore = {
       isCompleted: false,
     };
     state.items.push(newItem);
-    saveToStorage(STORAGE_KEYS.ITEMS, state.items);
+    saveToStorage(SHOPPING_STORAGE_KEYS.ITEMS, state.items);
   }),
 
   updateItem: action((state: any, payload: { id: string; updates: Partial<ShoppingItem> }) => {
@@ -86,13 +78,13 @@ const shoppingStore = {
     const itemIndex = state.items.findIndex((item: ShoppingItem) => item.id === id);
     if (itemIndex !== -1) {
       state.items[itemIndex] = { ...state.items[itemIndex], ...updates };
-      saveToStorage(STORAGE_KEYS.ITEMS, state.items);
+      saveToStorage(SHOPPING_STORAGE_KEYS.ITEMS, state.items);
     }
   }),
 
   removeItem: action((state: any, payload: string) => {
     state.items = state.items.filter((item: ShoppingItem) => item.id !== payload);
-    saveToStorage(STORAGE_KEYS.ITEMS, state.items);
+    saveToStorage(SHOPPING_STORAGE_KEYS.ITEMS, state.items);
   }),
 
   toggleItem: action((state: any, payload: string) => {
@@ -100,35 +92,35 @@ const shoppingStore = {
     if (item) {
       item.isCompleted = !item.isCompleted;
       item.completedAt = item.isCompleted ? new Date() : undefined;
-      saveToStorage(STORAGE_KEYS.ITEMS, state.items);
+      saveToStorage(SHOPPING_STORAGE_KEYS.ITEMS, state.items);
     }
   }),
 
   clearCompleted: action((state: any) => {
     state.items = state.items.filter((item: ShoppingItem) => !item.isCompleted);
-    saveToStorage(STORAGE_KEYS.ITEMS, state.items);
+    saveToStorage(SHOPPING_STORAGE_KEYS.ITEMS, state.items);
   }),
 
   setTotalBudget: action((state: any, payload: number) => {
     state.totalBudget = payload;
-    saveToStorage(STORAGE_KEYS.BUDGET, payload);
+    saveToStorage(SHOPPING_STORAGE_KEYS.BUDGET, payload);
   }),
 
   setCurrency: action((state: any, payload: 'NGN' | 'USD') => {
     state.currency = payload;
-    saveToStorage(STORAGE_KEYS.CURRENCY, payload);
+    saveToStorage(SHOPPING_STORAGE_KEYS.CURRENCY, payload);
   }),
 
   addCategory: action((state: any, payload: string) => {
     if (!state.categories.includes(payload)) {
       state.categories.push(payload);
-      saveToStorage(STORAGE_KEYS.CATEGORIES, state.categories);
+      saveToStorage(SHOPPING_STORAGE_KEYS.CATEGORIES, state.categories);
     }
   }),
 
   removeCategory: action((state: any, payload: string) => {
     state.categories = state.categories.filter((category: string) => category !== payload);
-    saveToStorage(STORAGE_KEYS.CATEGORIES, state.categories);
+    saveToStorage(SHOPPING_STORAGE_KEYS.CATEGORIES, state.categories);
   }),
 
   clearAllData: action((state: any) => {
@@ -136,44 +128,6 @@ const shoppingStore = {
     state.totalBudget = 1000000;
     state.currency = 'NGN';
     state.categories = ['Electronics', 'Clothing', 'Food', 'Home', 'Transport', 'Entertainment'];
-    clearStorage();
+    clearShoppingStorage();
   }),
-
-  // Platform Settings Actions
-  updatePlatformSettings: action((state: any, payload: Partial<GlobalPlatformSettings>) => {
-    state.platformSettings = { ...state.platformSettings, ...payload };
-    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
-  }),
-
-  updatePrimarySavingsPlatform: action((state: any, payload: PlatformConfig) => {
-    state.platformSettings.primarySavingsPlatform = payload;
-    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
-  }),
-
-  updatePrimaryInvestmentPlatform: action((state: any, payload: PlatformConfig) => {
-    state.platformSettings.primaryInvestmentPlatform = payload;
-    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
-  }),
-
-  setDefaultCurrency: action((state: any, payload: 'NGN' | 'USD') => {
-    state.platformSettings.defaultCurrency = payload;
-    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
-  }),
-
-  setExchangeRate: action((state: any, payload: number) => {
-    state.platformSettings.exchangeRate = payload;
-    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
-  }),
-
-  setPlatformConfigured: action((state: any, payload: boolean) => {
-    state.platformSettings.isConfigured = payload;
-    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
-  }),
-
-  resetPlatformSettings: action((state: any) => {
-    state.platformSettings = DEFAULT_PLATFORM_CONFIG;
-    saveToStorage(STORAGE_KEYS.PLATFORM_SETTINGS, state.platformSettings);
-  }),
-};
-
-export const store = createStore(shoppingStore); 
+}; 

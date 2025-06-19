@@ -17,7 +17,7 @@ import {
   NumberDecrementStepper,
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import { useStoreActions, useStoreState } from 'easy-peasy';
+import { useShoppingStore } from '../hooks/useShoppingStore';
 
 export function ShoppingListForm() {
   const [formData, setFormData] = useState({
@@ -29,9 +29,7 @@ export function ShoppingListForm() {
     notes: '',
   });
 
-  const addItem = useStoreActions((actions: any) => actions.addItem);
-  const categories = useStoreState((state: any) => state.categories);
-  const addCategory = useStoreActions((actions: any) => actions.addCategory);
+  const { addItem, categories, addCategory } = useShoppingStore();
 
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');

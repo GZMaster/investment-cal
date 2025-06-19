@@ -16,13 +16,10 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import { useStoreState, useStoreActions } from 'easy-peasy';
+import { useShoppingStore } from '../hooks/useShoppingStore';
 
 export function BudgetSettings() {
-  const totalBudget = useStoreState((state: any) => state.totalBudget);
-  const currency = useStoreState((state: any) => state.currency);
-  const setTotalBudget = useStoreActions((actions: any) => actions.setTotalBudget);
-  const setCurrency = useStoreActions((actions: any) => actions.setCurrency);
+  const { totalBudget, currency, setTotalBudget, setCurrency } = useShoppingStore();
 
   const [budget, setBudget] = useState(totalBudget);
   const [selectedCurrency, setSelectedCurrency] = useState(currency);

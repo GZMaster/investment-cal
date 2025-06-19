@@ -21,14 +21,11 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useRef } from 'react';
-import { useStoreState, useStoreActions } from 'easy-peasy';
+import { useShoppingStore } from '../hooks/useShoppingStore';
 import { FaTrash } from 'react-icons/fa';
 
 export function ShoppingListSummary() {
-  const items = useStoreState((state: any) => state.items);
-  const totalBudget = useStoreState((state: any) => state.totalBudget);
-  const currency = useStoreState((state: any) => state.currency);
-  const clearAllData = useStoreActions((actions: any) => actions.clearAllData);
+  const { items, totalBudget, currency, clearAllData } = useShoppingStore();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);

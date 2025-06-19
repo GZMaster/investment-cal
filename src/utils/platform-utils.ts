@@ -1,4 +1,4 @@
-import { store } from '../store/shopping-store';
+import { store } from '../store/global-store';
 
 export function getPlatformNames() {
   const state = store.getState();
