@@ -9,6 +9,7 @@ import { CalculatorPage } from './pages/CalculatorPage';
 import { LandingPage } from './pages/LandingPage';
 import { ThreeTierStrategyPage } from './pages/ThreeTierStrategyPage';
 import { ShoppingListPage } from './pages/ShoppingListPage';
+import { CryptoPortfolioPage } from './pages/CryptoPortfolioPage';
 import theme from './theme';
 import { ThemeToggle } from './components/ThemeToggle';
 import { PlatformConfigWidget } from './components/PlatformConfigWidget';
@@ -41,6 +42,7 @@ function App() {
                 <Route path="/vehicle-analysis" element={<AssetAnalysisPage />} />
                 <Route path="/three-tier-strategy" element={<ThreeTierStrategyPage />} />
                 <Route path="/shopping-list" element={<ShoppingListPage />} />
+                <Route path="/crypto-portfolio" element={<CryptoPortfolioPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Router>

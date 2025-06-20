@@ -1,0 +1,233 @@
+export interface CryptoAsset {
+  id: string;
+  symbol: string;
+  name: string;
+  quantity: number;
+  averageCost: number;
+  currentPrice: number;
+  stakingRewards: number;
+  defiYield: number;
+  blockchain: string;
+  walletAddress?: string;
+  purchaseDate: Date;
+  lastUpdated: Date;
+  category: 'defi' | 'layer1' | 'layer2' | 'meme' | 'stablecoin' | 'governance' | 'other';
+  riskLevel: 'low' | 'medium' | 'high' | 'very-high';
+}
+
+export interface CryptoPortfolio {
+  id: string;
+  name: string;
+  assets: CryptoAsset[];
+  totalValue: number;
+  totalCost: number;
+  unrealizedGains: number;
+  totalStakingRewards: number;
+  totalDefiYield: number;
+  createdAt: Date;
+  lastUpdated: Date;
+}
+
+export interface CryptoAnalysis {
+  totalValue: number;
+  totalCost: number;
+  unrealizedGains: number;
+  totalStakingRewards: number;
+  totalDefiYield: number;
+  portfolioDiversification: DiversificationMetrics;
+  riskMetrics: CryptoRiskMetrics;
+  taxImplications: CryptoTaxImplications;
+  performanceMetrics: CryptoPerformanceMetrics;
+}
+
+export interface DiversificationMetrics {
+  byCategory: Record<string, number>;
+  byBlockchain: Record<string, number>;
+  byRiskLevel: Record<string, number>;
+  concentrationRisk: number;
+  topHoldings: CryptoAsset[];
+}
+
+export interface CryptoRiskMetrics {
+  volatility: number;
+  beta: number;
+  sharpeRatio: number;
+  maxDrawdown: number;
+  valueAtRisk: number;
+  correlationMatrix: Record<string, Record<string, number>>;
+  riskScore: number;
+}
+
+export interface CryptoTaxImplications {
+  shortTermGains: number;
+  longTermGains: number;
+  stakingRewardsTaxable: number;
+  defiYieldTaxable: number;
+  totalTaxLiability: number;
+  taxOptimizationSuggestions: TaxSuggestion[];
+}
+
+export interface CryptoPerformanceMetrics {
+  totalReturn: number;
+  annualizedReturn: number;
+  monthlyReturns: MonthlyReturn[];
+  benchmarkComparison: BenchmarkComparison;
+  riskAdjustedReturn: number;
+}
+
+export interface MonthlyReturn {
+  month: string;
+  return: number;
+  cumulativeReturn: number;
+}
+
+export interface BenchmarkComparison {
+  benchmark: string;
+  benchmarkReturn: number;
+  outperformance: number;
+  correlation: number;
+}
+
+export interface TaxSuggestion {
+  type: 'harvest-losses' | 'optimize-holdings' | 'staking-strategy' | 'defi-optimization';
+  description: string;
+  potentialSavings: number;
+  priority: 'high' | 'medium' | 'low';
+}
+
+export interface CryptoMarketData {
+  symbol: string;
+  price: number;
+  marketCap: number;
+  volume24h: number;
+  priceChange24h: number;
+  priceChange7d: number;
+  circulatingSupply: number;
+  maxSupply?: number;
+  lastUpdated: Date;
+}
+
+export interface StakingInfo {
+  assetId: string;
+  stakingRate: number;
+  minimumStake: number;
+  lockPeriod: number;
+  rewards: number;
+  lastRewardDate: Date;
+}
+
+export interface DefiPosition {
+  id: string;
+  protocol: string;
+  asset: string;
+  deposited: number;
+  borrowed?: number;
+  apy: number;
+  rewards: number;
+  riskLevel: 'low' | 'medium' | 'high';
+  lastUpdated: Date;
+}
+
+export interface CryptoTransaction {
+  id: string;
+  assetId: string;
+  type: 'buy' | 'sell' | 'stake' | 'unstake' | 'defi-deposit' | 'defi-withdraw' | 'transfer';
+  quantity: number;
+  price: number;
+  fee: number;
+  date: Date;
+  exchange?: string;
+  walletAddress?: string;
+  notes?: string;
+}
+
+export interface CryptoPortfolioSettings {
+  defaultCurrency: 'USD' | 'NGN' | 'EUR';
+  riskTolerance: 'conservative' | 'moderate' | 'aggressive';
+  rebalancingFrequency: 'weekly' | 'monthly' | 'quarterly' | 'never';
+  enableStaking: boolean;
+  enableDefi: boolean;
+  taxOptimization: boolean;
+  alerts: {
+    priceAlerts: boolean;
+    rebalancingAlerts: boolean;
+    stakingRewardsAlerts: boolean;
+    riskAlerts: boolean;
+  };
+}
+
+export interface CryptoAlert {
+  id: string;
+  type: 'price' | 'rebalancing' | 'staking' | 'risk';
+  assetId?: string;
+  condition: 'above' | 'below' | 'change';
+  value: number;
+  isActive: boolean;
+  createdAt: Date;
+  triggeredAt?: Date;
+}
+
+// Default portfolio settings
+export const DEFAULT_CRYPTO_SETTINGS: CryptoPortfolioSettings = {
+  defaultCurrency: 'USD',
+  riskTolerance: 'moderate',
+  rebalancingFrequency: 'monthly',
+  enableStaking: true,
+  enableDefi: true,
+  taxOptimization: true,
+  alerts: {
+    priceAlerts: true,
+    rebalancingAlerts: true,
+    stakingRewardsAlerts: true,
+    riskAlerts: true,
+  },
+};
+
+// Sample crypto assets for testing
+export const SAMPLE_CRYPTO_ASSETS: CryptoAsset[] = [
+  {
+    id: 'bitcoin',
+    symbol: 'BTC',
+    name: 'Bitcoin',
+    quantity: 0.5,
+    averageCost: 45000,
+    currentPrice: 52000,
+    stakingRewards: 0,
+    defiYield: 0,
+    blockchain: 'Bitcoin',
+    purchaseDate: new Date('2023-01-15'),
+    lastUpdated: new Date(),
+    category: 'layer1',
+    riskLevel: 'medium',
+  },
+  {
+    id: 'ethereum',
+    symbol: 'ETH',
+    name: 'Ethereum',
+    quantity: 2.5,
+    averageCost: 2800,
+    currentPrice: 3200,
+    stakingRewards: 0.05,
+    defiYield: 0.12,
+    blockchain: 'Ethereum',
+    purchaseDate: new Date('2023-03-20'),
+    lastUpdated: new Date(),
+    category: 'layer1',
+    riskLevel: 'medium',
+  },
+  {
+    id: 'cardano',
+    symbol: 'ADA',
+    name: 'Cardano',
+    quantity: 5000,
+    averageCost: 0.45,
+    currentPrice: 0.52,
+    stakingRewards: 25,
+    defiYield: 0,
+    blockchain: 'Cardano',
+    purchaseDate: new Date('2023-02-10'),
+    lastUpdated: new Date(),
+    category: 'layer1',
+    riskLevel: 'high',
+  },
+]; 

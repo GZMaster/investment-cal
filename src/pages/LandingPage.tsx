@@ -13,7 +13,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet-async';
-import { FaCalculator, FaCar, FaChartLine, FaLock, FaLayerGroup, FaShoppingCart } from 'react-icons/fa';
+import { FaCalculator, FaCar, FaChartLine, FaLock, FaLayerGroup, FaShoppingCart, FaBitcoin } from 'react-icons/fa';
 import { Link as RouterLink } from 'react-router-dom';
 import favicon from '../assets/favicon.svg';
 import { FeaturesSection } from '../components/FeaturesSection';
@@ -51,6 +51,14 @@ const tools = [
     description: `Combine ${getSavingsPlatformName()} savings, ${getInvestmentPlatformName()} USD investments, and vehicle investments in one comprehensive strategy.`,
     icon: FaLayerGroup,
     path: '/three-tier-strategy',
+    status: 'active',
+  },
+  {
+    id: 'crypto-portfolio',
+    title: 'Cryptocurrency Portfolio Tracker',
+    description: 'Track and analyze your cryptocurrency investments with multi-chain support, staking rewards, DeFi yield farming, and comprehensive portfolio management tools.',
+    icon: FaBitcoin,
+    path: '/crypto-portfolio',
     status: 'active',
   },
   {
