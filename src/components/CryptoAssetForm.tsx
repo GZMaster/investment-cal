@@ -34,7 +34,6 @@ import {
 } from '@chakra-ui/react';
 import { useState, useEffect, useCallback } from 'react';
 import { FaSearch, FaBitcoin, FaPlus } from 'react-icons/fa';
-import { useCryptoStore } from '../hooks/useCryptoStore';
 import { useSearchCryptocurrencies, useStakingInfo, useDefiYieldRates, useTrendingCryptocurrencies } from '../hooks/useCryptoData';
 import type { CryptoAsset } from '../types/crypto';
 

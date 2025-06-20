@@ -7,7 +7,12 @@ import type {
   CryptoPortfolioSettings,
   CryptoAlert,
 } from '../types/crypto';
-import { SAMPLE_CRYPTO_ASSETS, DEFAULT_CRYPTO_SETTINGS } from '../types/crypto';
+import {
+  SAMPLE_CRYPTO_ASSETS,
+  SAMPLE_CRYPTO_TRANSACTIONS,
+  SAMPLE_CRYPTO_ALERTS,
+  DEFAULT_CRYPTO_SETTINGS
+} from '../types/crypto';
 import { dexscreenerAPI } from '../utils/dexscreener-api';
 
 // Local storage keys
@@ -68,23 +73,34 @@ const loadInitialPortfolio = (): CryptoPortfolio => {
 
 const loadInitialTransactions = (): CryptoTransaction[] => {
   const stored = loadFromStorage(CRYPTO_TRANSACTIONS_KEY, []);
-  return stored.map((transaction: any) => ({
-    ...transaction,
-    date: new Date(transaction.date),
-  }));
+  if (stored.length > 0) {
+    return stored.map((transaction: any) => ({
+      ...transaction,
+      date: new Date(transaction.date),
+    }));
+  }
+
+  // Return sample transactions if no stored data
+  return SAMPLE_CRYPTO_TRANSACTIONS;
 };
 
 const loadInitialSettings = (): CryptoPortfolioSettings => {
-  return loadFromStorage(CRYPTO_SETTINGS_KEY, DEFAULT_CRYPTO_SETTINGS);
+  const stored = loadFromStorage(CRYPTO_SETTINGS_KEY, null);
+  return stored || DEFAULT_CRYPTO_SETTINGS;
 };
 
 const loadInitialAlerts = (): CryptoAlert[] => {
   const stored = loadFromStorage(CRYPTO_ALERTS_KEY, []);
-  return stored.map((alert: any) => ({
-    ...alert,
-    createdAt: new Date(alert.createdAt),
-    triggeredAt: alert.triggeredAt ? new Date(alert.triggeredAt) : undefined,
-  }));
+  if (stored.length > 0) {
+    return stored.map((alert: any) => ({
+      ...alert,
+      createdAt: new Date(alert.createdAt),
+      triggeredAt: alert.triggeredAt ? new Date(alert.triggeredAt) : undefined,
+    }));
+  }
+
+  // Return sample alerts if no stored data
+  return SAMPLE_CRYPTO_ALERTS;
 };
 
 export const cryptoStore = {
@@ -108,6 +124,41 @@ export const cryptoStore = {
     state.portfolio.assets.push(newAsset);
     state.portfolio.lastUpdated = new Date();
     saveToStorage(CRYPTO_PORTFOLIO_KEY, state.portfolio);
+
+    // Auto-generate a buy transaction for the new asset
+    const buyTransaction: Omit<CryptoTransaction, 'id'> = {
+      assetId: newAsset.id,
+      type: 'buy',
+      quantity: asset.quantity,
+      price: asset.averageCost,
+      fee: 0,
+      date: asset.purchaseDate,
+      notes: `Initial purchase of ${asset.symbol}`,
+    };
+
+    if (!state.transactions) {
+      state.transactions = [];
+    }
+    const newTransaction = { ...buyTransaction, id: `tx-${Date.now()}` };
+    state.transactions.push(newTransaction);
+    saveToStorage(CRYPTO_TRANSACTIONS_KEY, state.transactions);
+
+    // Auto-generate a price alert for the new asset (10% above current price)
+    const priceAlert: Omit<CryptoAlert, 'id'> = {
+      type: 'price',
+      assetId: newAsset.id,
+      condition: 'above',
+      value: asset.currentPrice * 1.1, // 10% above current price
+      isActive: true,
+      createdAt: new Date(),
+    };
+
+    if (!state.alerts) {
+      state.alerts = [];
+    }
+    const newAlert = { ...priceAlert, id: `alert-${Date.now()}` };
+    state.alerts.push(newAlert);
+    saveToStorage(CRYPTO_ALERTS_KEY, state.alerts);
   }),
 
   updateAsset: action((state: any, { id, updates }: { id: string; updates: Partial<CryptoAsset> }) => {

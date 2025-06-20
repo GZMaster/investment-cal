@@ -10,8 +10,6 @@ import {
   Stat,
   StatLabel,
   StatNumber,
-  StatHelpText,
-  StatArrow,
   Icon,
   Spinner,
   Alert,

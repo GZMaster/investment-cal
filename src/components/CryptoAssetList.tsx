@@ -18,20 +18,38 @@ import {
   Tr,
   VStack,
   useColorModeValue,
-  useDisclosure
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  SimpleGrid,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  Divider,
 } from '@chakra-ui/react';
 import { FaEdit, FaEllipsisV, FaEye, FaPlus, FaTrash } from 'react-icons/fa';
 import { useCryptoStore } from '../hooks/useCryptoStore';
 import type { CryptoAsset } from '../types/crypto';
 import { CryptoAssetForm } from './CryptoAssetForm';
+import { useState } from 'react';
 
 export function CryptoAssetList() {
-  const { portfolio, removeAsset, addAsset } = useCryptoStore();
+  const { portfolio, removeAsset, addAsset, updateAsset } = useCryptoStore();
   const { isOpen: isFormOpen, onOpen: onFormOpen, onClose: onFormClose } = useDisclosure();
+  const { isOpen: isDetailsOpen, onOpen: onDetailsOpen, onClose: onDetailsClose } = useDisclosure();
+  const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
+
+  const [selectedAsset, setSelectedAsset] = useState<CryptoAsset | null>(null);
 
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const textColor = useColorModeValue('gray.600', 'gray.400');
+  const modalBg = useColorModeValue('white', 'gray.800');
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -83,6 +101,48 @@ export function CryptoAssetList() {
   const handleAddAsset = (asset: Omit<CryptoAsset, 'id'>) => {
     addAsset(asset);
     onFormClose();
+  };
+
+  const handleEditAsset = (asset: CryptoAsset) => {
+    setSelectedAsset(asset);
+    onEditOpen();
+  };
+
+  const handleUpdateAsset = (updates: Omit<CryptoAsset, 'id'>) => {
+    if (selectedAsset) {
+      updateAsset({
+        id: selectedAsset.id,
+        updates: {
+          ...updates,
+          lastUpdated: new Date(),
+        }
+      });
+      onEditClose();
+      setSelectedAsset(null);
+    }
+  };
+
+  const handleViewDetails = (asset: CryptoAsset) => {
+    setSelectedAsset(asset);
+    onDetailsOpen();
+  };
+
+  const calculateAssetStats = (asset: CryptoAsset) => {
+    const assetValue = asset.quantity * asset.currentPrice;
+    const assetCost = asset.quantity * asset.averageCost;
+    const gainLoss = assetValue - assetCost;
+    const gainLossPercentage = assetCost > 0 ? (gainLoss / assetCost) * 100 : 0;
+    const stakingRewards = asset.stakingRewards > 0 ? (assetValue * asset.stakingRewards) / 100 : 0;
+    const defiYield = asset.defiYield > 0 ? (assetValue * asset.defiYield) / 100 : 0;
+
+    return {
+      assetValue,
+      assetCost,
+      gainLoss,
+      gainLossPercentage,
+      stakingRewards,
+      defiYield,
+    };
   };
 
   return (
@@ -219,10 +279,16 @@ export function CryptoAssetList() {
                           size="sm"
                         />
                         <MenuList>
-                          <MenuItem icon={<Icon as={FaEye} />}>
+                          <MenuItem
+                            icon={<Icon as={FaEye} />}
+                            onClick={() => handleViewDetails(asset)}
+                          >
                             View Details
                           </MenuItem>
-                          <MenuItem icon={<Icon as={FaEdit} />}>
+                          <MenuItem
+                            icon={<Icon as={FaEdit} />}
+                            onClick={() => handleEditAsset(asset)}
+                          >
                             Edit Asset
                           </MenuItem>
                           <MenuItem
@@ -260,6 +326,119 @@ export function CryptoAssetList() {
           onCancel={onFormClose}
         />
       )}
+
+      {/* View Details Modal */}
+      <Modal isOpen={isDetailsOpen} onClose={onDetailsClose} size="lg">
+        <ModalOverlay />
+        <ModalContent bg={modalBg}>
+          <ModalHeader>Asset Details</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            {selectedAsset && (
+              <VStack spacing={6} align="stretch">
+                <Box>
+                  <Text fontSize="lg" fontWeight="bold" mb={2}>
+                    {selectedAsset.name} ({selectedAsset.symbol})
+                  </Text>
+                  <Text color={textColor} fontSize="sm">
+                    {selectedAsset.blockchain} • {selectedAsset.category}
+                  </Text>
+                </Box>
+
+                <SimpleGrid columns={2} spacing={4}>
+                  <Stat>
+                    <StatLabel>Current Value</StatLabel>
+                    <StatNumber>{formatCurrency(calculateAssetStats(selectedAsset).assetValue)}</StatNumber>
+                  </Stat>
+                  <Stat>
+                    <StatLabel>Total Cost</StatLabel>
+                    <StatNumber>{formatCurrency(calculateAssetStats(selectedAsset).assetCost)}</StatNumber>
+                  </Stat>
+                  <Stat>
+                    <StatLabel>P&L</StatLabel>
+                    <StatNumber color={getGainLossColor(calculateAssetStats(selectedAsset).gainLoss)}>
+                      {formatCurrency(calculateAssetStats(selectedAsset).gainLoss)}
+                    </StatNumber>
+                    <StatHelpText color={getGainLossColor(calculateAssetStats(selectedAsset).gainLossPercentage)}>
+                      {formatPercentage(calculateAssetStats(selectedAsset).gainLossPercentage)}
+                    </StatHelpText>
+                  </Stat>
+                  <Stat>
+                    <StatLabel>Quantity</StatLabel>
+                    <StatNumber>
+                      {selectedAsset.quantity.toLocaleString(undefined, {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 8,
+                      })}
+                    </StatNumber>
+                  </Stat>
+                </SimpleGrid>
+
+                <Divider />
+
+                <SimpleGrid columns={2} spacing={4}>
+                  <Box>
+                    <Text fontWeight="semibold" mb={2}>Price Information</Text>
+                    <VStack align="start" spacing={1}>
+                      <Text fontSize="sm">Current Price: {formatCurrency(selectedAsset.currentPrice)}</Text>
+                      <Text fontSize="sm">Average Cost: {formatCurrency(selectedAsset.averageCost)}</Text>
+                      <Text fontSize="sm">Purchase Date: {selectedAsset.purchaseDate.toLocaleDateString()}</Text>
+                    </VStack>
+                  </Box>
+                  <Box>
+                    <Text fontWeight="semibold" mb={2}>Yield Information</Text>
+                    <VStack align="start" spacing={1}>
+                      <Text fontSize="sm">Staking Rewards: {selectedAsset.stakingRewards > 0 ? `${selectedAsset.stakingRewards}%` : 'N/A'}</Text>
+                      <Text fontSize="sm">DeFi Yield: {selectedAsset.defiYield > 0 ? `${selectedAsset.defiYield}%` : 'N/A'}</Text>
+                      <Text fontSize="sm">Risk Level:
+                        <Badge ml={2} colorScheme={getRiskColor(selectedAsset.riskLevel)} variant="subtle">
+                          {selectedAsset.riskLevel}
+                        </Badge>
+                      </Text>
+                    </VStack>
+                  </Box>
+                </SimpleGrid>
+
+                {selectedAsset.stakingRewards > 0 && (
+                  <Box>
+                    <Text fontWeight="semibold" mb={2}>Staking Rewards</Text>
+                    <Text color="green.500" fontSize="lg">
+                      {formatCurrency(calculateAssetStats(selectedAsset).stakingRewards)} annually
+                    </Text>
+                  </Box>
+                )}
+
+                {selectedAsset.defiYield > 0 && (
+                  <Box>
+                    <Text fontWeight="semibold" mb={2}>DeFi Yield</Text>
+                    <Text color="purple.500" fontSize="lg">
+                      {formatCurrency(calculateAssetStats(selectedAsset).defiYield)} annually
+                    </Text>
+                  </Box>
+                )}
+              </VStack>
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
+      {/* Edit Asset Modal */}
+      <Modal isOpen={isEditOpen} onClose={onEditClose} size="xl">
+        <ModalOverlay />
+        <ModalContent bg={modalBg}>
+          <ModalHeader>Edit Asset</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            {selectedAsset && (
+              <CryptoAssetForm
+                onSave={handleUpdateAsset}
+                onCancel={onEditClose}
+                initialData={selectedAsset}
+              />
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 } 
