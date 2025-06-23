@@ -2,14 +2,10 @@ import {
   SimpleGrid,
   Card,
   CardBody,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  StatArrow,
   Tooltip,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
+import { StatCard } from './ui';
 
 const MotionCard = motion(Card);
 
@@ -37,18 +33,16 @@ export function SummaryCardsSection({
         transition={{ duration: 0.4 }}
       >
         <CardBody>
-          <Stat>
-            <StatLabel>Total Savings</StatLabel>
-            <StatNumber>{formatAmount(totalSavings, 'NGN')}</StatNumber>
-            <StatHelpText>
-              <Tooltip label="Monthly increase" hasArrow>
-                <StatArrow type="increase" aria-label="increase" />
-              </Tooltip>
-              {formatAmount(monthlyIncome, 'NGN')} monthly
-            </StatHelpText>
-          </Stat>
+          <StatCard
+            label="Total Savings"
+            value={formatAmount(totalSavings, 'NGN')}
+            helpText={`${formatAmount(monthlyIncome, 'NGN')} monthly`}
+            arrowType="increase"
+            size="lg"
+          />
         </CardBody>
       </MotionCard>
+
       <MotionCard
         whileHover={{ scale: 1.03 }}
         initial={{ opacity: 0, y: 20 }}
@@ -56,18 +50,16 @@ export function SummaryCardsSection({
         transition={{ duration: 0.4, delay: 0.1 }}
       >
         <CardBody>
-          <Stat>
-            <StatLabel>Total Debt</StatLabel>
-            <StatNumber>{formatAmount(totalDebt, 'NGN')}</StatNumber>
-            <StatHelpText>
-              <Tooltip label="Monthly income" hasArrow>
-                <StatArrow type="decrease" aria-label="decrease" />
-              </Tooltip>
-              {formatAmount(weeklyIncome * 4, 'NGN')} monthly income
-            </StatHelpText>
-          </Stat>
+          <StatCard
+            label="Total Debt"
+            value={formatAmount(totalDebt, 'NGN')}
+            helpText={`${formatAmount(weeklyIncome * 4, 'NGN')} monthly income`}
+            arrowType="decrease"
+            size="lg"
+          />
         </CardBody>
       </MotionCard>
+
       <MotionCard
         whileHover={{ scale: 1.03 }}
         initial={{ opacity: 0, y: 20 }}
@@ -75,16 +67,13 @@ export function SummaryCardsSection({
         transition={{ duration: 0.4, delay: 0.2 }}
       >
         <CardBody>
-          <Stat>
-            <StatLabel>Monthly Income</StatLabel>
-            <StatNumber>{formatAmount(monthlyIncome, 'NGN')}</StatNumber>
-            <StatHelpText>
-              <Tooltip label="Weekly income" hasArrow>
-                <StatArrow type="increase" aria-label="increase" />
-              </Tooltip>
-              {formatAmount(weeklyIncome, 'NGN')} weekly
-            </StatHelpText>
-          </Stat>
+          <StatCard
+            label="Monthly Income"
+            value={formatAmount(monthlyIncome, 'NGN')}
+            helpText={`${formatAmount(weeklyIncome, 'NGN')} weekly`}
+            arrowType="increase"
+            size="lg"
+          />
         </CardBody>
       </MotionCard>
     </SimpleGrid>

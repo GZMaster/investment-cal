@@ -1,18 +1,12 @@
 import {
   VStack,
-  FormControl,
-  FormLabel,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
   Button,
   useColorModeValue,
   Box,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import type { AssetAnalysisScenario } from '../types/investment';
+import { FormField } from './ui';
 
 interface AssetAnalysisFormProps {
   onSubmit: (scenario: AssetAnalysisScenario) => void;
@@ -23,7 +17,7 @@ export function AssetAnalysisForm({ onSubmit }: AssetAnalysisFormProps) {
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   const [scenario, setScenario] = useState<AssetAnalysisScenario>({
-    initialSavings: 3000000,
+    initialSavings: 10000000,
     monthlySavings: 1000000,
     vehicleInvestment: {
       investmentCost: 3300000,
@@ -51,176 +45,104 @@ export function AssetAnalysisForm({ onSubmit }: AssetAnalysisFormProps) {
       borderColor={borderColor}
     >
       <VStack spacing={4} align="stretch">
-        <FormControl>
-          <FormLabel>Initial Savings</FormLabel>
-          <NumberInput
-            value={scenario.initialSavings}
-            onChange={(_, value) =>
-              setScenario((prev) => ({ ...prev, initialSavings: value }))
-            }
-            min={0}
-            step={100000}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </FormControl>
+        <FormField
+          type="number"
+          label="Initial Savings"
+          value={scenario.initialSavings}
+          onChange={(value) => setScenario((prev) => ({ ...prev, initialSavings: value }))}
+          min={0}
+          step={100000}
+        />
 
-        <FormControl>
-          <FormLabel>Monthly Savings</FormLabel>
-          <NumberInput
-            value={scenario.monthlySavings}
-            onChange={(_, value) =>
-              setScenario((prev) => ({ ...prev, monthlySavings: value }))
-            }
-            min={0}
-            step={100000}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </FormControl>
+        <FormField
+          type="number"
+          label="Monthly Savings"
+          value={scenario.monthlySavings}
+          onChange={(value) => setScenario((prev) => ({ ...prev, monthlySavings: value }))}
+          min={0}
+          step={100000}
+        />
 
-        <FormControl>
-          <FormLabel>Investment Cost per Vehicle</FormLabel>
-          <NumberInput
-            value={scenario.vehicleInvestment.investmentCost}
-            onChange={(_, value) =>
-              setScenario((prev) => ({
-                ...prev,
-                vehicleInvestment: {
-                  ...prev.vehicleInvestment,
-                  investmentCost: value,
-                },
-              }))
-            }
-            min={0}
-            step={100000}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </FormControl>
+        <FormField
+          type="number"
+          label="Investment Cost per Vehicle"
+          value={scenario.vehicleInvestment.investmentCost}
+          onChange={(value) => setScenario((prev) => ({
+            ...prev,
+            vehicleInvestment: {
+              ...prev.vehicleInvestment,
+              investmentCost: value,
+            },
+          }))}
+          min={0}
+          step={100000}
+        />
 
-        <FormControl>
-          <FormLabel>Return Amount per Vehicle</FormLabel>
-          <NumberInput
-            value={scenario.vehicleInvestment.returnAmount}
-            onChange={(_, value) =>
-              setScenario((prev) => ({
-                ...prev,
-                vehicleInvestment: {
-                  ...prev.vehicleInvestment,
-                  returnAmount: value,
-                },
-              }))
-            }
-            min={0}
-            step={100000}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </FormControl>
+        <FormField
+          type="number"
+          label="Return Amount per Vehicle"
+          value={scenario.vehicleInvestment.returnAmount}
+          onChange={(value) => setScenario((prev) => ({
+            ...prev,
+            vehicleInvestment: {
+              ...prev.vehicleInvestment,
+              returnAmount: value,
+            },
+          }))}
+          min={0}
+          step={100000}
+        />
 
-        <FormControl>
-          <FormLabel>Investment Period (months)</FormLabel>
-          <NumberInput
-            value={scenario.vehicleInvestment.investmentPeriod}
-            onChange={(_, value) =>
-              setScenario((prev) => ({
-                ...prev,
-                vehicleInvestment: {
-                  ...prev.vehicleInvestment,
-                  investmentPeriod: value,
-                },
-              }))
-            }
-            min={1}
-            max={60}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </FormControl>
+        <FormField
+          type="number"
+          label="Investment Period (months)"
+          value={scenario.vehicleInvestment.investmentPeriod}
+          onChange={(value) => setScenario((prev) => ({
+            ...prev,
+            vehicleInvestment: {
+              ...prev.vehicleInvestment,
+              investmentPeriod: value,
+            },
+          }))}
+          min={1}
+          max={60}
+        />
 
-        <FormControl>
-          <FormLabel>Investment Cycle (months)</FormLabel>
-          <NumberInput
-            value={scenario.vehicleInvestment.cyclePeriod}
-            onChange={(_, value) =>
-              setScenario((prev) => ({
-                ...prev,
-                vehicleInvestment: {
-                  ...prev.vehicleInvestment,
-                  cyclePeriod: value,
-                },
-              }))
-            }
-            min={1}
-            max={12}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </FormControl>
+        <FormField
+          type="number"
+          label="Investment Cycle (months)"
+          value={scenario.vehicleInvestment.cyclePeriod}
+          onChange={(value) => setScenario((prev) => ({
+            ...prev,
+            vehicleInvestment: {
+              ...prev.vehicleInvestment,
+              cyclePeriod: value,
+            },
+          }))}
+          min={1}
+          max={12}
+        />
 
-        <FormControl>
-          <FormLabel>Vehicles per Cycle</FormLabel>
-          <NumberInput
-            value={scenario.vehiclesPerCycle}
-            onChange={(_, value) =>
-              setScenario((prev) => ({
-                ...prev,
-                vehiclesPerCycle: value,
-              }))
-            }
-            min={1}
-            max={10}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </FormControl>
+        <FormField
+          type="number"
+          label="Vehicles per Cycle"
+          value={scenario.vehiclesPerCycle}
+          onChange={(value) => setScenario((prev) => ({
+            ...prev,
+            vehiclesPerCycle: value,
+          }))}
+          min={1}
+          max={10}
+        />
 
-        <FormControl>
-          <FormLabel>Analysis Period (months)</FormLabel>
-          <NumberInput
-            value={scenario.analysisPeriod}
-            onChange={(_, value) =>
-              setScenario((prev) => ({ ...prev, analysisPeriod: value }))
-            }
-            min={1}
-            max={60}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </FormControl>
+        <FormField
+          type="number"
+          label="Analysis Period (months)"
+          value={scenario.analysisPeriod}
+          onChange={(value) => setScenario((prev) => ({ ...prev, analysisPeriod: value }))}
+          min={1}
+          max={60}
+        />
 
         <Button type="submit" colorScheme="blue" size="lg">
           Calculate
