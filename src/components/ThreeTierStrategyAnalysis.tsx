@@ -262,9 +262,9 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
                     </Thead>
                     <Tbody>
                       {result.monthlyBreakdown.map((month) => {
-                        const isInvestmentMonth = month.month % 3 === 0;
-                        const monthsSinceLastInvestment = month.month % 3;
-                        const isReturningMonth = monthsSinceLastInvestment > 0 && monthsSinceLastInvestment <= 12;
+                        const isInvestmentMonth = month.month % result.cyclePeriod === 0;
+                        const monthsSinceLastInvestment = month.month % result.cyclePeriod;
+                        const isReturningMonth = monthsSinceLastInvestment > 0 && monthsSinceLastInvestment <= result.investmentPeriod;
 
                         let vehicleStatus = '';
                         if (isInvestmentMonth) {
@@ -322,9 +322,9 @@ export function ThreeTierStrategyAnalysis({ result }: ThreeTierStrategyAnalysisP
                   <Tbody>
                     {result.monthlyBreakdown.map((month) => {
                       // Calculate vehicle investment status
-                      const isInvestmentMonth = month.month % 3 === 0;
-                      const monthsSinceLastInvestment = month.month % 3;
-                      const isReturningMonth = monthsSinceLastInvestment > 0 && monthsSinceLastInvestment <= 12;
+                      const isInvestmentMonth = month.month % result.cyclePeriod === 0;
+                      const monthsSinceLastInvestment = month.month % result.cyclePeriod;
+                      const isReturningMonth = monthsSinceLastInvestment > 0 && monthsSinceLastInvestment <= result.investmentPeriod;
 
                       let vehicleStatus = '';
                       if (isInvestmentMonth) {

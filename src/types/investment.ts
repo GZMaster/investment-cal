@@ -124,6 +124,10 @@ export interface ThreeTierStrategyResult {
     completedCycles: number;
   };
 
+  // Vehicle Investment Settings (for analysis display)
+  cyclePeriod: number;
+  investmentPeriod: number;
+
   // Monthly Breakdown
   monthlyBreakdown: {
     month: number;

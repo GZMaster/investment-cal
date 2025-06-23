@@ -164,6 +164,10 @@ export function calculateThreeTierStrategy(scenario: ThreeTierStrategyScenario):
       completedCycles: Math.floor(analysisPeriod / vehicleInvestment.cyclePeriod),
     },
 
+    // Vehicle Investment Settings (for analysis display)
+    cyclePeriod: vehicleInvestment.cyclePeriod,
+    investmentPeriod: vehicleInvestment.investmentPeriod,
+
     monthlyBreakdown,
   };
 }
